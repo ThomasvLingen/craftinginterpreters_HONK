@@ -4,16 +4,113 @@
 
 #include "Lexer.hpp"
 
+#include <iostream>
+#include <sstream>
+
+#include "Interpreter.hpp"
+
 namespace Honk
 {
-    Lexer::Lexer(const std::string& source)
-    : _source(source)
-    {
+    SingleCharTokenMap Lexer::single_char_tokens = {
+        {'(', (+TokenType::PAREN_OPEN)},  {')', (+TokenType::PAREN_CLOSE)},
+        {'{', (+TokenType::CURLY_OPEN)},  {'}', (+TokenType::CURLY_CLOSE)},
+        {',', (+TokenType::COMMA)},
+        {';', (+TokenType::SEMICOLON)},
+        {'+', (+TokenType::PLUS)}, {'-', (+TokenType::MINUS)},
+        {'*', (+TokenType::STAR)}, {'/', (+TokenType::SLASH)},
+    };
 
+    Lexer::Lexer(const Interpreter& parent, const std::string& source)
+    :_honk(parent)
+    , _source(source)
+    , _current_char(this->_source.begin())
+    {
     }
 
-    TokenStream Lexer::lex_input()
+    std::optional<TokenStream> Lexer::lex_input()
     {
-        return {};
+        // Reset lexing
+        this->_current_line = 1;
+        this->_current_char = this->_source.begin();
+
+        while (!this->_is_at_end()) {
+            this->_token_start = this->_current_char;
+            this->_lex_token();
+        }
+
+        if (this->_has_error) {
+            return std::nullopt;
+        }
+
+        return this->_tokens;
+    }
+
+    bool Lexer::_is_at_end()
+    {
+        return this->_current_char == this->_source.end();
+    }
+
+    void Lexer::_lex_token()
+    {
+        char c = this->_advance();
+
+        // Whitespace is ignored
+        if (isblank(c)) {
+            return;
+        }
+
+        // Newlines = next line
+        if (c == '\n') {
+            this->_current_line++;
+            return;
+        }
+
+        // Single character tokens
+        std::optional<TokenType> single_char_token = this->_get_singlechar_token(c);
+        if (single_char_token) {
+            this->_add_token(single_char_token.value());
+            return;
+        }
+
+        // Well, I don't know what to do with this.
+        this->_error_unknown_char(c);
+    }
+
+    void Lexer::_add_token(TokenType type, TokenLiteral value)
+    {
+        this->_tokens.push_back(Token {
+            type, this->_get_token_text(), value, this->_current_line
+        });
+    }
+
+    std::string Lexer::_get_token_text()
+    {
+        return std::string(this->_token_start, this->_current_char);
+    }
+
+    char Lexer::_advance()
+    {
+        return *(this->_current_char)++;
+    }
+
+    std::optional<TokenType> Lexer::_get_singlechar_token(char c)
+    {
+        SingleCharTokenMap& token_map = Lexer::single_char_tokens;
+
+        if (token_map.find(c) != token_map.end()) {
+            return token_map[c];
+        }
+
+        return std::nullopt;
+    }
+
+    void Lexer::_error_unknown_char(char c)
+    {
+        this->_has_error = true;
+
+        std::stringstream error_message;
+        error_message <<  "Unknown character \'" << c << "\', wtf is this?";
+
+        this->_honk.fuck(this->_current_line, error_message.str());
     }
 }

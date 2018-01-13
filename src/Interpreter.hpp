@@ -9,13 +9,20 @@
 
 namespace Honk
 {
+    using std::string;
+
     struct Interpreter
     {
-        void run_from_file(const std::string& path);
+        void run_from_file(const string& path);
         void run_repl();
 
+        void fuck(uint32_t line, const string& message) const;
+        void report_message(const string& type, uint32_t line, const string& message) const;
+
     private:
-        void _run_code(const std::string& source);
+        string _current_file = "";
+
+        void _run_code(const string& source);
     };
 }
 

@@ -10,15 +10,16 @@
 
 #include <variant>
 
+#include "third_party/enum.h"
+
 namespace Honk
 {
-    enum struct TokenType
-    {
-        IDENTIFIER, INT, BOOL,
+    BETTER_ENUM(TokenType, int,
+        IDENTIFIER, INT, BOOL, STRING,
 
         PAREN_OPEN, PAREN_CLOSE, CURLY_OPEN, CURLY_CLOSE,
         COMMA, SEMICOLON,
-        PLUS, MIN, STAR, SLASH,
+        PLUS, MINUS, STAR, SLASH,
 
         NOT,
 
@@ -31,21 +32,28 @@ namespace Honk
         IF, ELSE, WHILE, FOR,
 
         END_OF_FILE
-    };
+    )
 
+    using TokenLiteral = std::variant<
+        std::string,
+        int32_t,
+        bool
+    >;
+
+    // The order of members is used in aggregate initialisation.
+    // Don't fuck with it.
     struct Token
     {
         TokenType type;
         std::string text;
 
-        std::variant<
-            int32_t,
-            std::string,
-            bool
-        > value;
+        TokenLiteral value;
 
         // For error reporting
         uint32_t line;
+
+        std::string to_str() const;
+        bool has_value() const;
     };
 }
 

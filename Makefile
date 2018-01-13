@@ -9,7 +9,7 @@ LD = $(CC)
 # Wextra = extra warnings
 # g = debug symbols
 # std=c++1z = C++17
-INCLUDE_PATHS = -Isrc/
+INCLUDE_PATHS = -Isrc/ -I./
 COMPILER_FLAGS = -Wall -Wextra -g -std=c++1z $(INCLUDE_PATHS)
 
 # Clang tidy
