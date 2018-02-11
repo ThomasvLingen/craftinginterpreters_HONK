@@ -66,9 +66,16 @@ namespace Honk
         }
 
         // Single character tokens
-        std::optional<TokenType> single_char_token = this->_get_singlechar_token(c);
-        if (single_char_token) {
-            this->_add_token(single_char_token.value());
+        if (this->_add_singlechar_token(c)) {
+            return;
+        }
+
+        // Not + double char tokens
+        if (this->_add_single_or_double(c, '!', '=', TokenType::NOT, TokenType::NOT_EQUALS)
+            || this->_add_single_or_double(c, '=', '=', TokenType::ASSIGNMENT, TokenType::EQUALS)
+            || this->_add_single_or_double(c, '<', '=', TokenType::LESS_THAN, TokenType::LESS_THAN_EQ)
+            || this->_add_single_or_double(c, '>', '=', TokenType::GREATER, TokenType::GREATER_EQ))
+        {
             return;
         }
 
@@ -93,17 +100,6 @@ namespace Honk
         return *(this->_current_char)++;
     }
 
-    std::optional<TokenType> Lexer::_get_singlechar_token(char c)
-    {
-        SingleCharTokenMap& token_map = Lexer::single_char_tokens;
-
-        if (token_map.find(c) != token_map.end()) {
-            return token_map[c];
-        }
-
-        return std::nullopt;
-    }
-
     void Lexer::_error_unknown_char(char c)
     {
         this->_has_error = true;
@@ -112,5 +108,44 @@ namespace Honk
         error_message <<  "Unknown character \'" << c << "\', wtf is this?";
 
         this->_honk.fuck(this->_current_line, error_message.str());
+    }
+
+    bool Lexer::_match(char to_match)
+    {
+        if (this->_is_at_end()) {
+            return false;
+        }
+
+        if (*this->_current_char == to_match) {
+            this->_current_char++;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool Lexer::_add_singlechar_token(char c)
+    {
+        SingleCharTokenMap& token_map = Lexer::single_char_tokens;
+
+        if (token_map.find(c) == token_map.end()) {
+            return false;
+        }
+
+        this->_add_token(token_map[c]);
+        return true;
+    }
+
+    bool Lexer::_add_single_or_double(char c, char single_c, char double_c, TokenType single_type, TokenType double_type)
+    {
+        if (c != single_c) {
+            return false;
+        }
+
+        this->_add_token(
+            this->_match(double_c) ? double_type : single_type
+        );
+
+        return true;
     }
 }

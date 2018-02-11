@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <optional>
 
 #include "Lexer/Token.hpp"
 
@@ -39,9 +38,11 @@ namespace Honk
         bool _has_error = false; // When an error is encountered, this gets set to true
 
         char _advance();
+        bool _match(char to_match);
         void _lex_token();
 
-        std::optional<TokenType> _get_singlechar_token(char c);
+        bool _add_singlechar_token(char c);
+        bool _add_single_or_double(char c, char single_c, char double_c, TokenType single_type, TokenType double_type);
 
         void _add_token(TokenType type, TokenLiteral value = "");
 
