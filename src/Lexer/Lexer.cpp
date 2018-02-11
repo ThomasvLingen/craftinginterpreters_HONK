@@ -65,6 +65,12 @@ namespace Honk
             return;
         }
 
+        // Comment = skip to end of line
+        if (c == '/' && _match('/')) {
+            this->_advance_until('\n');
+            return;
+        }
+
         // Single character tokens
         if (this->_add_singlechar_token(c)) {
             return;
@@ -147,5 +153,23 @@ namespace Honk
         );
 
         return true;
+    }
+
+    void Lexer::_advance_until(char to_match)
+    {
+        while (this->_peek() != to_match && !this->_is_at_end()) {
+            this->_advance();
+        }
+
+        this->_advance(); // Get on the matched char
+    }
+
+    char Lexer::_peek()
+    {
+        if (this->_is_at_end()) {
+            return '\0';
+        }
+
+        return *(std::next(this->_current_char));
     }
 }

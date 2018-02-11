@@ -38,7 +38,9 @@ namespace Honk
         bool _has_error = false; // When an error is encountered, this gets set to true
 
         char _advance();
+        char _peek();
         bool _match(char to_match);
+        void _advance_until(char to_match);
         void _lex_token();
 
         bool _add_singlechar_token(char c);
