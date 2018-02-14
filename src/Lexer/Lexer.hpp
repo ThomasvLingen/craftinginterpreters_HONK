@@ -45,6 +45,7 @@ namespace Honk
 
         bool _add_singlechar_token(char c);
         bool _add_single_or_double(char c, char single_c, char double_c, TokenType single_type, TokenType double_type);
+        bool _add_string_literal(char c);
 
         void _add_token(TokenType type, TokenLiteral value = "");
 
@@ -52,6 +53,7 @@ namespace Honk
         bool _is_at_end();
 
         void _error_unknown_char(char c);
+        void _error_unclosed_string();
     };
 }
 

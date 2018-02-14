@@ -6,6 +6,8 @@
 
 }
 // I am a comment
+""
+"some string"
 (!= /) {
 }
 !;

@@ -85,6 +85,10 @@ namespace Honk
             return;
         }
 
+        if (this->_add_string_literal(c)) {
+            return;
+        }
+
         // Well, I don't know what to do with this.
         this->_error_unknown_char(c);
     }
@@ -112,6 +116,17 @@ namespace Honk
 
         std::stringstream error_message;
         error_message <<  "Unknown character \'" << c << "\', wtf is this?";
+
+        this->_honk.fuck(this->_current_line, error_message.str());
+    }
+
+    void Lexer::_error_unclosed_string()
+    {
+        this->_has_error = true;
+
+        std::string unclosed_string = this->_get_token_text();
+        std::stringstream error_message;
+        error_message << "Unclosed string: " << unclosed_string;
 
         this->_honk.fuck(this->_current_line, error_message.str());
     }
@@ -171,5 +186,35 @@ namespace Honk
         }
 
         return *(std::next(this->_current_char));
+    }
+
+    // This is a bit messy. Maybe re-do.
+    bool Lexer::_add_string_literal(char c)
+    {
+        if (c != '"') {
+            return false;
+        }
+
+        // Edge case, immediate newline
+        if (this->_is_at_end() || *this->_current_char == '\n') {
+            this->_error_unclosed_string();
+            return true;
+        }
+
+        while (*this->_current_char != '"') {
+            if (this->_peek() == '\n' || this->_is_at_end()) {
+                this->_advance();
+                this->_error_unclosed_string();
+                return true;
+            }
+
+            this->_advance();
+        }
+
+        this->_advance(); // Grab the closing " as well
+
+        std::string string_text = this->_get_token_text();
+        this->_add_token(TokenType::STRING, string_text.substr(1, string_text.size() - 2));
+        return true;
     }
 }
