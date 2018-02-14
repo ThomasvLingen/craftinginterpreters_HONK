@@ -95,6 +95,11 @@ namespace Honk
             return;
         }
 
+        // Identifiers & keywords
+        if (this->_add_ident_or_keyword(c)) {
+            return;
+        }
+
         // Well, I don't know what to do with this.
         this->_error_unknown_char(c);
     }
@@ -229,6 +234,25 @@ namespace Honk
         }
 
         this->_add_token(TokenType::INT, std::stoi(this->_get_token_text()));
+        return true;
+    }
+
+    bool isidentifier(char c) {
+        return isalnum(c) || c == '_';
+    }
+
+    bool Lexer::_add_ident_or_keyword(char c)
+    {
+        if (!isidentifier(c)) {
+            return false;
+        }
+
+        while (this->_match(isidentifier)) {
+            // Eat the identifier...
+        }
+
+        // TODO: Add support for keywords and such
+        this->_add_token(TokenType::IDENTIFIER, this->_get_token_text());
         return true;
     }
 }
