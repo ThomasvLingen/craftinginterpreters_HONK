@@ -85,7 +85,13 @@ namespace Honk
             return;
         }
 
+        // String literals
         if (this->_add_string_literal(c)) {
+            return;
+        }
+
+        // Integer literals
+        if (this->_add_integer_literal(c)) {
             return;
         }
 
@@ -133,16 +139,9 @@ namespace Honk
 
     bool Lexer::_match(char to_match)
     {
-        if (this->_is_at_end()) {
-            return false;
-        }
-
-        if (*this->_current_char == to_match) {
-            this->_current_char++;
-            return true;
-        } else {
-            return false;
-        }
+        return this->_match([&to_match] (char c) {
+            return c == to_match;
+        });
     }
 
     bool Lexer::_add_singlechar_token(char c)
@@ -189,6 +188,7 @@ namespace Honk
     }
 
     // This is a bit messy. Maybe re-do.
+    // Maybe _match could be used better here.
     bool Lexer::_add_string_literal(char c)
     {
         if (c != '"') {
@@ -215,6 +215,20 @@ namespace Honk
 
         std::string string_text = this->_get_token_text();
         this->_add_token(TokenType::STRING, string_text.substr(1, string_text.size() - 2));
+        return true;
+    }
+
+    bool Lexer::_add_integer_literal(char c)
+    {
+        if (!isdigit(c)) {
+            return false;
+        }
+
+        while (this->_match(isdigit)) {
+            // Just keep eating the number
+        }
+
+        this->_add_token(TokenType::INT, std::stoi(this->_get_token_text()));
         return true;
     }
 }

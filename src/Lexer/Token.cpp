@@ -20,7 +20,7 @@ namespace Honk
         std::stringstream str;
 
         str << "["   << this->type._to_string() << "]"
-            << " \"" << this->text              << "\"";
+            << " '" << this->text              << "'";
 
         if (this->has_value()) {
             auto value_variant_printer = [&str] (const auto& value) {

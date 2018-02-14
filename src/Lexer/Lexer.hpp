@@ -39,13 +39,29 @@ namespace Honk
 
         char _advance();
         char _peek();
+        void _lex_token();
+
+        template <typename Callable>
+        bool _match(Callable comparator)
+        {
+            if (this->_is_at_end()) {
+                return false;
+            }
+
+            if (comparator(*this->_current_char)) {
+                this->_advance();
+                return true;
+            } else {
+                return false;
+            }
+        }
         bool _match(char to_match);
         void _advance_until(char to_match);
-        void _lex_token();
 
         bool _add_singlechar_token(char c);
         bool _add_single_or_double(char c, char single_c, char double_c, TokenType single_type, TokenType double_type);
         bool _add_string_literal(char c);
+        bool _add_integer_literal(char c);
 
         void _add_token(TokenType type, TokenLiteral value = "");
 
