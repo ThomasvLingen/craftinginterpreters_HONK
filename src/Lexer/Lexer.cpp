@@ -6,8 +6,10 @@
 
 #include <iostream>
 #include <sstream>
+#include <optional>
 
 #include "Interpreter.hpp"
+#include "Util.hpp"
 
 namespace Honk
 {
@@ -18,6 +20,13 @@ namespace Honk
         {';', (+TokenType::SEMICOLON)},
         {'+', (+TokenType::PLUS)}, {'-', (+TokenType::MINUS)},
         {'*', (+TokenType::STAR)}, {'/', (+TokenType::SLASH)},
+    };
+
+    KeywordTokenMap Lexer::keyword_tokens = {
+        {"fun",   (+TokenType::FUN)},   {"return", (+TokenType::RETURN)},
+        {"const", (+TokenType::CONST)}, {"var",    (+TokenType::VAR)},    {"null",  (+TokenType::VAL_NULL)},
+        {"if",    (+TokenType::IF)},    {"else",   (+TokenType::ELSE)},   {"while", (+TokenType::WHILE)},    {"for", (+TokenType::FOR)},
+        {"and",   (+TokenType::AND)},   {"or",     (+TokenType::OR)},
     };
 
     Lexer::Lexer(const Interpreter& parent, const std::string& source)
@@ -251,8 +260,45 @@ namespace Honk
             // Eat the identifier...
         }
 
-        // TODO: Add support for keywords and such
-        this->_add_token(TokenType::IDENTIFIER, this->_get_token_text());
+        std::string token_text = this->_get_token_text();
+
+        // Is it a bool or a keyword?
+        if (this->_add_bool_literal(token_text)
+            || this->_add_keyword(token_text))
+        {
+            return true;
+        }
+
+        // Ok, then it's just a regular identifier
+        this->_add_token(TokenType::IDENTIFIER, token_text);
+        return true;
+    }
+
+    static std::unordered_map<std::string, bool> _bool_map = {
+        {"true", true}, {"false", false}
+    };
+
+    bool Lexer::_add_bool_literal(const std::string& token_text)
+    {
+        std::optional<bool> bool_value = Util::map_get_optional(_bool_map, token_text);
+
+        if (!bool_value) {
+            return false;
+        }
+
+        this->_add_token(TokenType::BOOL, bool_value.value());
+        return true;
+    }
+
+    bool Lexer::_add_keyword(const std::string& token_text)
+    {
+        std::optional<TokenType::_enumerated> keyword_type = Util::map_get_optional(Lexer::keyword_tokens, token_text);
+
+        if (!keyword_type) {
+            return false;
+        }
+
+        this->_add_token(keyword_type.value());
         return true;
     }
 }

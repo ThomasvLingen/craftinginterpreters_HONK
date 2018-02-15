@@ -17,6 +17,7 @@ namespace Honk
 
     using TokenStream = std::vector<Token>;
     using SingleCharTokenMap = std::unordered_map<char, TokenType::_enumerated>;
+    using KeywordTokenMap = std::unordered_map<std::string, TokenType::_enumerated>;
 
     struct Lexer
     {
@@ -27,6 +28,7 @@ namespace Honk
 
     private:
         static SingleCharTokenMap single_char_tokens;
+        static KeywordTokenMap keyword_tokens;
         const Interpreter& _honk;
 
         std::string _source;
@@ -63,6 +65,8 @@ namespace Honk
         bool _add_string_literal(char c);
         bool _add_integer_literal(char c);
         bool _add_ident_or_keyword(char c);
+        bool _add_bool_literal(const std::string& token_text);
+        bool _add_keyword(const std::string& token_text);
 
         void _add_token(TokenType type, TokenLiteral value = "");
 

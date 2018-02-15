@@ -30,6 +30,7 @@ namespace Honk
         FUN, RETURN,
         CONST, VAR, ASSIGNMENT, VAL_NULL,
         IF, ELSE, WHILE, FOR,
+        AND, OR,
 
         END_OF_FILE
     )
