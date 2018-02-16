@@ -55,6 +55,7 @@ namespace Honk
 
         std::string to_str() const;
         bool has_value() const;
+        static std::string literal_to_str(const TokenLiteral& literal);
     };
 }
 

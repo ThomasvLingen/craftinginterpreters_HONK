@@ -23,14 +23,22 @@ namespace Honk
             << " '" << this->text              << "'";
 
         if (this->has_value()) {
-            auto value_variant_printer = [&str] (const auto& value) {
-                str << " = " << value;
-            };
-
-            std::visit(value_variant_printer, this->value);
+            str << " = " << Token::literal_to_str(this->value);
         }
 
         str << "\n";
+
+        return str.str();
+    }
+
+    std::string Token::literal_to_str(const TokenLiteral& literal)
+    {
+        std::stringstream str;
+
+        auto value_variant_printer = [&str] (const auto& value) {
+            str << value;
+        };
+        std::visit(value_variant_printer, literal);
 
         return str.str();
     }
