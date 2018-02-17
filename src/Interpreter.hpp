@@ -7,12 +7,16 @@
 
 #include <string>
 
+#include "Lexer/Token.hpp"
+
 namespace Honk
 {
     using std::string;
 
     struct Interpreter
     {
+        Interpreter(bool debug);
+
         void run_from_file(const string& path);
         void run_repl();
 
@@ -20,9 +24,11 @@ namespace Honk
         void report_message(const string& type, uint32_t line, const string& message) const;
 
     private:
+        bool _debug = false;
         string _current_file = "";
 
         void _run_code(const string& source);
+        void _print_tokens(const TokenStream& tokens);
     };
 }
 

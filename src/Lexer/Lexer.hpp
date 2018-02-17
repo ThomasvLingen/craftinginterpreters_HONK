@@ -13,9 +13,8 @@
 
 namespace Honk
 {
-    class Interpreter;
+    struct Interpreter;
 
-    using TokenStream = std::vector<Token>;
     using SingleCharTokenMap = std::unordered_map<char, TokenType::_enumerated>;
     using KeywordTokenMap = std::unordered_map<std::string, TokenType::_enumerated>;
 

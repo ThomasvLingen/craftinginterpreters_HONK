@@ -8,7 +8,7 @@
 #include <string>
 #include <memory>
 
-#include <Lexer/Token.hpp>
+#include "Lexer/Token.hpp"
 
 // I am sure that somewhere, someone is cursing intently at me as I write this.
 // But I can't be fucked to write a unique accept method every time.

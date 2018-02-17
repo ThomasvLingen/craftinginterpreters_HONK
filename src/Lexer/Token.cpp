@@ -26,8 +26,6 @@ namespace Honk
             str << " = " << Token::literal_to_str(this->value);
         }
 
-        str << "\n";
-
         return str.str();
     }
 

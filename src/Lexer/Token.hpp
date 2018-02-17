@@ -7,8 +7,8 @@
 
 #include <cstdint>
 #include <string>
-
 #include <variant>
+#include <vector>
 
 #include "third_party/enum.h"
 
@@ -57,6 +57,8 @@ namespace Honk
         bool has_value() const;
         static std::string literal_to_str(const TokenLiteral& literal);
     };
+
+    using TokenStream = std::vector<Token>;
 }
 
 #endif //HONK_TOKEN_HPP

@@ -9,9 +9,15 @@
 
 #include "Util.hpp"
 #include "Lexer/Lexer.hpp"
+#include "AST/Parser.hpp"
 
 namespace Honk
 {
+    Interpreter::Interpreter(bool debug)
+        : _debug(debug)
+    {
+    }
+
     void Interpreter::run_repl()
     {
         this->_current_file = "REPL";
@@ -36,6 +42,7 @@ namespace Honk
 
     void Interpreter::_run_code(const std::string& source)
     {
+        // Lex text input into TokenStream
         Lexer lexer(*this, source);
         std::optional<TokenStream> tokens = lexer.lex_input();
 
@@ -44,10 +51,13 @@ namespace Honk
             return;
         }
 
-        // We currently just print the output. Lame...
-        for (const Token& token : tokens.value()) {
-            std::cout << token.to_str();
+        if (this->_debug) {
+            this->_print_tokens(tokens.value());
         }
+
+        // Parse TokenStream into AST
+        Parser parser(*this, tokens.value());
+        parser.parse_input();
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const
@@ -60,5 +70,12 @@ namespace Honk
     void Interpreter::fuck(uint32_t line, const string& message) const
     {
         this->report_message("ERROR", line, message);
+    }
+
+    void Interpreter::_print_tokens(const TokenStream& tokens)
+    {
+        for (const Token& token : tokens) {
+            std::cout << token.to_str() << '\n';
+        }
     }
 }

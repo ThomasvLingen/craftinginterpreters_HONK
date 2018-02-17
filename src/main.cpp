@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     }
     std::cout << "\n";
 
-    Honk::Interpreter interpreter;
+    Honk::Interpreter interpreter(args.flags.debug);
 
     if (args.target_filename != "") {
         std::cout << "Source file = " << args.target_filename << "\n";
@@ -80,22 +80,6 @@ int main(int argc, char** argv)
         std::cout << "REPL\n";
         interpreter.run_repl();
     }
-
-    // TODO: Remove this debug shit
-    // TODO: Rethink if using unique_ptr for this is really a good idea
-    // This while make_unique shebang makes me cry a little bit.
-    Honk::Expr::u_ptr expression = std::make_unique<Honk::Binary>(
-        std::make_unique<Honk::Unary>(
-            Honk::Token {Honk::TokenType::MINUS, "-"},
-            std::make_unique<Honk::Literal>(123)
-        ),
-        Honk::Token {Honk::TokenType::STAR, "*"},
-        std::make_unique<Honk::Grouped>(
-            std::make_unique<Honk::Literal>(456)
-        )
-    );
-
-    Honk::PrettyASTPrinter().print(*expression);
 
     return 0;
 }
