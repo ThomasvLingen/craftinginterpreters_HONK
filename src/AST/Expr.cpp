@@ -6,24 +6,24 @@
 
 namespace Honk
 {
-    Binary::Binary(Expr::u_ptr left, Token op, Expr::u_ptr right)
+    Expr::Binary::Binary(Expr::u_ptr left, Token op, Expr::u_ptr right)
         : left(std::move(left))
         , op(op)
         , right(std::move(right))
     {
     }
 
-    Grouped::Grouped(Expr::u_ptr expression)
+    Expr::Grouped::Grouped(Expr::u_ptr expression)
         : expression(std::move(expression))
     {
     }
 
-    Literal::Literal(TokenLiteral val)
+    Expr::Literal::Literal(TokenLiteral val)
         : value(val)
     {
     }
 
-    Unary::Unary(Token op, Expr::u_ptr right)
+    Expr::Unary::Unary(Token op, Expr::u_ptr right)
         : op(op)
         , right(std::move(right))
     {

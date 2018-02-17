@@ -12,39 +12,45 @@
 
 // I am sure that somewhere, someone is cursing intently at me as I write this.
 // But I can't be fucked to write a unique accept method every time.
-#define VISITOR_ACCEPT(returntype, classname)                \
-    returntype accept(Visitor<returntype>& visitor) override \
+#define EXPRVISITOR_ACCEPT(returntype, classname)                \
+    returntype accept(ExprVisitor<returntype>& visitor) override \
     {                                                        \
         return visitor.visit##classname(*this);              \
     }                                                        \
 
 namespace Honk
 {
-    // Forward declarations for visitor
-    struct Binary;
-    struct Grouped;
-    struct Literal;
-    struct Unary;
-
     template <typename T>
-    struct Visitor
-    {
-        virtual T visitBinary(Binary& expr) = 0;
-        virtual T visitGrouped(Grouped& expr) = 0;
-        virtual T visitLiteral(Literal& expr) = 0;
-        virtual T visitUnary(Unary& expr) = 0;
-    };
+    struct ExprVisitor;
 
+    // Ok, so here's how this is set up:
+    //     The Expr class is the base class for all expressions
+    //     Different expressions are nested _into_ the base class
+    //     Example: Expr::Binary is a binary expression (like 2 * 3)
     struct Expr
     {
         virtual ~Expr() = default;
 
-        virtual std::string accept(Visitor<std::string>& visitor) = 0;
+        virtual std::string accept(ExprVisitor<std::string>& visitor) = 0;
 
         using u_ptr = std::unique_ptr<Expr>;
+
+        struct Binary;
+        struct Grouped;
+        struct Literal;
+        struct Unary;
     };
 
-    struct Binary : Expr
+    template <typename T>
+    struct ExprVisitor
+    {
+        virtual T visitBinary(Expr::Binary& expr) = 0;
+        virtual T visitGrouped(Expr::Grouped& expr) = 0;
+        virtual T visitLiteral(Expr::Literal& expr) = 0;
+        virtual T visitUnary(Expr::Unary& expr) = 0;
+    };
+
+    struct Expr::Binary : Expr
     {
         Binary(Expr::u_ptr left, Token op, Expr::u_ptr right);
 
@@ -52,35 +58,35 @@ namespace Honk
         Token op;
         Expr::u_ptr right;
 
-        VISITOR_ACCEPT(std::string, Binary)
+        EXPRVISITOR_ACCEPT(std::string, Binary)
     };
 
-    struct Grouped : Expr
+    struct Expr::Grouped : Expr
     {
         Grouped(Expr::u_ptr expression);
 
         Expr::u_ptr expression;
 
-        VISITOR_ACCEPT(std::string, Grouped)
+        EXPRVISITOR_ACCEPT(std::string, Grouped)
     };
 
-    struct Literal : Expr
+    struct Expr::Literal : Expr
     {
         Literal(TokenLiteral val);
 
         TokenLiteral value;
 
-        VISITOR_ACCEPT(std::string, Literal)
+        EXPRVISITOR_ACCEPT(std::string, Literal)
     };
 
-    struct Unary : Expr
+    struct Expr::Unary : Expr
     {
         Unary(Token op, Expr::u_ptr right);
 
         Token op;
         Expr::u_ptr right;
 
-        VISITOR_ACCEPT(std::string, Unary)
+        EXPRVISITOR_ACCEPT(std::string, Unary)
     };
 }
 

@@ -24,14 +24,14 @@ namespace Honk
         // TODO: Remove this debug shit
         // TODO: Rethink if using unique_ptr for this is really a good idea
         // This while make_unique shebang makes me cry a little bit.
-        Expr::u_ptr expression = std::make_unique<Binary>(
-            std::make_unique<Unary>(
+        Expr::u_ptr expression = std::make_unique<Expr::Binary>(
+            std::make_unique<Expr::Unary>(
                 Token {TokenType::MINUS, "-"},
-                std::make_unique<Literal>(123)
+                std::make_unique<Expr::Literal>(123)
             ),
             Token {TokenType::STAR, "*"},
-            std::make_unique<Grouped>(
-                std::make_unique<Literal>(456)
+            std::make_unique<Expr::Grouped>(
+                std::make_unique<Expr::Literal>(456)
             )
         );
 

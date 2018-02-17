@@ -27,22 +27,22 @@ namespace Honk
         return output.str();
     }
 
-    std::string PrettyASTPrinter::visitBinary(Binary& expr)
+    std::string PrettyASTPrinter::visitBinary(Expr::Binary& expr)
     {
         return parenthesize(expr.op.text, {expr.left.get(), expr.right.get()});
     }
 
-    std::string PrettyASTPrinter::visitGrouped(Grouped& expr)
+    std::string PrettyASTPrinter::visitGrouped(Expr::Grouped& expr)
     {
         return parenthesize("group", {expr.expression.get()});
     }
 
-    std::string PrettyASTPrinter::visitLiteral(Literal& expr)
+    std::string PrettyASTPrinter::visitLiteral(Expr::Literal& expr)
     {
         return Token::literal_to_str(expr.value);
     }
 
-    std::string PrettyASTPrinter::visitUnary(Unary& expr)
+    std::string PrettyASTPrinter::visitUnary(Expr::Unary& expr)
     {
         return parenthesize(expr.op.text, {expr.right.get()});
     }

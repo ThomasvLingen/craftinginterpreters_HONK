@@ -9,14 +9,14 @@
 
 namespace Honk
 {
-    struct PrettyASTPrinter : Visitor<std::string>
+    struct PrettyASTPrinter : ExprVisitor<std::string>
     {
         void print(Expr& expression);
 
-        std::string visitBinary(Binary& expr) override;
-        std::string visitGrouped(Grouped& expr) override;
-        std::string visitLiteral(Literal& expr) override;
-        std::string visitUnary(Unary& expr) override;
+        std::string visitBinary(Expr::Binary& expr) override;
+        std::string visitGrouped(Expr::Grouped& expr) override;
+        std::string visitLiteral(Expr::Literal& expr) override;
+        std::string visitUnary(Expr::Unary& expr) override;
 
         std::string parenthesize(const std::string& name, std::initializer_list<Expr*> expressions);
     };
