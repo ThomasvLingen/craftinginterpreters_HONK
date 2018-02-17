@@ -10,11 +10,10 @@
 #include <variant>
 #include <vector>
 
-#include "third_party/enum.h"
-
 namespace Honk
 {
-    BETTER_ENUM(TokenType, int,
+    enum struct TokenType : int
+    {
         IDENTIFIER, INT, BOOL, STRING,
 
         PAREN_OPEN, PAREN_CLOSE, CURLY_OPEN, CURLY_CLOSE,
@@ -33,7 +32,9 @@ namespace Honk
         AND, OR,
 
         END_OF_FILE
-    )
+    };
+
+    std::string _to_string(TokenType type);
 
     using TokenLiteral = std::variant<
         std::string,

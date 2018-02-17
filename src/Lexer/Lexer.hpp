@@ -15,8 +15,8 @@ namespace Honk
 {
     struct Interpreter;
 
-    using SingleCharTokenMap = std::unordered_map<char, TokenType::_enumerated>;
-    using KeywordTokenMap = std::unordered_map<std::string, TokenType::_enumerated>;
+    using SingleCharTokenMap = std::unordered_map<char, TokenType>;
+    using KeywordTokenMap = std::unordered_map<std::string, TokenType>;
 
     struct Lexer
     {
