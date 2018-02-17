@@ -46,7 +46,7 @@ namespace Honk
             this->_lex_token();
         }
 
-        this->_add_token(TokenType::END_OF_FILE);
+        this->_add_token(Token {TokenType::END_OF_FILE, "", "", this->_current_line});
 
         if (this->_has_error) {
             return std::nullopt;
@@ -119,6 +119,11 @@ namespace Honk
         this->_tokens.push_back(Token {
             type, this->_get_token_text(), value, this->_current_line
         });
+    }
+
+    void Lexer::_add_token(Token tok)
+    {
+        this->_tokens.push_back(tok);
     }
 
     std::string Lexer::_get_token_text()

@@ -68,6 +68,7 @@ namespace Honk
         bool _add_keyword(const std::string& token_text);
 
         void _add_token(TokenType type, TokenLiteral value = "");
+        void _add_token(Token tok);
 
         std::string _get_token_text();
         bool _is_at_end();
