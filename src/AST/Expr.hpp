@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <optional>
 
 #include "Lexer/Token.hpp"
 
@@ -72,9 +73,13 @@ namespace Honk
 
     struct Expr::Literal : Expr
     {
+        explicit Literal();
         Literal(TokenLiteral val);
 
-        TokenLiteral value;
+        operator bool() const;
+
+        std::optional<TokenLiteral> value;
+
 
         EXPRVISITOR_ACCEPT(std::string, Literal)
     };

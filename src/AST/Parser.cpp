@@ -137,6 +137,13 @@ namespace Honk
             return std::make_unique<Expr::Literal>(value);
         }
 
+        if (this->_match(TokenType::VAL_NULL)) {
+            return std::make_unique<Expr::Literal>();
+        }
+
+        // This isn't done yet, doesn't handle the following:
+        //    grouped expressions
+
         this->_parent.fuck(this->_get_current().line, "Uhh, there should be a literal here, for sure.");
         return std::make_unique<Expr::Literal>(std::string("broken lol"));
     }
