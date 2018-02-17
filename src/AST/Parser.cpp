@@ -17,14 +17,17 @@ namespace Honk
     {
     }
 
-    void Parser::parse_input()
+    std::optional<Expr::u_ptr> Parser::parse_input()
     {
         // Reset parser
         this->_current_token = this->_tokens.begin();
 
         Expr::u_ptr expression = this->_parse_expression();
+        if (this->_has_error) {
+            return std::nullopt;
+        }
 
-        PrettyASTPrinter().print(*expression);
+        return std::move(expression);
     }
 
     Expr::u_ptr Parser::_parse_expression()
@@ -141,11 +144,17 @@ namespace Honk
             return std::make_unique<Expr::Literal>();
         }
 
-        // This isn't done yet, doesn't handle the following:
-        //    grouped expressions
+        if (this->_match(TokenType::PAREN_OPEN)) {
+            Expr::u_ptr grouped_expr = this->_parse_expression();
+            if (!this->_match(TokenType::PAREN_CLOSE)) {
+                this->_error_unclosed_param();
+                return this->_error_expr();
+            }
+            return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
+        }
 
-        this->_parent.fuck(this->_get_current().line, "Uhh, there should be a literal here, for sure.");
-        return std::make_unique<Expr::Literal>(std::string("broken lol"));
+        this->_error_broken_expression();
+        return this->_error_expr();
     }
 
     const Token& Parser::_advance()
@@ -155,8 +164,7 @@ namespace Honk
 
     bool Parser::_is_at_end()
     {
-        // return this->_get_current().type._enumerated() == TokenType::END_OF_FILE;
-        return false;
+        return this->_get_current().type == TokenType::END_OF_FILE;
     }
 
     template <typename Callable>
@@ -196,5 +204,24 @@ namespace Honk
     const Token& Parser::_get_previous()
     {
         return *std::prev(this->_current_token);
+    }
+
+    Expr::u_ptr Parser::_error_expr()
+    {
+        return std::make_unique<Expr::Literal>(std::string("lol broken"));
+    }
+
+    void Parser::_error_broken_expression()
+    {
+        this->_has_error = true;
+
+        this->_parent.fuck(this->_get_current().line, "An expression is broken (unrecognised symbols)");
+    }
+
+    void Parser::_error_unclosed_param()
+    {
+        this->_has_error = true;
+
+        this->_parent.fuck(this->_get_current().line, "An opening parenthesis '(' was not closed");
     }
 }

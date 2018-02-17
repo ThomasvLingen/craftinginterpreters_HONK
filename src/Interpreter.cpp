@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <AST/PrettyPrinter.hpp>
 
 #include "Util.hpp"
 #include "Lexer/Lexer.hpp"
@@ -58,7 +59,15 @@ namespace Honk
 
         // Parse TokenStream into AST
         Parser parser(*this, tokens.value());
-        parser.parse_input();
+        std::optional<Expr::u_ptr> AST = parser.parse_input();
+        if (!AST) {
+            // lol not going to run that
+            return;
+        }
+
+        if (this->_debug) {
+            this->_print_AST(**AST);
+        }
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const
@@ -78,5 +87,10 @@ namespace Honk
         for (const Token& token : tokens) {
             std::cout << token.to_str() << '\n';
         }
+    }
+
+    void Interpreter::_print_AST(Expr& expr)
+    {
+        PrettyASTPrinter().print(expr);
     }
 }

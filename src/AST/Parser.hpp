@@ -20,11 +20,13 @@ namespace Honk
         Parser(const Interpreter& parent, const TokenStream& input);
 
         // TODO: Make this return the parsed stuff.
-        void parse_input();
+        std::optional<Expr::u_ptr> parse_input();
 
     private:
         const Interpreter& _parent;
         const TokenStream& _tokens;
+
+        bool _has_error = false;
 
         TokenStream::const_iterator _current_token = _tokens.begin();
         bool _is_at_end();
@@ -57,6 +59,10 @@ namespace Honk
         bool _match(TokenType type);
         template <typename Callable>
         bool _match(Callable comparator);
+
+        Expr::u_ptr _error_expr();
+        void _error_broken_expression();
+        void _error_unclosed_param();
     };
 }
 
