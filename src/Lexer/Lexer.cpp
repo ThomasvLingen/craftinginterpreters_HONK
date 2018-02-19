@@ -14,19 +14,18 @@
 namespace Honk
 {
     SingleCharTokenMap Lexer::single_char_tokens = {
-        {'(', (+TokenType::PAREN_OPEN)},  {')', (+TokenType::PAREN_CLOSE)},
-        {'{', (+TokenType::CURLY_OPEN)},  {'}', (+TokenType::CURLY_CLOSE)},
-        {',', (+TokenType::COMMA)},
-        {';', (+TokenType::SEMICOLON)},
-        {'+', (+TokenType::PLUS)}, {'-', (+TokenType::MINUS)},
-        {'*', (+TokenType::STAR)}, {'/', (+TokenType::SLASH)},
+        {'(', TokenType::PAREN_OPEN}, {')', TokenType::PAREN_CLOSE},
+        {'{', TokenType::CURLY_OPEN}, {'}', TokenType::CURLY_CLOSE},
+        {',', TokenType::COMMA},      {';', TokenType::SEMICOLON},
+        {'+', TokenType::PLUS},       {'-', TokenType::MINUS},
+        {'*', TokenType::STAR},       {'/', TokenType::SLASH},
     };
 
     KeywordTokenMap Lexer::keyword_tokens = {
-        {"fun",   (+TokenType::FUN)},   {"return", (+TokenType::RETURN)},
-        {"const", (+TokenType::CONST)}, {"var",    (+TokenType::VAR)},    {"null",  (+TokenType::VAL_NULL)},
-        {"if",    (+TokenType::IF)},    {"else",   (+TokenType::ELSE)},   {"while", (+TokenType::WHILE)},    {"for", (+TokenType::FOR)},
-        {"and",   (+TokenType::AND)},   {"or",     (+TokenType::OR)},
+        {"fun",   TokenType::FUN},   {"return", TokenType::RETURN},
+        {"const", TokenType::CONST}, {"var",    TokenType::VAR},    {"null",  TokenType::VAL_NULL},
+        {"if",    TokenType::IF},    {"else",   TokenType::ELSE},   {"while", TokenType::WHILE},    {"for", TokenType::FOR},
+        {"and",   TokenType::AND},   {"or",     TokenType::OR},
     };
 
     Lexer::Lexer(const Interpreter& parent, const std::string& source)
@@ -46,6 +45,8 @@ namespace Honk
             this->_token_start = this->_current_char;
             this->_lex_token();
         }
+
+        this->_add_token(Token {TokenType::END_OF_FILE, "", "", this->_current_line});
 
         if (this->_has_error) {
             return std::nullopt;
@@ -118,6 +119,11 @@ namespace Honk
         this->_tokens.push_back(Token {
             type, this->_get_token_text(), value, this->_current_line
         });
+    }
+
+    void Lexer::_add_token(Token tok)
+    {
+        this->_tokens.push_back(tok);
     }
 
     std::string Lexer::_get_token_text()
@@ -292,7 +298,7 @@ namespace Honk
 
     bool Lexer::_add_keyword(const std::string& token_text)
     {
-        std::optional<TokenType::_enumerated> keyword_type = Util::map_get_optional(Lexer::keyword_tokens, token_text);
+        std::optional<TokenType> keyword_type = Util::map_get_optional(Lexer::keyword_tokens, token_text);
 
         if (!keyword_type) {
             return false;

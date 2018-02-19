@@ -39,7 +39,11 @@ namespace Honk
 
     std::string PrettyASTPrinter::visitLiteral(Expr::Literal& expr)
     {
-        return Token::literal_to_str(expr.value);
+        if (!expr) {
+            return "null";
+        }
+
+        return Token::literal_to_str(expr.value.value());
     }
 
     std::string PrettyASTPrinter::visitUnary(Expr::Unary& expr)

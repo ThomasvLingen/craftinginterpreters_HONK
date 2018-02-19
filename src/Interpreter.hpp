@@ -13,6 +13,8 @@ namespace Honk
 {
     using std::string;
 
+    struct Expr;
+
     struct Interpreter
     {
         Interpreter(bool debug);
@@ -29,6 +31,8 @@ namespace Honk
 
         void _run_code(const string& source);
         void _print_tokens(const TokenStream& tokens);
+        // TODO: This should logically be const, but it isn't since the Visitor interface doesn't stick to it.
+        void _print_AST(Expr& expr);
     };
 }
 

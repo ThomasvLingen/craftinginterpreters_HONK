@@ -46,18 +46,22 @@ CLI_Args parse_args(int argc, char** argv)
     std::vector<std::string> args = get_args(argc, argv);
 
     // Scan for flags and remove them. This is done by using remove_if with a side effect
-    std::remove_if(args.begin(), args.end(),
+    args.erase(std::remove_if(args.begin(), args.end(),
         [&parsed_args] (const std::string& arg) {
-             if (arg == "--debug") {
-                 parsed_args.flags.debug = true;
-                 return true;
-             }
+            if (arg == "--debug") {
+                parsed_args.flags.debug = true;
+                return true;
+            }
 
             return false;
-        });
+        }), args.end());
+
+    // Nothing left I guess
+    if (args.size() == 0) {
+        return parsed_args;
+    }
 
     parsed_args.target_filename = args[CLI_Args::TARGET_FILE_NAME_INDEX];
-
     return parsed_args;
 }
 

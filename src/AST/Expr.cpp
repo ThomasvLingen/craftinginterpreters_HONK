@@ -23,6 +23,16 @@ namespace Honk
     {
     }
 
+    Expr::Literal::Literal()
+        : value(std::nullopt)
+    {
+    }
+
+    Expr::Literal::operator bool() const
+    {
+        return this->value.has_value();
+    }
+
     Expr::Unary::Unary(Token op, Expr::u_ptr right)
         : op(op)
         , right(std::move(right))

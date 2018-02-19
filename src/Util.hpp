@@ -8,6 +8,7 @@
 #include <string>
 #include <optional>
 #include <unordered_map>
+#include <algorithm>
 
 namespace Honk
 {
@@ -23,6 +24,12 @@ namespace Honk
             }
 
             return map.at(key);
+        };
+
+        template <typename Container, typename Value>
+        bool contains(const Container& container, const Value& val)
+        {
+            return std::find(container.begin(), container.end(), val) != container.end();
         };
     }
 }
