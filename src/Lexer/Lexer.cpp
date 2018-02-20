@@ -23,7 +23,7 @@ namespace Honk
 
     KeywordTokenMap Lexer::keyword_tokens = {
         {"fun",   TokenType::FUN},   {"return", TokenType::RETURN},
-        {"const", TokenType::CONST}, {"var",    TokenType::VAR},    {"null",  TokenType::VAL_NULL},
+        {"const", TokenType::CONST}, {"var",    TokenType::VAR},
         {"if",    TokenType::IF},    {"else",   TokenType::ELSE},   {"while", TokenType::WHILE},    {"for", TokenType::FOR},
         {"and",   TokenType::AND},   {"or",     TokenType::OR},
     };
@@ -268,8 +268,9 @@ namespace Honk
 
         std::string token_text = this->_get_token_text();
 
-        // Is it a bool or a keyword?
+        // Is it a bool, null, or a keyword?
         if (this->_add_bool_literal(token_text)
+            || this->_add_null_literal(token_text)
             || this->_add_keyword(token_text))
         {
             return true;
@@ -293,6 +294,16 @@ namespace Honk
         }
 
         this->_add_token(TokenType::BOOL, bool_value.value());
+        return true;
+    }
+
+    bool Lexer::_add_null_literal(const std::string& token_text)
+    {
+        if (token_text != "null") {
+            return false;
+        }
+
+        this->_add_token(TokenType::VAL_NULL, null);
         return true;
     }
 

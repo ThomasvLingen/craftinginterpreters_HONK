@@ -9,6 +9,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <ostream>
 
 namespace Honk
 {
@@ -34,13 +35,23 @@ namespace Honk
         END_OF_FILE
     };
 
-    std::string _to_string(TokenType type);
+    // This exists to represent a "null" value.
+    struct null_t
+    {
+        friend std::ostream& operator<<(std::ostream& os, null_t);
+    };
+    static const null_t null {};
 
     using TokenLiteral = std::variant<
         std::string,
         int32_t,
-        bool
+        bool,
+        null_t
     >;
+
+    // Helpers for stringifying
+    std::string _to_string(TokenType type);
+    std::string _to_string(TokenLiteral literal);
 
     // The order of members is used in aggregate initialisation.
     // Don't fuck with it.
@@ -56,7 +67,6 @@ namespace Honk
 
         std::string to_str() const;
         bool has_value() const;
-        static std::string literal_to_str(const TokenLiteral& literal);
     };
 
     using TokenStream = std::vector<Token>;

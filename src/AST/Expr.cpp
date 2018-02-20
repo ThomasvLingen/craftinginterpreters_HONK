@@ -19,18 +19,18 @@ namespace Honk
     }
 
     Expr::Literal::Literal(TokenLiteral val)
-        : value(val)
+        : value(Value {val})
     {
     }
 
-    Expr::Literal::Literal()
-        : value(std::nullopt)
+    Expr::Literal::Literal(Value val)
+        : value(val)
     {
     }
 
     Expr::Literal::operator bool() const
     {
-        return this->value.has_value();
+        return !this->value.is_null();
     }
 
     Expr::Unary::Unary(Token op, Expr::u_ptr right)

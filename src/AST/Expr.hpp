@@ -10,6 +10,7 @@
 #include <optional>
 
 #include "Lexer/Token.hpp"
+#include "Value.hpp"
 
 // I am sure that somewhere, someone is cursing intently at me as I write this.
 // But I can't be fucked to write a unique accept method every time.
@@ -73,13 +74,12 @@ namespace Honk
 
     struct Expr::Literal : Expr
     {
-        explicit Literal();
-        Literal(TokenLiteral val);
+        Literal(TokenLiteral literal);
+        Literal(Value val);
 
         operator bool() const;
 
-        std::optional<TokenLiteral> value;
-
+        Value value;
 
         EXPRVISITOR_ACCEPT(std::string, Literal)
     };

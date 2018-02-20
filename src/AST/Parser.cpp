@@ -129,7 +129,7 @@ namespace Honk
 
     bool _match_literal(const Token& token)
     {
-        static auto match_tokentypes = {TokenType::BOOL, TokenType::INT, TokenType::STRING};
+        static auto match_tokentypes = {TokenType::BOOL, TokenType::INT, TokenType::STRING, TokenType::VAL_NULL};
         return Util::contains(match_tokentypes, token.type);
     }
 
@@ -138,10 +138,6 @@ namespace Honk
         if (this->_match(_match_literal)) {
             TokenLiteral value = this->_get_previous().value;
             return std::make_unique<Expr::Literal>(value);
-        }
-
-        if (this->_match(TokenType::VAL_NULL)) {
-            return std::make_unique<Expr::Literal>();
         }
 
         if (this->_match(TokenType::PAREN_OPEN)) {

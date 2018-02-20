@@ -65,6 +65,7 @@ namespace Honk
         bool _add_integer_literal(char c);
         bool _add_ident_or_keyword(char c);
         bool _add_bool_literal(const std::string& token_text);
+        bool _add_null_literal(const std::string& token_text);
         bool _add_keyword(const std::string& token_text);
 
         void _add_token(TokenType type, TokenLiteral value = "");

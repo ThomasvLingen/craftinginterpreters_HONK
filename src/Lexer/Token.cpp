@@ -23,13 +23,13 @@ namespace Honk
             << " '" << this->text              << "'";
 
         if (this->has_value()) {
-            str << " = " << Token::literal_to_str(this->value);
+            str << " = " << _to_string(this->value);
         }
 
         return str.str();
     }
 
-    std::string Token::literal_to_str(const TokenLiteral& literal)
+    std::string _to_string(TokenLiteral literal)
     {
         std::stringstream str;
 
@@ -71,5 +71,11 @@ namespace Honk
             default:
                 return "BIG FAT ERROR";
         }
+    }
+
+    std::ostream& operator<<(std::ostream& os, null_t)
+    {
+        os << "null";
+        return os;
     }
 }
