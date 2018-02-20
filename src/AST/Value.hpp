@@ -18,11 +18,7 @@ namespace Honk
         template <typename T>
         T* get()
         {
-            if (this->is_a<T>()) {
-                return std::get_if<T>();
-            } else {
-                return nullptr;
-            }
+            return std::get_if<T>(&this->value);
         }
 
         template <typename T>
