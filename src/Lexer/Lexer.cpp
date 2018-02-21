@@ -143,7 +143,7 @@ namespace Honk
         std::stringstream error_message;
         error_message <<  "Unknown character \'" << c << "\', wtf is this?";
 
-        this->_honk.fuck(this->_current_line, error_message.str());
+        this->_honk.report_error(this->_current_line, error_message.str());
     }
 
     void Lexer::_error_unclosed_string()
@@ -154,7 +154,7 @@ namespace Honk
         std::stringstream error_message;
         error_message << "Unclosed string: " << unclosed_string;
 
-        this->_honk.fuck(this->_current_line, error_message.str());
+        this->_honk.report_error(this->_current_line, error_message.str());
     }
 
     bool Lexer::_match(char to_match)

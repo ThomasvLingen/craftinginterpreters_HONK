@@ -22,7 +22,7 @@ namespace Honk
         void run_from_file(const string& path);
         void run_repl();
 
-        void fuck(uint32_t line, const string& message) const;
+        void report_error(uint32_t line, const string& message) const;
         void report_message(const string& type, uint32_t line, const string& message) const;
 
     private:

@@ -211,13 +211,13 @@ namespace Honk
     {
         this->_has_error = true;
 
-        this->_parent.fuck(this->_get_current().line, "An expression is broken (unrecognised symbols)");
+        this->_parent.report_error(this->_get_current().line, "An expression is broken (unrecognised symbols)");
     }
 
     void Parser::_error_unclosed_param()
     {
         this->_has_error = true;
 
-        this->_parent.fuck(this->_get_current().line, "An opening parenthesis '(' was not closed");
+        this->_parent.report_error(this->_get_current().line, "An opening parenthesis '(' was not closed");
     }
 }

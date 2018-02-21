@@ -77,7 +77,7 @@ namespace Honk
                   << message << "\n";
     }
 
-    void Interpreter::fuck(uint32_t line, const string& message) const
+    void Interpreter::report_error(uint32_t line, const string& message) const
     {
         this->report_message("ERROR", line, message);
     }
