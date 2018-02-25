@@ -5,7 +5,7 @@
 #ifndef HONK_PRETTYPRINTER_HPP
 #define HONK_PRETTYPRINTER_HPP
 
-#include "Expr.hpp"
+#include "AST/Expr.hpp"
 
 namespace Honk
 {

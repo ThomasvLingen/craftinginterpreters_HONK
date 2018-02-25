@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "Interpreter.hpp"
-#include "AST/PrettyPrinter.hpp"
 
 struct CLI_Args
 {

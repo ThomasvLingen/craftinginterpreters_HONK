@@ -7,7 +7,6 @@
 #include "Interpreter.hpp"
 #include "Util.hpp"
 #include "AST/Expr.hpp"
-#include "AST/PrettyPrinter.hpp"
 
 namespace Honk
 {

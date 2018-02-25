@@ -6,11 +6,11 @@
 
 #include <iostream>
 #include <fstream>
-#include <AST/PrettyPrinter.hpp>
 
 #include "Util.hpp"
 #include "Lexer/Lexer.hpp"
 #include "AST/Parser.hpp"
+#include "AST/Visitors/PrettyPrinter.hpp"
 
 namespace Honk
 {
