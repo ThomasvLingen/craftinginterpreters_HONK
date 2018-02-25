@@ -11,6 +11,7 @@
 #include "Lexer/Lexer.hpp"
 #include "AST/Parser.hpp"
 #include "AST/Visitors/PrettyPrinter.hpp"
+#include "AST/Visitors/Evaluator.hpp"
 
 namespace Honk
 {
@@ -68,6 +69,10 @@ namespace Honk
         if (this->_debug) {
             this->_print_AST(**AST);
         }
+
+        // Run AST
+        Evaluator evaluator(*this);
+        evaluator.evaluate(**AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const

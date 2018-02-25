@@ -78,4 +78,10 @@ namespace Honk
         os << "null";
         return os;
     }
+
+    bool operator==(const null_t&, const null_t&)
+    {
+        // null is always equal to null
+        return true;
+    }
 }

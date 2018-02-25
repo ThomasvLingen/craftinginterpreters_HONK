@@ -22,7 +22,7 @@
 
 namespace Honk
 {
-    template <typename T>
+    template<typename T>
     struct ExprVisitor;
 
     // Ok, so here's how this is set up:
@@ -34,6 +34,7 @@ namespace Honk
         virtual ~Expr() = default;
 
         virtual std::string accept(ExprVisitor<std::string>& visitor) = 0;
+        virtual Value accept(ExprVisitor<Value>& visitor) = 0;
 
         using u_ptr = std::unique_ptr<Expr>;
 
@@ -43,13 +44,29 @@ namespace Honk
         struct Unary;
     };
 
-    template <typename T>
+    template<typename T>
     struct ExprVisitor
     {
         virtual T visitBinary(Expr::Binary& expr) = 0;
         virtual T visitGrouped(Expr::Grouped& expr) = 0;
         virtual T visitLiteral(Expr::Literal& expr) = 0;
         virtual T visitUnary(Expr::Unary& expr) = 0;
+    };
+
+    struct BinaryExprVisitor
+    {
+        virtual Value visit_minus(const Value& left, const Value& right) = 0;
+        virtual Value visit_plus(const Value& left, const Value& right) = 0;
+        virtual Value visit_slash(const Value& left, const Value& right) = 0;
+        virtual Value visit_star(const Value& left, const Value& right) = 0;
+        virtual Value visit_greater(const Value& left, const Value& right) = 0;
+        virtual Value visit_greater_eq(const Value& left, const Value& right) = 0;
+        virtual Value visit_less_than(const Value& left, const Value& right) = 0;
+        virtual Value visit_less_than_eq(const Value& left, const Value& right) = 0;
+        virtual Value visit_equals(const Value& left, const Value& right) = 0;
+        virtual Value visit_not_equals(const Value& left, const Value& right) = 0;
+
+        using method_ptr = Value (BinaryExprVisitor::*) (const Value& left, const Value& right);
     };
 
     struct Expr::Binary : Expr
@@ -60,7 +77,12 @@ namespace Honk
         Token op;
         Expr::u_ptr right;
 
+        TokenType op_type();
+
         EXPRVISITOR_ACCEPT(std::string, Binary)
+        EXPRVISITOR_ACCEPT(Value, Binary)
+
+        Value accept(BinaryExprVisitor& visitor, const Value& left, const Value& right);
     };
 
     struct Expr::Grouped : Expr
@@ -70,6 +92,7 @@ namespace Honk
         Expr::u_ptr expression;
 
         EXPRVISITOR_ACCEPT(std::string, Grouped)
+        EXPRVISITOR_ACCEPT(Value, Grouped)
     };
 
     struct Expr::Literal : Expr
@@ -82,6 +105,7 @@ namespace Honk
         Value value;
 
         EXPRVISITOR_ACCEPT(std::string, Literal)
+        EXPRVISITOR_ACCEPT(Value, Literal)
     };
 
     struct Expr::Unary : Expr
@@ -91,7 +115,10 @@ namespace Honk
         Token op;
         Expr::u_ptr right;
 
+        TokenType op_type();
+
         EXPRVISITOR_ACCEPT(std::string, Unary)
+        EXPRVISITOR_ACCEPT(Value, Unary)
     };
 }
 

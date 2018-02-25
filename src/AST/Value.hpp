@@ -34,7 +34,10 @@ namespace Honk
         }
 
         bool is_null() const;
+        bool is_integer() const;
         std::string to_str() const;
+
+        friend bool operator==(const Value& a, const Value& b);
     };
 };
 

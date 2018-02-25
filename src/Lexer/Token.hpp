@@ -39,6 +39,7 @@ namespace Honk
     struct null_t
     {
         friend std::ostream& operator<<(std::ostream& os, null_t);
+        friend bool operator==(const null_t&, const null_t&);
     };
     static const null_t null {};
 
