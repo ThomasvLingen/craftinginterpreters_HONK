@@ -8,9 +8,9 @@ LD = $(CC)
 # Wall = all warnings
 # Wextra = extra warnings
 # g = debug symbols
-# std=c++1z = C++17
+# std=c++17 = C++17 standard
 INCLUDE_PATHS = -Isrc/ -I./
-COMPILER_FLAGS = -Wall -Wextra -g -std=c++1z $(INCLUDE_PATHS)
+COMPILER_FLAGS = -Wall -Wextra -g -std=c++17 $(INCLUDE_PATHS)
 
 # Clang tidy
 CLANG_TIDY = clang-tidy
