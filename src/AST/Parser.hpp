@@ -9,6 +9,7 @@
 
 #include "Lexer/Token.hpp"
 #include "Expr.hpp"
+#include "Stmt.hpp"
 
 namespace Honk
 {
@@ -19,8 +20,8 @@ namespace Honk
     {
         Parser(const Interpreter& parent, const TokenStream& input);
 
-        // TODO: Make this return the parsed stuff.
-        std::optional<Expr::u_ptr> parse_input();
+        std::optional<Stmt::stream> parse_input();
+        std::optional<Expr::u_ptr> parse_input_as_expr();
 
     private:
         const Interpreter& _parent;
@@ -30,6 +31,16 @@ namespace Honk
 
         TokenStream::const_iterator _current_token = _tokens.begin();
         bool _is_at_end();
+
+        // Program grammar:
+        //     program   → statement* EOF ;
+        //
+        //     statement → exprStmt
+        //                 | printStmt ;
+        //
+        //     exprStmt  → expression ";" ;
+        //     printStmt → "print" expression ";" ; // TODO: I want to change this to "print" "(" expression ")" ";"
+        Stmt::u_ptr _parse_statement();
 
         // Expression grammar:
         //     expression     → equality ;

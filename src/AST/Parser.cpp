@@ -16,17 +16,53 @@ namespace Honk
     {
     }
 
-    std::optional<Expr::u_ptr> Parser::parse_input()
+    std::optional<Stmt::stream> Parser::parse_input()
+    {
+        // Reset parser
+        this->_current_token = this->_tokens.begin();
+
+        Stmt::stream statements;
+        while (!this->_is_at_end()) {
+            statements.push_back(this->_parse_statement());
+        }
+
+        if (this->_has_error) {
+            return std::nullopt;
+        }
+
+        return statements;
+    }
+
+    std::optional<Expr::u_ptr> Parser::parse_input_as_expr()
     {
         // Reset parser
         this->_current_token = this->_tokens.begin();
 
         Expr::u_ptr expression = this->_parse_expression();
+
         if (this->_has_error) {
             return std::nullopt;
         }
 
-        return std::move(expression);
+        return expression;
+    }
+
+    Stmt::u_ptr Parser::_parse_statement()
+    {
+        // TODO: replace with actual statement parsing
+        // Eat everything
+        while (!this->_is_at_end()) {
+            this->_advance();
+        }
+
+        // Dummy statement
+        return std::make_unique<Stmt::Print>(
+            std::make_unique<Expr::Binary>(
+                std::make_unique<Expr::Literal>(std::string("Hello ")),
+                Token {TokenType::PLUS, "+", "", 0},
+                std::make_unique<Expr::Literal>(std::string("statements!"))
+            )
+        );
     }
 
     Expr::u_ptr Parser::_parse_expression()

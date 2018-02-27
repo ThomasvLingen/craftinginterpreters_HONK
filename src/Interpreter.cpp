@@ -60,19 +60,20 @@ namespace Honk
 
         // Parse TokenStream into AST
         Parser parser(*this, tokens.value());
-        std::optional<Expr::u_ptr> AST = parser.parse_input();
+        std::optional<Stmt::stream> AST = parser.parse_input();
         if (!AST) {
             // lol not going to run that
             return;
         }
 
         if (this->_debug) {
-            this->_print_AST(**AST);
+            // this->_print_expression(**AST);
+            this->_print_statements(*AST);
         }
 
-        // Run AST
-        Evaluator evaluator(*this);
-        evaluator.evaluate(**AST);
+        // TODO: Run AST
+        // Evaluator evaluator(*this);
+        // evaluator.evaluate(**AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const
@@ -94,8 +95,17 @@ namespace Honk
         }
     }
 
-    void Interpreter::_print_AST(Expr& expr)
+    void Interpreter::_print_expression(Expr& expr)
     {
         PrettyASTPrinter().print(expr);
+    }
+
+    void Interpreter::_print_statements(Stmt::stream& statements)
+    {
+        PrettyASTPrinter printer;
+
+        for (Stmt::u_ptr& statement : statements) {
+            printer.print(*statement);
+        }
     }
 }
