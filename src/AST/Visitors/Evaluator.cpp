@@ -15,12 +15,23 @@ namespace Honk
     {
     }
 
-    void Evaluator::evaluate(Expr& expression)
+    void Evaluator::interpret(Stmt::stream& code)
     {
         try {
-            Value result = this->_evaluate(expression);
-            std::cout << "= " << result.to_str() << '\n';
-        } catch (std::runtime_error e) {
+            for (Stmt::u_ptr& statement : code) {
+                this->_interpret(*statement);
+            }
+        } catch (std::runtime_error& e) {
+            // TODO: make sure the line number is correct here
+            this->_parent.report_error(0, e.what());
+        }
+    }
+
+    Value Evaluator::evaluate(Expr& expression)
+    {
+        try {
+            return this->_evaluate(expression);
+        } catch (std::runtime_error& e) {
             // TODO: make sure the line number is correct here
             this->_parent.report_error(0, e.what());
         }
@@ -39,6 +50,11 @@ namespace Honk
     Value Evaluator::_evaluate(Expr& expr)
     {
         return expr.accept(*this);
+    }
+
+    void Evaluator::_interpret(Stmt& statement)
+    {
+        statement.accept(*this);
     }
 
     Value Evaluator::visitUnary(Expr::Unary& expr)
@@ -200,5 +216,18 @@ namespace Honk
         if (!this->_values_are<int32_t>(left, right)) {
             throw std::runtime_error {throw_msg};
         }
+    }
+
+    void Evaluator::visit_Expression(Stmt::Expression& stmt)
+    {
+        // Nothing is done with this
+        // TODO: might want to print this or emit a warning?
+        this->_evaluate(*stmt.expression);
+    }
+
+    void Evaluator::visit_Print(Stmt::Print& stmt)
+    {
+        Value expression_result = this->_evaluate(*stmt.expression);
+        std::cout << expression_result.to_str() << std::endl;
     }
 }

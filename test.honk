@@ -2,5 +2,8 @@
 // Print statements
 print 1 + 2 + 3;
 print "hello" + " " + "HONK!";
+print true;
 // Expression statements
-3*4;
+3 * 4;
+3 > 2;
+3 != 1;

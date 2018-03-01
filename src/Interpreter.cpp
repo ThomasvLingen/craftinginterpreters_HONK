@@ -71,9 +71,8 @@ namespace Honk
             this->_print_statements(*AST);
         }
 
-        // TODO: Run AST
-        // Evaluator evaluator(*this);
-        // evaluator.evaluate(**AST);
+        Evaluator evaluator(*this);
+        evaluator.interpret(*AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const

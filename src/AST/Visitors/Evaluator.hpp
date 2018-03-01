@@ -6,16 +6,22 @@
 #define HONK_EVALUATOR_HPP
 
 #include "AST/Expr.hpp"
+#include "AST/Stmt.hpp"
 
 namespace Honk
 {
     struct Interpreter;
 
-    struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor
+    struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor, StmtVisitor<void>
     {
         Evaluator(const Interpreter& parent);
 
-        void evaluate(Expr& expression);
+        void interpret(Stmt::stream& code);
+        Value evaluate(Expr& expression);
+
+        // Statement visitor methods
+        void visit_Expression(Stmt::Expression& stmt) override;
+        void visit_Print(Stmt::Print& stmt) override;
 
         // Expression visitor methods
         Value visitLiteral(Expr::Literal& expr) override;
@@ -39,6 +45,8 @@ namespace Honk
         const Interpreter& _parent;
 
         Value _evaluate(Expr& expr);
+        void _interpret(Stmt& statement);
+
         bool _is_truthy(const Value& val);
         bool _is_equal(const Value& a, const Value& b);
 
