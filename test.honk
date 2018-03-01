@@ -1,18 +1,6 @@
-(==) {
 
-}
-
-(<) {
-
-}
-// I am a comment
-"";
-"some string";
-123;
-(!= /) {
-}
-!;
-=;
-if (thing == 123) {
-
-}
+// Print statements
+print 1 + 2 + 3;
+print "hello" + " " + "HONK!";
+// Expression statements
+3*4;

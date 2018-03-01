@@ -16,6 +16,14 @@ namespace Honk
     // Forward declarations
     struct Interpreter;
 
+    namespace PARSER_ERROR
+    {
+        constexpr char BROKEN_EXPR[] = "An expression is broken (unrecognised symbols)";
+        constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
+        constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the operand of print";
+        constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
+    }
+
     struct Parser
     {
         Parser(const Interpreter& parent, const TokenStream& input);
@@ -41,6 +49,8 @@ namespace Honk
         //     exprStmt  → expression ";" ;
         //     printStmt → "print" expression ";" ; // TODO: I want to change this to "print" "(" expression ")" ";"
         Stmt::u_ptr _parse_statement();
+        Stmt::u_ptr _parse_statement_print();
+        Stmt::u_ptr _parse_statement_expression();
 
         // Expression grammar:
         //     expression     → equality ;
@@ -71,9 +81,10 @@ namespace Honk
         template <typename Callable>
         bool _match(Callable comparator);
 
+
         Expr::u_ptr _error_expr();
-        void _error_broken_expression();
-        void _error_unclosed_param();
+        Stmt::u_ptr _error_stmt();
+        void _report_error(const char* message);
     };
 }
 

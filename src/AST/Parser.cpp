@@ -47,22 +47,43 @@ namespace Honk
         return expression;
     }
 
+    bool _match_print(const Token& token)
+    {
+        return token.type == TokenType::IDENTIFIER &&
+               token.text == "print";
+    }
+
     Stmt::u_ptr Parser::_parse_statement()
     {
-        // TODO: replace with actual statement parsing
-        // Eat everything
-        while (!this->_is_at_end()) {
-            this->_advance();
+        if (this->_match(_match_print)) {
+            return this->_parse_statement_print();
         }
 
-        // Dummy statement
-        return std::make_unique<Stmt::Print>(
-            std::make_unique<Expr::Binary>(
-                std::make_unique<Expr::Literal>(std::string("Hello ")),
-                Token {TokenType::PLUS, "+", "", 0},
-                std::make_unique<Expr::Literal>(std::string("statements!"))
-            )
-        );
+        return this->_parse_statement_expression();
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_print()
+    {
+        Expr::u_ptr expression = this->_parse_expression();
+
+        if (!this->_match(TokenType::SEMICOLON)) {
+            this->_report_error(PARSER_ERROR::UNTERMINATED_PRINT);
+            return this->_error_stmt();
+        }
+
+        return std::make_unique<Stmt::Print>(std::move(expression));
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_expression()
+    {
+        Expr::u_ptr expression = this->_parse_expression();
+
+        if (!this->_match(TokenType::SEMICOLON)) {
+            this->_report_error(PARSER_ERROR::UNTERMINATED_EXPR);
+            return this->_error_stmt();
+        }
+
+        return std::make_unique<Stmt::Expression>(std::move(expression));
     }
 
     Expr::u_ptr Parser::_parse_expression()
@@ -177,14 +198,16 @@ namespace Honk
 
         if (this->_match(TokenType::PAREN_OPEN)) {
             Expr::u_ptr grouped_expr = this->_parse_expression();
+
             if (!this->_match(TokenType::PAREN_CLOSE)) {
-                this->_error_unclosed_param();
+                this->_report_error(PARSER_ERROR::UNCLOSED_GROUP);
                 return this->_error_expr();
             }
+
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
 
-        this->_error_broken_expression();
+        this->_report_error(PARSER_ERROR::BROKEN_EXPR);
         return this->_error_expr();
     }
 
@@ -237,22 +260,20 @@ namespace Honk
         return *std::prev(this->_current_token);
     }
 
+    Stmt::u_ptr Parser::_error_stmt()
+    {
+        return std::make_unique<Stmt::Print>(this->_error_expr());
+    }
+
     Expr::u_ptr Parser::_error_expr()
     {
         return std::make_unique<Expr::Literal>(std::string("lol broken"));
     }
 
-    void Parser::_error_broken_expression()
+    void Parser::_report_error(const char* message)
     {
         this->_has_error = true;
 
-        this->_parent.report_error(this->_get_current().line, "An expression is broken (unrecognised symbols)");
-    }
-
-    void Parser::_error_unclosed_param()
-    {
-        this->_has_error = true;
-
-        this->_parent.report_error(this->_get_current().line, "An opening parenthesis '(' was not closed");
+        this->_parent.report_error(this->_get_current().line, message);
     }
 }
