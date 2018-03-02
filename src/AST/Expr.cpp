@@ -78,4 +78,14 @@ namespace Honk
     {
         return this->op.type;
     }
+
+    Expr::VarAccess::VarAccess(Token identifier)
+        : identifier_tok(identifier)
+    {
+    }
+
+    std::string Expr::VarAccess::get_identifier()
+    {
+        return this->identifier_tok.text;
+    }
 }

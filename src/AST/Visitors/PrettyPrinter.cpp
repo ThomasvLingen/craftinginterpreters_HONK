@@ -52,6 +52,11 @@ namespace Honk
         return parenthesize(expr.op.text, {expr.right.get()});
     }
 
+    std::string PrettyASTPrinter::visitVarAccess(Expr::VarAccess& expr)
+    {
+        return expr.get_identifier();
+    }
+
     std::string PrettyASTPrinter::visit_Expression(Stmt::Expression& stmt)
     {
         std::string output;
@@ -67,6 +72,23 @@ namespace Honk
         std::string output;
         output += "[print ";
         output += stmt.expression->accept(*this);
+        output += "]";
+
+        return output;
+    }
+
+    std::string PrettyASTPrinter::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
+    {
+        std::string output;
+        output += "[var_decl ";
+        output += stmt.get_identifier();
+
+        if (stmt.initializer) {
+            Expr& initializer = **stmt.initializer;
+            output += " = ";
+            output += initializer.accept(*this);
+        }
+
         output += "]";
 
         return output;

@@ -23,7 +23,7 @@ namespace Honk
 
         Stmt::stream statements;
         while (!this->_is_at_end()) {
-            statements.push_back(this->_parse_statement());
+            statements.push_back(this->_parse_declaration());
         }
 
         if (this->_has_error) {
@@ -47,8 +47,41 @@ namespace Honk
         return expression;
     }
 
+    Stmt::u_ptr Parser::_parse_declaration()
+    {
+        if (this->_match(TokenType::VAR)) {
+            return this->_parse_declaration_vardeclaration();
+        }
+
+        // TODO: synchronisation / error handling try-catch.
+
+        return this->_parse_statement();
+    }
+
+    Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
+    {
+        if (!this->_match(TokenType::IDENTIFIER)) {
+            this->_report_error(PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
+            return this->_error_stmt();
+        }
+        Token identifier = this->_get_previous();
+
+        std::optional<Expr::u_ptr> initializer;
+        if (this->_match(TokenType::ASSIGNMENT)) {
+            initializer = std::move(this->_parse_expression());
+        }
+
+        if (!this->_match(TokenType::SEMICOLON)) {
+            this->_report_error(PARSER_ERROR::UNTERMINATED_VAR);
+            return this->_error_stmt();
+        }
+
+        return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
+    }
+
     bool _match_print(const Token& token)
     {
+        // TODO: make "print" into its own TokenType instead of this hack
         return token.type == TokenType::IDENTIFIER &&
                token.text == "print";
     }
@@ -194,6 +227,10 @@ namespace Honk
         if (this->_match(_match_literal)) {
             TokenLiteral value = this->_get_previous().value;
             return std::make_unique<Expr::Literal>(value);
+        }
+
+        if (this->_match(TokenType::IDENTIFIER)) {
+            return std::make_unique<Expr::VarAccess>(this->_get_previous());
         }
 
         if (this->_match(TokenType::PAREN_OPEN)) {

@@ -15,4 +15,15 @@ namespace Honk
         : expression(std::move(expression))
     {
     }
+
+    Stmt::VarDeclaration::VarDeclaration(Token identifier, std::optional<Expr::u_ptr> initializer)
+        : identifier_token(identifier)
+        , initializer(std::move(initializer))
+    {
+    }
+
+    std::string Stmt::VarDeclaration::get_identifier()
+    {
+        return this->identifier_token.text;
+    }
 }

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <optional>
 
 #include "Expr.hpp"
 
@@ -33,6 +34,7 @@ namespace Honk
 
         struct Expression;
         struct Print;
+        struct VarDeclaration;
     };
 
     template<typename T>
@@ -40,6 +42,7 @@ namespace Honk
     {
         virtual T visit_Expression(Stmt::Expression& stmt) = 0;
         virtual T visit_Print(Stmt::Print& stmt) = 0;
+        virtual T visit_VarDeclaration(Stmt::VarDeclaration& stmt) = 0;
     };
 
     struct Stmt::Expression : Stmt
@@ -60,6 +63,19 @@ namespace Honk
         STMTVISITOR_ACCEPT(std::string, Print)
 
         Expr::u_ptr expression;
+    };
+
+    struct Stmt::VarDeclaration : Stmt
+    {
+        VarDeclaration(Token identifier, std::optional<Expr::u_ptr> initializer);
+
+        std::string get_identifier();
+
+        STMTVISITOR_ACCEPT(void, VarDeclaration)
+        STMTVISITOR_ACCEPT(std::string, VarDeclaration)
+
+        Token identifier_token;
+        std::optional<Expr::u_ptr> initializer;
     };
 }
 

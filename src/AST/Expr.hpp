@@ -42,6 +42,7 @@ namespace Honk
         struct Grouped;
         struct Literal;
         struct Unary;
+        struct VarAccess;
     };
 
     template<typename T>
@@ -51,6 +52,7 @@ namespace Honk
         virtual T visitGrouped(Expr::Grouped& expr) = 0;
         virtual T visitLiteral(Expr::Literal& expr) = 0;
         virtual T visitUnary(Expr::Unary& expr) = 0;
+        virtual T visitVarAccess(Expr::VarAccess& expr) = 0;
     };
 
     struct BinaryExprVisitor
@@ -119,6 +121,18 @@ namespace Honk
 
         EXPRVISITOR_ACCEPT(std::string, Unary)
         EXPRVISITOR_ACCEPT(Value, Unary)
+    };
+
+    struct Expr::VarAccess : Expr
+    {
+        VarAccess(Token identifier);
+
+        std::string get_identifier();
+
+        Token identifier_tok;
+
+        EXPRVISITOR_ACCEPT(std::string, VarAccess)
+        EXPRVISITOR_ACCEPT(Value, VarAccess)
     };
 }
 

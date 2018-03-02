@@ -22,6 +22,8 @@ namespace Honk
         constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
         constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the operand of print";
         constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
+        constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
+        constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
     }
 
     struct Parser
@@ -41,13 +43,20 @@ namespace Honk
         bool _is_at_end();
 
         // Program grammar:
-        //     program   → statement* EOF ;
+        //     program     → declaration* EOF ;
         //
-        //     statement → exprStmt
-        //                 | printStmt ;
+        //     declaration → varDecl
+        //                   | statement ;
         //
-        //     exprStmt  → expression ";" ;
-        //     printStmt → "print" expression ";" ; // TODO: I want to change this to "print" "(" expression ")" ";"
+        //     varDecl     → "var" IDENTIFIER ( "=" expression )? ";" ;
+        //     statement   → exprStmt
+        //                   | printStmt ;
+        //
+        //     exprStmt    → expression ";" ;
+        //     printStmt   → "print" expression ";" ; // TODO: I want to change this to "print" "(" expression ")" ";"
+
+        Stmt::u_ptr _parse_declaration();
+        Stmt::u_ptr _parse_declaration_vardeclaration();
         Stmt::u_ptr _parse_statement();
         Stmt::u_ptr _parse_statement_print();
         Stmt::u_ptr _parse_statement_expression();
@@ -61,6 +70,7 @@ namespace Honk
         //     unary          → ( "!" | "-" ) unary
         //                      | primary ;
         //     primary        → INT | STRING | BOOL | "null"
+        //                      | IDENTIFIER
         //                      | "(" expression ")" ;
         Expr::u_ptr _parse_expression();
         Expr::u_ptr _parse_equality();
