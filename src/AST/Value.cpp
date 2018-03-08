@@ -4,13 +4,20 @@
 
 #include "Value.hpp"
 
+#include "Util.hpp"
+
 namespace Honk
 {
     std::string Value::to_str() const
     {
-        // TODO: Some of this is pretty crappy:
-        // * booleans print "1" or "0"
-        // * strings are printed without quotes
+        if (this->is_a<std::string>()) {
+            return "\"" + _to_string(this->value) + "\"";
+        }
+
+        if (this->is_a<bool>()) {
+            return Util::bool_str(this->get_as<bool>());
+        }
+
         return _to_string(this->value);
     }
 

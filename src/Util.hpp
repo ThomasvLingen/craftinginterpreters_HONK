@@ -31,6 +31,15 @@ namespace Honk
         {
             return std::find(container.begin(), container.end(), val) != container.end();
         };
+
+        inline const char* bool_str(bool val)
+        {
+            if (val) {
+                return "true";
+            } else {
+                return "false";
+            }
+        }
     }
 }
 
