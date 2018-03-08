@@ -76,16 +76,9 @@ namespace Honk
         return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
     }
 
-    bool _match_print(const Token& token)
-    {
-        // TODO: make "print" into its own TokenType instead of this hack
-        return token.type == TokenType::IDENTIFIER &&
-               token.text == "print";
-    }
-
     Stmt::u_ptr Parser::_parse_statement()
     {
-        if (this->_match(_match_print)) {
+        if (this->_match(TokenType::PRINT)) {
             return this->_parse_statement_print();
         }
 
