@@ -49,20 +49,23 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_declaration()
     {
-        if (this->_match(TokenType::VAR)) {
-            return this->_parse_declaration_vardeclaration();
+        try {
+            if (this->_match(TokenType::VAR)) {
+                return this->_parse_declaration_vardeclaration();
+            }
+
+            return this->_parse_statement();
+        } catch (const parse_exception& e) {
+            // Parsing is fucked, meaning that syntax is in some way incorrect, better synchronise
+            this->_synchronise();
+            return nullptr;
         }
-
-        // TODO: synchronisation / error handling try-catch.
-
-        return this->_parse_statement();
     }
 
     Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
     {
         if (!this->_match(TokenType::IDENTIFIER)) {
-            this->_report_error(PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
-            return this->_error_stmt();
+            this->_panic(PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
         }
         Token identifier = this->_get_previous();
 
@@ -72,8 +75,7 @@ namespace Honk
         }
 
         if (!this->_match(TokenType::SEMICOLON)) {
-            this->_report_error(PARSER_ERROR::UNTERMINATED_VAR);
-            return this->_error_stmt();
+            this->_panic(PARSER_ERROR::UNTERMINATED_VAR);
         }
 
         return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
@@ -100,8 +102,7 @@ namespace Honk
         Expr::u_ptr expression = this->_parse_expression();
 
         if (!this->_match(TokenType::SEMICOLON)) {
-            this->_report_error(PARSER_ERROR::UNTERMINATED_PRINT);
-            return this->_error_stmt();
+            this->_panic(PARSER_ERROR::UNTERMINATED_PRINT);
         }
 
         return std::make_unique<Stmt::Print>(std::move(expression));
@@ -112,8 +113,7 @@ namespace Honk
         Expr::u_ptr expression = this->_parse_expression();
 
         if (!this->_match(TokenType::SEMICOLON)) {
-            this->_report_error(PARSER_ERROR::UNTERMINATED_EXPR);
-            return this->_error_stmt();
+            this->_panic(PARSER_ERROR::UNTERMINATED_EXPR);
         }
 
         return std::make_unique<Stmt::Expression>(std::move(expression));
@@ -237,15 +237,14 @@ namespace Honk
             Expr::u_ptr grouped_expr = this->_parse_expression();
 
             if (!this->_match(TokenType::PAREN_CLOSE)) {
-                this->_report_error(PARSER_ERROR::UNCLOSED_GROUP);
-                return this->_error_expr();
+                this->_panic(PARSER_ERROR::UNCLOSED_GROUP);
             }
 
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
 
-        this->_report_error(PARSER_ERROR::BROKEN_EXPR);
-        return this->_error_expr();
+        this->_panic(PARSER_ERROR::BROKEN_EXPR);
+        return nullptr;
     }
 
     const Token& Parser::_advance()
@@ -297,20 +296,25 @@ namespace Honk
         return *std::prev(this->_current_token);
     }
 
-    Stmt::u_ptr Parser::_error_stmt()
+    // You may be thinking "why not use a default arg?". Because you cannot use the result of a method in it...
+    void Parser::_panic(const char* message)
     {
-        return std::make_unique<Stmt::Print>(this->_error_expr());
+        this->_panic(message, this->_get_previous());
     }
 
-    Expr::u_ptr Parser::_error_expr()
-    {
-        return std::make_unique<Expr::Literal>(std::string("lol broken"));
-    }
-
-    void Parser::_report_error(const char* message)
+    void Parser::_panic(const char* message, const Token& token)
     {
         this->_has_error = true;
+        this->_parent.report_error(token.line, message);
 
-        this->_parent.report_error(this->_get_current().line, message);
+        throw parse_exception(message, token);
+    }
+
+    void Parser::_synchronise()
+    {
+        // TODO: do actual synchronisation. Currently we just consume tokens until the end.
+        while (!this->_is_at_end()) {
+            this->_advance();
+        }
     }
 }

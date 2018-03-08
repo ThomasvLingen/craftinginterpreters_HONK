@@ -26,6 +26,17 @@ namespace Honk
         constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
     }
 
+    struct parse_exception : std::runtime_error
+    {
+        parse_exception(const char* error_msg, const Token& token)
+            : std::runtime_error(error_msg)
+            , token(token)
+        {
+        }
+
+        const Token& token;
+    };
+
     struct Parser
     {
         Parser(const Interpreter& parent, const TokenStream& input);
@@ -80,8 +91,8 @@ namespace Honk
         Expr::u_ptr _parse_unary();
         Expr::u_ptr _parse_primary();
 
-        // TODO: Determine whether an "isAtEnd" should be interwoven with this
-        // It is in the book, but it clutters everything imo and I don't know why it's in there.
+        // this->_is_at_end() is not interwoven with this.
+        // It is in the book, but it clutters everything imo.
         const Token& _advance();
         const Token& _get_current();
         const Token& _get_previous();
@@ -91,10 +102,10 @@ namespace Honk
         template <typename Callable>
         bool _match(Callable comparator);
 
+        void _panic(const char* message);
+        void _panic(const char* message, const Token& token);
 
-        Expr::u_ptr _error_expr();
-        Stmt::u_ptr _error_stmt();
-        void _report_error(const char* message);
+        void _synchronise();
     };
 }
 
