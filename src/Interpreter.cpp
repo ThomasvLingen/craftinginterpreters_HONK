@@ -11,7 +11,7 @@
 #include "Lexer/Lexer.hpp"
 #include "AST/Parser.hpp"
 #include "AST/Visitors/PrettyPrinter.hpp"
-#include "AST/Visitors/Evaluator.hpp"
+#include "Evaluator/Evaluator.hpp"
 
 namespace Honk
 {
