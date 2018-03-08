@@ -87,8 +87,9 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_statement_print()
     {
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::PRINT_NO_OPEN);
         Expr::u_ptr expression = this->_parse_expression();
-
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::PRINT_NO_CLOSE);
         this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_PRINT);
 
         return std::make_unique<Stmt::Print>(std::move(expression));

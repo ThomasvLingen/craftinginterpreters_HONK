@@ -20,7 +20,9 @@ namespace Honk
     {
         constexpr char BROKEN_EXPR[] = "An expression is broken (unrecognised symbols)";
         constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
-        constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the operand of print";
+        constexpr char PRINT_NO_OPEN[] = "Expected a '(' after print";
+        constexpr char PRINT_NO_CLOSE[] = "Expected a ')' after the operand of print";
+        constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the print call";
         constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
         constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
         constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
@@ -64,7 +66,7 @@ namespace Honk
         //                   | printStmt ;
         //
         //     exprStmt    → expression ";" ;
-        //     printStmt   → "print" expression ";" ; // TODO: I want to change this to "print" "(" expression ")" ";"
+        //     printStmt   → "print" "(" expression ")" ";" ;
 
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
