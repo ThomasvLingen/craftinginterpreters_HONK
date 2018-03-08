@@ -105,6 +105,8 @@ namespace Honk
         void _panic(const char* message);
         void _panic(const char* message, const Token& token);
 
+        void _assert_next_token_is(TokenType type, const char* message);
+
         void _synchronise();
     };
 }

@@ -64,9 +64,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
     {
-        if (!this->_match(TokenType::IDENTIFIER)) {
-            this->_panic(PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
-        }
+        this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
         Token identifier = this->_get_previous();
 
         std::optional<Expr::u_ptr> initializer;
@@ -74,10 +72,7 @@ namespace Honk
             initializer = std::move(this->_parse_expression());
         }
 
-        if (!this->_match(TokenType::SEMICOLON)) {
-            this->_panic(PARSER_ERROR::UNTERMINATED_VAR);
-        }
-
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_VAR);
         return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
     }
 
@@ -101,9 +96,7 @@ namespace Honk
     {
         Expr::u_ptr expression = this->_parse_expression();
 
-        if (!this->_match(TokenType::SEMICOLON)) {
-            this->_panic(PARSER_ERROR::UNTERMINATED_PRINT);
-        }
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_PRINT);
 
         return std::make_unique<Stmt::Print>(std::move(expression));
     }
@@ -112,9 +105,7 @@ namespace Honk
     {
         Expr::u_ptr expression = this->_parse_expression();
 
-        if (!this->_match(TokenType::SEMICOLON)) {
-            this->_panic(PARSER_ERROR::UNTERMINATED_EXPR);
-        }
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_EXPR);
 
         return std::make_unique<Stmt::Expression>(std::move(expression));
     }
@@ -235,10 +226,7 @@ namespace Honk
 
         if (this->_match(TokenType::PAREN_OPEN)) {
             Expr::u_ptr grouped_expr = this->_parse_expression();
-
-            if (!this->_match(TokenType::PAREN_CLOSE)) {
-                this->_panic(PARSER_ERROR::UNCLOSED_GROUP);
-            }
+            this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::UNCLOSED_GROUP);
 
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
@@ -315,6 +303,13 @@ namespace Honk
         // TODO: do actual synchronisation. Currently we just consume tokens until the end.
         while (!this->_is_at_end()) {
             this->_advance();
+        }
+    }
+
+    void Parser::_assert_next_token_is(TokenType type, const char* message)
+    {
+        if (!this->_match(type)) {
+            this->_panic(message);
         }
     }
 }
