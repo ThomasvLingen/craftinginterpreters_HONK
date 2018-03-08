@@ -41,7 +41,6 @@ namespace Honk
         std::optional<BinaryExprVisitor::method_ptr> dispatch_method = Util::map_get_optional(_accept_dispatch_map, this->op_type());
 
         if (!dispatch_method) {
-            // TODO: throw an error or something
             throw std::runtime_error{"BinaryExprVisitor cannot dispatch the method for this operator"};
         }
 
