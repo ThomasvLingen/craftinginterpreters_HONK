@@ -37,12 +37,12 @@ namespace Honk
         }
     }
 
-    Value Evaluator::visitLiteral(Expr::Literal& expr)
+    Value Evaluator::visit_Literal(Expr::Literal& expr)
     {
         return expr.value;
     }
 
-    Value Evaluator::visitGrouped(Expr::Grouped& expr)
+    Value Evaluator::visit_Grouped(Expr::Grouped& expr)
     {
         return this->_evaluate(*expr.expression);
     }
@@ -57,7 +57,7 @@ namespace Honk
         statement.accept(*this);
     }
 
-    Value Evaluator::visitUnary(Expr::Unary& expr)
+    Value Evaluator::visit_Unary(Expr::Unary& expr)
     {
         Value right = this->_evaluate(*expr.right);
 
@@ -99,7 +99,7 @@ namespace Honk
         return a == b;
     }
 
-    Value Evaluator::visitBinary(Expr::Binary& expr)
+    Value Evaluator::visit_Binary(Expr::Binary& expr)
     {
         // Binary expressions are evaluated left to right
         Value left = this->_evaluate(*expr.left);
@@ -189,7 +189,7 @@ namespace Honk
         return Value {!this->_is_equal(left, right)};
     }
 
-    Value Evaluator::visitVarAccess(Expr::VarAccess& expr)
+    Value Evaluator::visit_VarAccess(Expr::VarAccess& expr)
     {
         Value* accessed_value = this->_env.get_var(expr.get_identifier());
 

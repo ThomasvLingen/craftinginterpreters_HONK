@@ -26,11 +26,11 @@ namespace Honk
         void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
 
         // Expression visitor methods TODO: Make this consistent with the above...
-        Value visitLiteral(Expr::Literal& expr) override;
-        Value visitGrouped(Expr::Grouped& expr) override;
-        Value visitUnary(Expr::Unary& expr) override;
-        Value visitVarAccess(Expr::VarAccess& expr) override;
-        Value visitBinary(Expr::Binary& expr) override;
+        Value visit_Literal(Expr::Literal& expr) override;
+        Value visit_Grouped(Expr::Grouped& expr) override;
+        Value visit_Unary(Expr::Unary& expr) override;
+        Value visit_VarAccess(Expr::VarAccess& expr) override;
+        Value visit_Binary(Expr::Binary& expr) override;
 
         // Binary expression visitor methods
         virtual Value visit_minus(const Value& left, const Value& right) override;

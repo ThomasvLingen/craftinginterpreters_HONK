@@ -16,9 +16,9 @@
 // But I can't be fucked to write a unique accept method every time.
 #define EXPRVISITOR_ACCEPT(returntype, classname)                \
     returntype accept(ExprVisitor<returntype>& visitor) override \
-    {                                                        \
-        return visitor.visit##classname(*this);              \
-    }                                                        \
+    {                                                            \
+        return visitor.visit_##classname(*this);                 \
+    }                                                            \
 
 namespace Honk
 {
@@ -48,11 +48,11 @@ namespace Honk
     template<typename T>
     struct ExprVisitor
     {
-        virtual T visitBinary(Expr::Binary& expr) = 0;
-        virtual T visitGrouped(Expr::Grouped& expr) = 0;
-        virtual T visitLiteral(Expr::Literal& expr) = 0;
-        virtual T visitUnary(Expr::Unary& expr) = 0;
-        virtual T visitVarAccess(Expr::VarAccess& expr) = 0;
+        virtual T visit_Binary(Expr::Binary& expr) = 0;
+        virtual T visit_Grouped(Expr::Grouped& expr) = 0;
+        virtual T visit_Literal(Expr::Literal& expr) = 0;
+        virtual T visit_Unary(Expr::Unary& expr) = 0;
+        virtual T visit_VarAccess(Expr::VarAccess& expr) = 0;
     };
 
     struct BinaryExprVisitor
