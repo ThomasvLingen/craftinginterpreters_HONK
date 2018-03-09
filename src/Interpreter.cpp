@@ -16,7 +16,8 @@
 namespace Honk
 {
     Interpreter::Interpreter(bool debug)
-        : _debug(debug)
+        : _evaluator(*this)
+        , _debug(debug)
     {
     }
 
@@ -71,9 +72,8 @@ namespace Honk
             this->_print_statements(*AST);
         }
 
-        // TODO: enable this again as soon as the Evaluator visitor interface has the new visit_* methods
-        // Evaluator evaluator(*this);
-        // evaluator.interpret(*AST);
+        // Run the code!
+        this->_evaluator.interpret(*AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const

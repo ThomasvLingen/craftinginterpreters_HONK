@@ -6,8 +6,9 @@
 #define HONK_INTERPRETER_HPP
 
 #include <string>
-#include <AST/Stmt.hpp>
 
+#include "AST/Stmt.hpp"
+#include "Evaluator/Evaluator.hpp"
 #include "Lexer/Token.hpp"
 
 namespace Honk
@@ -27,6 +28,8 @@ namespace Honk
         void report_message(const string& type, uint32_t line, const string& message) const;
 
     private:
+        Evaluator _evaluator;
+
         bool _debug = false;
         string _current_file = "";
 

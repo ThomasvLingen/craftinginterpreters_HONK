@@ -7,6 +7,7 @@
 
 #include "AST/Expr.hpp"
 #include "AST/Stmt.hpp"
+#include "VariableBucket.hpp"
 
 namespace Honk
 {
@@ -22,11 +23,13 @@ namespace Honk
         // Statement visitor methods
         void visit_Expression(Stmt::Expression& stmt) override;
         void visit_Print(Stmt::Print& stmt) override;
+        void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
 
-        // Expression visitor methods
+        // Expression visitor methods TODO: Make this consistent with the above...
         Value visitLiteral(Expr::Literal& expr) override;
         Value visitGrouped(Expr::Grouped& expr) override;
         Value visitUnary(Expr::Unary& expr) override;
+        Value visitVarAccess(Expr::VarAccess& expr) override;
         Value visitBinary(Expr::Binary& expr) override;
 
         // Binary expression visitor methods
@@ -43,6 +46,7 @@ namespace Honk
 
     private:
         const Interpreter& _parent;
+        VariableBucket _env;
 
         Value _evaluate(Expr& expr);
         void _interpret(Stmt& statement);

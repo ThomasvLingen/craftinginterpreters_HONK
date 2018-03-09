@@ -189,6 +189,17 @@ namespace Honk
         return Value {!this->_is_equal(left, right)};
     }
 
+    Value Evaluator::visitVarAccess(Expr::VarAccess& expr)
+    {
+        Value* accessed_value = this->_env.get_var(expr.get_identifier());
+
+        if (!accessed_value) {
+            throw std::runtime_error {"Accessing an undefined variable: " + expr.get_identifier()};
+        }
+
+        return *accessed_value;
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {
@@ -229,5 +240,16 @@ namespace Honk
     {
         Value expression_result = this->_evaluate(*stmt.expression);
         std::cout << expression_result.to_str() << std::endl;
+    }
+
+    void Evaluator::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
+    {
+        Value initial_value { null };
+
+        if (stmt.initializer) {
+            initial_value = this->_evaluate(**stmt.initializer);
+        }
+
+        this->_env.new_var(stmt.get_identifier(), initial_value);
     }
 }
