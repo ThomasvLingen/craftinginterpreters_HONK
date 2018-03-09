@@ -1,9 +1,15 @@
-
 // Print statements
-print 1 + 2 + 3;
-print "hello" + " " + "HONK!";
-print true;
+print(1 + 2 + 3);
+print("hello" + " " + "HONK!");
+print(true);
+
 // Expression statements
 3 * 4;
 3 > 2;
 3 != 1;
+
+// Variables + expressions
+var three = 3;
+var five = 5;
+print(three + five);
+print(three < five);
