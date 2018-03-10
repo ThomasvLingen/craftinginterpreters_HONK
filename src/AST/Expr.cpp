@@ -93,4 +93,9 @@ namespace Honk
         , new_value(std::move(new_value))
     {
     }
+
+    std::string Expr::VarAssign::get_identifier()
+    {
+        return this->identifier_tok.text;
+    }
 }

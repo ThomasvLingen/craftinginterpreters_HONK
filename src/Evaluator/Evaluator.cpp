@@ -200,6 +200,16 @@ namespace Honk
         return *accessed_value;
     }
 
+    Value Evaluator::visit_VarAssign(Expr::VarAssign& expr)
+    {
+        Value* assigned_value = this->_env.get_var(expr.get_identifier());
+        if (!assigned_value) {
+            throw std::runtime_error {"Trying to assign to an undefined variable: " + expr.get_identifier()};
+        }
+
+        return *assigned_value = this->evaluate(*expr.new_value);
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {

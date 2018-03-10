@@ -136,9 +136,13 @@ namespace Honk
         EXPRVISITORS_ACCEPT(VarAccess);
     };
 
+    // TODO: This get_identifier is a repeated construct
+    // Either make the AST not have tokens, or generalise this
     struct Expr::VarAssign : Expr
     {
         VarAssign(Token identifier_tok, Expr::u_ptr new_value);
+
+        std::string get_identifier();
 
         Token identifier_tok;
         Expr::u_ptr new_value;
