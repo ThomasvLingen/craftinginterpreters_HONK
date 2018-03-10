@@ -16,8 +16,8 @@
 namespace Honk
 {
     Interpreter::Interpreter(bool debug)
-        : _evaluator(*this)
-        , _debug(debug)
+        // : _evaluator(*this)
+        : _debug(debug)
     {
     }
 
@@ -73,7 +73,7 @@ namespace Honk
         }
 
         // Run the code!
-        this->_evaluator.interpret(*AST);
+        // this->_evaluator.interpret(*AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const
@@ -97,15 +97,13 @@ namespace Honk
 
     void Interpreter::_print_expression(Expr& expr)
     {
-        PrettyASTPrinter().print(expr);
+         this->_printer.print(expr);
     }
 
     void Interpreter::_print_statements(Stmt::stream& statements)
     {
-        PrettyASTPrinter printer;
-
         for (Stmt::u_ptr& statement : statements) {
-            printer.print(*statement);
+            this->_printer.print(*statement);
         }
     }
 }

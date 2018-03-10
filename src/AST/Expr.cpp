@@ -87,4 +87,10 @@ namespace Honk
     {
         return this->identifier_tok.text;
     }
+
+    Expr::VarAssign::VarAssign(Token identifier_tok, Expr::u_ptr new_value)
+        : identifier_tok(identifier_tok)
+        , new_value(std::move(new_value))
+    {
+    }
 }

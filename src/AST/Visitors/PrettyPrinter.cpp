@@ -93,4 +93,9 @@ namespace Honk
 
         return output;
     }
+
+    std::string PrettyASTPrinter::visit_VarAssign(Expr::VarAssign& expr)
+    {
+        return parenthesize(expr.identifier_tok.text + "=", {expr.new_value.get()});
+    }
 }

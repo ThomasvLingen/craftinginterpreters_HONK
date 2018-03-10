@@ -26,6 +26,7 @@ namespace Honk
         constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
         constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
         constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
+        constexpr char INVALID_ASSIGNMENT_TARGET[] = "Expected an identifier to the left of the '='";
     }
 
     struct parse_exception : std::runtime_error
@@ -75,7 +76,9 @@ namespace Honk
         Stmt::u_ptr _parse_statement_expression();
 
         // Expression grammar:
-        //     expression     → equality ;
+        //     expression     → assignment ;
+        //     assignment     → IDENTIFIER "=" equality
+        //                      | equality ;
         //     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         //     comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
         //     addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -86,6 +89,7 @@ namespace Honk
         //                      | IDENTIFIER
         //                      | "(" expression ")" ;
         Expr::u_ptr _parse_expression();
+        Expr::u_ptr _parse_assignment();
         Expr::u_ptr _parse_equality();
         Expr::u_ptr _parse_comparison();
         Expr::u_ptr _parse_addition();
@@ -103,6 +107,10 @@ namespace Honk
         bool _match(TokenType type);
         template <typename Callable>
         bool _match(Callable comparator);
+
+        template <typename Callable>
+        bool _peek(Callable comparator);
+        bool _peek(TokenType type);
 
         void _panic(const char* message);
         void _panic(const char* message, const Token& token);

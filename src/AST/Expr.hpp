@@ -20,6 +20,10 @@
         return visitor.visit_##classname(*this);                 \
     }                                                            \
 
+#define EXPRVISITORS_ACCEPT(classname)         \
+    EXPRVISITOR_ACCEPT(std::string, classname) \
+    EXPRVISITOR_ACCEPT(Value      , classname) \
+
 namespace Honk
 {
     template<typename T>
@@ -43,6 +47,7 @@ namespace Honk
         struct Literal;
         struct Unary;
         struct VarAccess;
+        struct VarAssign;
     };
 
     template<typename T>
@@ -53,6 +58,7 @@ namespace Honk
         virtual T visit_Literal(Expr::Literal& expr) = 0;
         virtual T visit_Unary(Expr::Unary& expr) = 0;
         virtual T visit_VarAccess(Expr::VarAccess& expr) = 0;
+        virtual T visit_VarAssign(Expr::VarAssign& expr) = 0;
     };
 
     struct BinaryExprVisitor
@@ -81,8 +87,7 @@ namespace Honk
 
         TokenType op_type();
 
-        EXPRVISITOR_ACCEPT(std::string, Binary)
-        EXPRVISITOR_ACCEPT(Value, Binary)
+        EXPRVISITORS_ACCEPT(Binary);
 
         Value accept(BinaryExprVisitor& visitor, const Value& left, const Value& right);
     };
@@ -93,8 +98,7 @@ namespace Honk
 
         Expr::u_ptr expression;
 
-        EXPRVISITOR_ACCEPT(std::string, Grouped)
-        EXPRVISITOR_ACCEPT(Value, Grouped)
+        EXPRVISITORS_ACCEPT(Grouped);
     };
 
     struct Expr::Literal : Expr
@@ -106,8 +110,7 @@ namespace Honk
 
         Value value;
 
-        EXPRVISITOR_ACCEPT(std::string, Literal)
-        EXPRVISITOR_ACCEPT(Value, Literal)
+        EXPRVISITORS_ACCEPT(Literal);
     };
 
     struct Expr::Unary : Expr
@@ -119,8 +122,7 @@ namespace Honk
 
         TokenType op_type();
 
-        EXPRVISITOR_ACCEPT(std::string, Unary)
-        EXPRVISITOR_ACCEPT(Value, Unary)
+        EXPRVISITORS_ACCEPT(Unary);
     };
 
     struct Expr::VarAccess : Expr
@@ -131,8 +133,17 @@ namespace Honk
 
         Token identifier_tok;
 
-        EXPRVISITOR_ACCEPT(std::string, VarAccess)
-        EXPRVISITOR_ACCEPT(Value, VarAccess)
+        EXPRVISITORS_ACCEPT(VarAccess);
+    };
+
+    struct Expr::VarAssign : Expr
+    {
+        VarAssign(Token identifier_tok, Expr::u_ptr new_value);
+
+        Token identifier_tok;
+        Expr::u_ptr new_value;
+
+        EXPRVISITORS_ACCEPT(VarAssign);
     };
 }
 

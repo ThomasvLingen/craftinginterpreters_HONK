@@ -26,6 +26,7 @@ namespace Honk
         std::string visit_Literal(Expr::Literal& expr) override;
         std::string visit_Unary(Expr::Unary& expr) override;
         std::string visit_VarAccess(Expr::VarAccess& expr) override;
+        std::string visit_VarAssign(Expr::VarAssign& expr) override;
 
         std::string parenthesize(const std::string& name, std::initializer_list<Expr*> expressions);
     };

@@ -106,7 +106,23 @@ namespace Honk
 
     Expr::u_ptr Parser::_parse_expression()
     {
-        return this->_parse_equality();
+        return this->_parse_assignment();
+    }
+
+    Expr::u_ptr Parser::_parse_assignment()
+    {
+        if (!this->_peek(TokenType::ASSIGNMENT)) {
+            // This means we fall through to equality
+            return this->_parse_equality();
+        }
+
+        this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::INVALID_ASSIGNMENT_TARGET);
+        Token identifier = this->_get_previous();
+
+        this->_advance();
+
+        Expr::u_ptr new_value = this->_parse_equality();
+        return std::make_unique<Expr::VarAssign>(identifier, std::move(new_value));
     }
 
     bool _match_equality(const Token& token)
@@ -254,10 +270,28 @@ namespace Honk
         }
     }
 
+    template<typename Callable>
+    bool Parser::_peek(Callable comparator)
+    {
+        TokenStream::const_iterator target_it = std::next(this->_current_token);
+        if (target_it >= this->_tokens.end()) {
+            return false;
+        }
+
+        return comparator(*target_it);
+    }
+
     bool Parser::_match(TokenType type)
     {
         return this->_match([&type] (const Token& current) {
             return current.type == type;
+        });
+    }
+
+    bool Parser::_peek(TokenType type)
+    {
+        return this->_peek([&type] (const Token& peeked) {
+            return peeked.type == type;
         });
     }
 
