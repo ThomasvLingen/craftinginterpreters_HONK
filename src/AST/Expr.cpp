@@ -41,7 +41,6 @@ namespace Honk
         std::optional<BinaryExprVisitor::method_ptr> dispatch_method = Util::map_get_optional(_accept_dispatch_map, this->op_type());
 
         if (!dispatch_method) {
-            // TODO: throw an error or something
             throw std::runtime_error{"BinaryExprVisitor cannot dispatch the method for this operator"};
         }
 
@@ -77,5 +76,26 @@ namespace Honk
     TokenType Expr::Unary::op_type()
     {
         return this->op.type;
+    }
+
+    Expr::VarAccess::VarAccess(Token identifier)
+        : identifier_tok(identifier)
+    {
+    }
+
+    std::string Expr::VarAccess::get_identifier()
+    {
+        return this->identifier_tok.text;
+    }
+
+    Expr::VarAssign::VarAssign(Token identifier_tok, Expr::u_ptr new_value)
+        : identifier_tok(identifier_tok)
+        , new_value(std::move(new_value))
+    {
+    }
+
+    std::string Expr::VarAssign::get_identifier()
+    {
+        return this->identifier_tok.text;
     }
 }

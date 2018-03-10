@@ -15,23 +15,34 @@ namespace Honk
     {
     }
 
-    void Evaluator::evaluate(Expr& expression)
+    void Evaluator::interpret(Stmt::stream& code)
     {
         try {
-            Value result = this->_evaluate(expression);
-            std::cout << "= " << result.to_str() << '\n';
-        } catch (std::runtime_error e) {
+            for (Stmt::u_ptr& statement : code) {
+                this->_interpret(*statement);
+            }
+        } catch (std::runtime_error& e) {
             // TODO: make sure the line number is correct here
             this->_parent.report_error(0, e.what());
         }
     }
 
-    Value Evaluator::visitLiteral(Expr::Literal& expr)
+    Value Evaluator::evaluate(Expr& expression)
+    {
+        try {
+            return this->_evaluate(expression);
+        } catch (std::runtime_error& e) {
+            // TODO: make sure the line number is correct here
+            this->_parent.report_error(0, e.what());
+        }
+    }
+
+    Value Evaluator::visit_Literal(Expr::Literal& expr)
     {
         return expr.value;
     }
 
-    Value Evaluator::visitGrouped(Expr::Grouped& expr)
+    Value Evaluator::visit_Grouped(Expr::Grouped& expr)
     {
         return this->_evaluate(*expr.expression);
     }
@@ -41,7 +52,12 @@ namespace Honk
         return expr.accept(*this);
     }
 
-    Value Evaluator::visitUnary(Expr::Unary& expr)
+    void Evaluator::_interpret(Stmt& statement)
+    {
+        statement.accept(*this);
+    }
+
+    Value Evaluator::visit_Unary(Expr::Unary& expr)
     {
         Value right = this->_evaluate(*expr.right);
 
@@ -83,7 +99,7 @@ namespace Honk
         return a == b;
     }
 
-    Value Evaluator::visitBinary(Expr::Binary& expr)
+    Value Evaluator::visit_Binary(Expr::Binary& expr)
     {
         // Binary expressions are evaluated left to right
         Value left = this->_evaluate(*expr.left);
@@ -173,6 +189,27 @@ namespace Honk
         return Value {!this->_is_equal(left, right)};
     }
 
+    Value Evaluator::visit_VarAccess(Expr::VarAccess& expr)
+    {
+        Value* accessed_value = this->_env.get_var(expr.get_identifier());
+
+        if (!accessed_value) {
+            throw std::runtime_error {"Accessing an undefined variable: " + expr.get_identifier()};
+        }
+
+        return *accessed_value;
+    }
+
+    Value Evaluator::visit_VarAssign(Expr::VarAssign& expr)
+    {
+        Value* assigned_value = this->_env.get_var(expr.get_identifier());
+        if (!assigned_value) {
+            throw std::runtime_error {"Trying to assign to an undefined variable: " + expr.get_identifier()};
+        }
+
+        return *assigned_value = this->evaluate(*expr.new_value);
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {
@@ -200,5 +237,29 @@ namespace Honk
         if (!this->_values_are<int32_t>(left, right)) {
             throw std::runtime_error {throw_msg};
         }
+    }
+
+    void Evaluator::visit_Expression(Stmt::Expression& stmt)
+    {
+        // Nothing is done with this
+        // TODO: might want to print this or emit a warning?
+        this->_evaluate(*stmt.expression);
+    }
+
+    void Evaluator::visit_Print(Stmt::Print& stmt)
+    {
+        Value expression_result = this->_evaluate(*stmt.expression);
+        std::cout << expression_result.to_str() << std::endl;
+    }
+
+    void Evaluator::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
+    {
+        Value initial_value { null };
+
+        if (stmt.initializer) {
+            initial_value = this->_evaluate(**stmt.initializer);
+        }
+
+        this->_env.new_var(stmt.get_identifier(), initial_value);
     }
 }

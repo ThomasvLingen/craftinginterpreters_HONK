@@ -9,18 +9,43 @@
 
 #include "Lexer/Token.hpp"
 #include "Expr.hpp"
+#include "Stmt.hpp"
 
 namespace Honk
 {
     // Forward declarations
     struct Interpreter;
 
+    namespace PARSER_ERROR
+    {
+        constexpr char BROKEN_EXPR[] = "An expression is broken (unrecognised symbols)";
+        constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
+        constexpr char PRINT_NO_OPEN[] = "Expected a '(' after print";
+        constexpr char PRINT_NO_CLOSE[] = "Expected a ')' after the operand of print";
+        constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the print call";
+        constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
+        constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
+        constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
+        constexpr char INVALID_ASSIGNMENT_TARGET[] = "Expected an identifier to the left of the '='";
+    }
+
+    struct parse_exception : std::runtime_error
+    {
+        parse_exception(const char* error_msg, const Token& token)
+            : std::runtime_error(error_msg)
+            , token(token)
+        {
+        }
+
+        const Token& token;
+    };
+
     struct Parser
     {
         Parser(const Interpreter& parent, const TokenStream& input);
 
-        // TODO: Make this return the parsed stuff.
-        std::optional<Expr::u_ptr> parse_input();
+        std::optional<Stmt::stream> parse_input();
+        std::optional<Expr::u_ptr> parse_input_as_expr();
 
     private:
         const Interpreter& _parent;
@@ -31,8 +56,29 @@ namespace Honk
         TokenStream::const_iterator _current_token = _tokens.begin();
         bool _is_at_end();
 
+        // Program grammar:
+        //     program     → declaration* EOF ;
+        //
+        //     declaration → varDecl
+        //                   | statement ;
+        //
+        //     varDecl     → "var" IDENTIFIER ( "=" expression )? ";" ;
+        //     statement   → exprStmt
+        //                   | printStmt ;
+        //
+        //     exprStmt    → expression ";" ;
+        //     printStmt   → "print" "(" expression ")" ";" ;
+
+        Stmt::u_ptr _parse_declaration();
+        Stmt::u_ptr _parse_declaration_vardeclaration();
+        Stmt::u_ptr _parse_statement();
+        Stmt::u_ptr _parse_statement_print();
+        Stmt::u_ptr _parse_statement_expression();
+
         // Expression grammar:
-        //     expression     → equality ;
+        //     expression     → assignment ;
+        //     assignment     → IDENTIFIER "=" equality
+        //                      | equality ;
         //     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         //     comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
         //     addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -40,8 +86,10 @@ namespace Honk
         //     unary          → ( "!" | "-" ) unary
         //                      | primary ;
         //     primary        → INT | STRING | BOOL | "null"
+        //                      | IDENTIFIER
         //                      | "(" expression ")" ;
         Expr::u_ptr _parse_expression();
+        Expr::u_ptr _parse_assignment();
         Expr::u_ptr _parse_equality();
         Expr::u_ptr _parse_comparison();
         Expr::u_ptr _parse_addition();
@@ -49,8 +97,8 @@ namespace Honk
         Expr::u_ptr _parse_unary();
         Expr::u_ptr _parse_primary();
 
-        // TODO: Determine whether an "isAtEnd" should be interwoven with this
-        // It is in the book, but it clutters everything imo and I don't know why it's in there.
+        // this->_is_at_end() is not interwoven with this.
+        // It is in the book, but it clutters everything imo.
         const Token& _advance();
         const Token& _get_current();
         const Token& _get_previous();
@@ -60,9 +108,16 @@ namespace Honk
         template <typename Callable>
         bool _match(Callable comparator);
 
-        Expr::u_ptr _error_expr();
-        void _error_broken_expression();
-        void _error_unclosed_param();
+        template <typename Callable>
+        bool _peek(Callable comparator);
+        bool _peek(TokenType type);
+
+        void _panic(const char* message);
+        void _panic(const char* message, const Token& token);
+
+        void _assert_next_token_is(TokenType type, const char* message);
+
+        void _synchronise();
     };
 }
 

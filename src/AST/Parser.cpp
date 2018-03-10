@@ -16,22 +16,113 @@ namespace Honk
     {
     }
 
-    std::optional<Expr::u_ptr> Parser::parse_input()
+    std::optional<Stmt::stream> Parser::parse_input()
+    {
+        // Reset parser
+        this->_current_token = this->_tokens.begin();
+
+        Stmt::stream statements;
+        while (!this->_is_at_end()) {
+            statements.push_back(this->_parse_declaration());
+        }
+
+        if (this->_has_error) {
+            return std::nullopt;
+        }
+
+        return statements;
+    }
+
+    std::optional<Expr::u_ptr> Parser::parse_input_as_expr()
     {
         // Reset parser
         this->_current_token = this->_tokens.begin();
 
         Expr::u_ptr expression = this->_parse_expression();
+
         if (this->_has_error) {
             return std::nullopt;
         }
 
-        return std::move(expression);
+        return expression;
+    }
+
+    Stmt::u_ptr Parser::_parse_declaration()
+    {
+        try {
+            if (this->_match(TokenType::VAR)) {
+                return this->_parse_declaration_vardeclaration();
+            }
+
+            return this->_parse_statement();
+        } catch (const parse_exception& e) {
+            // Parsing is fucked, meaning that syntax is in some way incorrect, better synchronise
+            this->_synchronise();
+            return nullptr;
+        }
+    }
+
+    Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
+    {
+        this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
+        Token identifier = this->_get_previous();
+
+        std::optional<Expr::u_ptr> initializer;
+        if (this->_match(TokenType::ASSIGNMENT)) {
+            initializer = std::move(this->_parse_expression());
+        }
+
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_VAR);
+        return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
+    }
+
+    Stmt::u_ptr Parser::_parse_statement()
+    {
+        if (this->_match(TokenType::PRINT)) {
+            return this->_parse_statement_print();
+        }
+
+        return this->_parse_statement_expression();
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_print()
+    {
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::PRINT_NO_OPEN);
+        Expr::u_ptr expression = this->_parse_expression();
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::PRINT_NO_CLOSE);
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_PRINT);
+
+        return std::make_unique<Stmt::Print>(std::move(expression));
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_expression()
+    {
+        Expr::u_ptr expression = this->_parse_expression();
+
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_EXPR);
+
+        return std::make_unique<Stmt::Expression>(std::move(expression));
     }
 
     Expr::u_ptr Parser::_parse_expression()
     {
-        return this->_parse_equality();
+        return this->_parse_assignment();
+    }
+
+    Expr::u_ptr Parser::_parse_assignment()
+    {
+        if (!this->_peek(TokenType::ASSIGNMENT)) {
+            // This means we fall through to equality
+            return this->_parse_equality();
+        }
+
+        this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::INVALID_ASSIGNMENT_TARGET);
+        Token identifier = this->_get_previous();
+
+        this->_advance();
+
+        Expr::u_ptr new_value = this->_parse_equality();
+        return std::make_unique<Expr::VarAssign>(identifier, std::move(new_value));
     }
 
     bool _match_equality(const Token& token)
@@ -139,17 +230,19 @@ namespace Honk
             return std::make_unique<Expr::Literal>(value);
         }
 
+        if (this->_match(TokenType::IDENTIFIER)) {
+            return std::make_unique<Expr::VarAccess>(this->_get_previous());
+        }
+
         if (this->_match(TokenType::PAREN_OPEN)) {
             Expr::u_ptr grouped_expr = this->_parse_expression();
-            if (!this->_match(TokenType::PAREN_CLOSE)) {
-                this->_error_unclosed_param();
-                return this->_error_expr();
-            }
+            this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::UNCLOSED_GROUP);
+
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
 
-        this->_error_broken_expression();
-        return this->_error_expr();
+        this->_panic(PARSER_ERROR::BROKEN_EXPR);
+        return nullptr;
     }
 
     const Token& Parser::_advance()
@@ -177,10 +270,28 @@ namespace Honk
         }
     }
 
+    template<typename Callable>
+    bool Parser::_peek(Callable comparator)
+    {
+        TokenStream::const_iterator target_it = std::next(this->_current_token);
+        if (target_it >= this->_tokens.end()) {
+            return false;
+        }
+
+        return comparator(*target_it);
+    }
+
     bool Parser::_match(TokenType type)
     {
         return this->_match([&type] (const Token& current) {
             return current.type == type;
+        });
+    }
+
+    bool Parser::_peek(TokenType type)
+    {
+        return this->_peek([&type] (const Token& peeked) {
+            return peeked.type == type;
         });
     }
 
@@ -201,22 +312,32 @@ namespace Honk
         return *std::prev(this->_current_token);
     }
 
-    Expr::u_ptr Parser::_error_expr()
+    // You may be thinking "why not use a default arg?". Because you cannot use the result of a method in it...
+    void Parser::_panic(const char* message)
     {
-        return std::make_unique<Expr::Literal>(std::string("lol broken"));
+        this->_panic(message, this->_get_previous());
     }
 
-    void Parser::_error_broken_expression()
+    void Parser::_panic(const char* message, const Token& token)
     {
         this->_has_error = true;
+        this->_parent.report_error(token.line, message);
 
-        this->_parent.report_error(this->_get_current().line, "An expression is broken (unrecognised symbols)");
+        throw parse_exception(message, token);
     }
 
-    void Parser::_error_unclosed_param()
+    void Parser::_synchronise()
     {
-        this->_has_error = true;
+        // TODO: do actual synchronisation. Currently we just consume tokens until the end.
+        while (!this->_is_at_end()) {
+            this->_advance();
+        }
+    }
 
-        this->_parent.report_error(this->_get_current().line, "An opening parenthesis '(' was not closed");
+    void Parser::_assert_next_token_is(TokenType type, const char* message)
+    {
+        if (!this->_match(type)) {
+            this->_panic(message);
+        }
     }
 }

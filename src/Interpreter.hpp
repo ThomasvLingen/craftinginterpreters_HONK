@@ -7,6 +7,9 @@
 
 #include <string>
 
+#include "AST/Visitors/PrettyPrinter.hpp"
+#include "AST/Stmt.hpp"
+#include "Evaluator/Evaluator.hpp"
 #include "Lexer/Token.hpp"
 
 namespace Honk
@@ -26,13 +29,17 @@ namespace Honk
         void report_message(const string& type, uint32_t line, const string& message) const;
 
     private:
+        Evaluator _evaluator;
+        PrettyASTPrinter _printer;
+
         bool _debug = false;
         string _current_file = "";
 
         void _run_code(const string& source);
         void _print_tokens(const TokenStream& tokens);
         // TODO: This should logically be const, but it isn't since the Visitor interface doesn't stick to it.
-        void _print_AST(Expr& expr);
+        void _print_expression(Expr& expr);
+        void _print_statements(Stmt::stream& statements);
     };
 }
 

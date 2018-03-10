@@ -1,7 +1,7 @@
 SILENT = @
 
 # Compiler
-CC = g++
+CC = g++-8
 LD = $(CC)
 
 # Compiler flags

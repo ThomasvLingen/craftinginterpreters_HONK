@@ -67,6 +67,8 @@ namespace Honk
             HONK_ENUM_STR(IF); HONK_ENUM_STR(ELSE); HONK_ENUM_STR(WHILE); HONK_ENUM_STR(FOR);
             HONK_ENUM_STR(AND); HONK_ENUM_STR(OR);
 
+            HONK_ENUM_STR(PRINT);
+
             HONK_ENUM_STR(END_OF_FILE);
             default:
                 return "BIG FAT ERROR";

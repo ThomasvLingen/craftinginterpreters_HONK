@@ -6,22 +6,32 @@
 #define HONK_EVALUATOR_HPP
 
 #include "AST/Expr.hpp"
+#include "AST/Stmt.hpp"
+#include "VariableBucket.hpp"
 
 namespace Honk
 {
     struct Interpreter;
 
-    struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor
+    struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor, StmtVisitor<void>
     {
         Evaluator(const Interpreter& parent);
 
-        void evaluate(Expr& expression);
+        void interpret(Stmt::stream& code);
+        Value evaluate(Expr& expression);
 
-        // Expression visitor methods
-        Value visitLiteral(Expr::Literal& expr) override;
-        Value visitGrouped(Expr::Grouped& expr) override;
-        Value visitUnary(Expr::Unary& expr) override;
-        Value visitBinary(Expr::Binary& expr) override;
+        // Statement visitor methods
+        void visit_Expression(Stmt::Expression& stmt) override;
+        void visit_Print(Stmt::Print& stmt) override;
+        void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
+
+        // Expression visitor methods TODO: Make this consistent with the above...
+        Value visit_Literal(Expr::Literal& expr) override;
+        Value visit_Grouped(Expr::Grouped& expr) override;
+        Value visit_Unary(Expr::Unary& expr) override;
+        Value visit_VarAccess(Expr::VarAccess& expr) override;
+        Value visit_Binary(Expr::Binary& expr) override;
+        Value visit_VarAssign(Expr::VarAssign& expr) override;
 
         // Binary expression visitor methods
         virtual Value visit_minus(const Value& left, const Value& right) override;
@@ -37,8 +47,11 @@ namespace Honk
 
     private:
         const Interpreter& _parent;
+        VariableBucket _env;
 
         Value _evaluate(Expr& expr);
+        void _interpret(Stmt& statement);
+
         bool _is_truthy(const Value& val);
         bool _is_equal(const Value& a, const Value& b);
 

@@ -11,12 +11,13 @@
 #include "Lexer/Lexer.hpp"
 #include "AST/Parser.hpp"
 #include "AST/Visitors/PrettyPrinter.hpp"
-#include "AST/Visitors/Evaluator.hpp"
+#include "Evaluator/Evaluator.hpp"
 
 namespace Honk
 {
     Interpreter::Interpreter(bool debug)
-        : _debug(debug)
+        : _evaluator(*this)
+        , _debug(debug)
     {
     }
 
@@ -60,19 +61,18 @@ namespace Honk
 
         // Parse TokenStream into AST
         Parser parser(*this, tokens.value());
-        std::optional<Expr::u_ptr> AST = parser.parse_input();
+        std::optional<Stmt::stream> AST = parser.parse_input();
         if (!AST) {
             // lol not going to run that
             return;
         }
 
         if (this->_debug) {
-            this->_print_AST(**AST);
+            this->_print_statements(*AST);
         }
 
-        // Run AST
-        Evaluator evaluator(*this);
-        evaluator.evaluate(**AST);
+        // Run the code!
+        this->_evaluator.interpret(*AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const
@@ -94,8 +94,15 @@ namespace Honk
         }
     }
 
-    void Interpreter::_print_AST(Expr& expr)
+    void Interpreter::_print_expression(Expr& expr)
     {
-        PrettyASTPrinter().print(expr);
+         this->_printer.print(expr);
+    }
+
+    void Interpreter::_print_statements(Stmt::stream& statements)
+    {
+        for (Stmt::u_ptr& statement : statements) {
+            this->_printer.print(*statement);
+        }
     }
 }
