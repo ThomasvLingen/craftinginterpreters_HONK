@@ -272,6 +272,16 @@ namespace Honk
         return this->_get_current().type == TokenType::END_OF_FILE;
     }
 
+    bool Parser::_check(TokenType type)
+    {
+        return this->_internal_peek(0, type);
+    }
+
+    bool Parser::_peek(TokenType type)
+    {
+        return this->_internal_peek(1, type);
+    }
+
     template <typename Callable>
     bool Parser::_match(Callable comparator)
     {
@@ -287,17 +297,6 @@ namespace Honk
         }
     }
 
-    template<typename Callable>
-    bool Parser::_peek(Callable comparator)
-    {
-        TokenStream::const_iterator target_it = std::next(this->_current_token);
-        if (target_it >= this->_tokens.end()) {
-            return false;
-        }
-
-        return comparator(*target_it);
-    }
-
     bool Parser::_match(TokenType type)
     {
         return this->_match([&type] (const Token& current) {
@@ -305,28 +304,27 @@ namespace Honk
         });
     }
 
-    bool Parser::_peek(TokenType type)
+    bool Parser::_internal_peek(size_t steps, TokenType type)
     {
-        return this->_peek([&type] (const Token& peeked) {
+        return this->_internal_peek(steps, [&type] (const Token& peeked) {
             return peeked.type == type;
         });
     }
 
-    bool Parser::_check(TokenType type)
+    template<typename Callable>
+    bool Parser::_internal_peek(size_t steps, Callable comparator)
     {
-        return this->_get_current().type == type;
+        TokenStream::const_iterator target_it = std::next(this->_current_token, steps);
+        if (target_it >= this->_tokens.end()) {
+            return false;
+        }
+
+        return comparator(*target_it);
     }
 
     const Token& Parser::_get_current()
     {
         return *this->_current_token;
-    }
-
-    bool Parser::_match(std::initializer_list<TokenType> types)
-    {
-        return this->_match([&types] (const Token& token) {
-            return Util::contains(types, token.type);
-        });
     }
 
     const Token& Parser::_get_previous()

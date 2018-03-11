@@ -108,16 +108,16 @@ namespace Honk
         const Token& _get_previous();
 
         // TODO: I am not happy with the amount of utility match/peek/check code I have...
-        bool _match(std::initializer_list<TokenType> types);
         bool _match(TokenType type);
         template <typename Callable>
         bool _match(Callable comparator);
 
-        template <typename Callable>
-        bool _peek(Callable comparator);
         bool _peek(TokenType type);
-
         bool _check(TokenType type);
+
+        template <typename Callable>
+        bool _internal_peek(size_t steps, Callable comparator);
+        bool _internal_peek(size_t steps, TokenType type);
 
         void _panic(const char* message);
         void _panic(const char* message, const Token& token);
