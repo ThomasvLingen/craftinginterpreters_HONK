@@ -20,6 +20,7 @@ namespace Honk
     {
         constexpr char BROKEN_EXPR[] = "An expression is broken (unrecognised symbols)";
         constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
+        constexpr char UNCLOSED_BLOCK[] = "The start of a code block '{' was not closed";
         constexpr char PRINT_NO_OPEN[] = "Expected a '(' after print";
         constexpr char PRINT_NO_CLOSE[] = "Expected a ')' after the operand of print";
         constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the print call";
@@ -65,15 +66,18 @@ namespace Honk
         //     varDecl     → "var" IDENTIFIER ( "=" expression )? ";" ;
         //     statement   → exprStmt
         //                   | printStmt ;
+        //                   | blockStmt ;
         //
         //     exprStmt    → expression ";" ;
         //     printStmt   → "print" "(" expression ")" ";" ;
+        //     blockStmt   → "{" declaration* "}" ;
 
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
         Stmt::u_ptr _parse_statement();
         Stmt::u_ptr _parse_statement_print();
         Stmt::u_ptr _parse_statement_expression();
+        Stmt::u_ptr _parse_statement_block();
 
         // Expression grammar:
         //     expression     → assignment ;
@@ -103,14 +107,17 @@ namespace Honk
         const Token& _get_current();
         const Token& _get_previous();
 
-        bool _match(std::initializer_list<TokenType> types);
+        // TODO: I am not happy with the amount of utility match/peek/check code I have...
         bool _match(TokenType type);
         template <typename Callable>
         bool _match(Callable comparator);
 
-        template <typename Callable>
-        bool _peek(Callable comparator);
         bool _peek(TokenType type);
+        bool _check(TokenType type);
+
+        template <typename Callable>
+        bool _internal_peek(size_t steps, Callable comparator);
+        bool _internal_peek(size_t steps, TokenType type);
 
         void _panic(const char* message);
         void _panic(const char* message, const Token& token);

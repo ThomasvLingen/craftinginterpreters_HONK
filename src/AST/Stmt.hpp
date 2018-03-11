@@ -17,6 +17,10 @@
         return visitor.visit_##classname(*this);                 \
     }                                                            \
 
+#define STMTVISITORS_ACCEPT(classname)         \
+    STMTVISITOR_ACCEPT(void       , classname) \
+    STMTVISITOR_ACCEPT(std::string, classname) \
+
 namespace Honk
 {
     template<typename T>
@@ -34,6 +38,7 @@ namespace Honk
 
         struct Expression;
         struct Print;
+        struct Block;
         struct VarDeclaration;
     };
 
@@ -42,6 +47,7 @@ namespace Honk
     {
         virtual T visit_Expression(Stmt::Expression& stmt) = 0;
         virtual T visit_Print(Stmt::Print& stmt) = 0;
+        virtual T visit_Block(Stmt::Block& stmt) = 0;
         virtual T visit_VarDeclaration(Stmt::VarDeclaration& stmt) = 0;
     };
 
@@ -49,20 +55,27 @@ namespace Honk
     {
         Expression(Expr::u_ptr expression);
 
-        STMTVISITOR_ACCEPT(void, Expression)
-        STMTVISITOR_ACCEPT(std::string, Expression)
-
         Expr::u_ptr expression;
+
+        STMTVISITORS_ACCEPT(Expression)
     };
 
     struct Stmt::Print : Stmt
     {
         Print(Expr::u_ptr expression);
 
-        STMTVISITOR_ACCEPT(void, Print)
-        STMTVISITOR_ACCEPT(std::string, Print)
-
         Expr::u_ptr expression;
+
+        STMTVISITORS_ACCEPT(Print)
+    };
+
+    struct Stmt::Block : Stmt
+    {
+        Block(Stmt::stream statements);
+
+        Stmt::stream statements;
+
+        STMTVISITORS_ACCEPT(Block)
     };
 
     struct Stmt::VarDeclaration : Stmt
@@ -71,11 +84,10 @@ namespace Honk
 
         std::string get_identifier();
 
-        STMTVISITOR_ACCEPT(void, VarDeclaration)
-        STMTVISITOR_ACCEPT(std::string, VarDeclaration)
-
         Token identifier_token;
         std::optional<Expr::u_ptr> initializer;
+
+        STMTVISITORS_ACCEPT(VarDeclaration)
     };
 }
 

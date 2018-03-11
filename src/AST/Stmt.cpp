@@ -26,4 +26,9 @@ namespace Honk
     {
         return this->identifier_token.text;
     }
+
+    Stmt::Block::Block(Stmt::stream statements)
+        : statements(std::move(statements))
+    {
+    }
 }
