@@ -191,7 +191,7 @@ namespace Honk
 
     Value Evaluator::visit_VarAccess(Expr::VarAccess& expr)
     {
-        Value* accessed_value = this->_env.get_var(expr.get_identifier());
+        Value* accessed_value = this->_env().get_var(expr.get_identifier());
 
         if (!accessed_value) {
             throw std::runtime_error {"Accessing an undefined variable: " + expr.get_identifier()};
@@ -202,7 +202,7 @@ namespace Honk
 
     Value Evaluator::visit_VarAssign(Expr::VarAssign& expr)
     {
-        Value* assigned_value = this->_env.get_var(expr.get_identifier());
+        Value* assigned_value = this->_env().get_var(expr.get_identifier());
         if (!assigned_value) {
             throw std::runtime_error {"Trying to assign to an undefined variable: " + expr.get_identifier()};
         }
@@ -252,6 +252,16 @@ namespace Honk
         std::cout << expression_result.to_str() << std::endl;
     }
 
+    void Evaluator::visit_Block(Stmt::Block& stmt)
+    {
+        // A scope guard is used to guarantee exception safety
+        VariableBucket::Scoped::Guard scope_entry_guard(this->_scopes);
+
+        for (Stmt::u_ptr& block_stmt : stmt.statements) {
+            this->_interpret(*block_stmt);
+        }
+    }
+
     void Evaluator::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
     {
         Value initial_value { null };
@@ -260,6 +270,11 @@ namespace Honk
             initial_value = this->_evaluate(**stmt.initializer);
         }
 
-        this->_env.new_var(stmt.get_identifier(), initial_value);
+        this->_env().new_var(stmt.get_identifier(), initial_value);
+    }
+
+    VariableBucket& Evaluator::_env()
+    {
+        return this->_scopes.get_current_env();
     }
 }

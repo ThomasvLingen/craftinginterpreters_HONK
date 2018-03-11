@@ -1,6 +1,8 @@
 // Print statements
+print("Hello" + " " + "HONK!");
+print("This should read 6:");
 print(1 + 2 + 3);
-print("hello" + " " + "HONK!");
+print("Printing booleans:");
 print(true);
 
 // Expression statements
@@ -11,26 +13,24 @@ print(true);
 // Variables + expressions
 var three = 3;
 var five = 5;
-print(three + five);
+print("Expect true for the following:");
+print(three + five == 8);
 print(three < five);
+print(!(three > five));
 
 // Scopes + shadowing
-var a = "global a";
-var b = "global b";
-var c = "global c";
+var global_a = 10;
 {
-    var a = "outer a";
-    var b = "outer b";
-    {
-        var a = "inner a";
-        print(a);
-        print(b);
-        print(c);
-    }
-    print(a);
-    print(b);
-    print(c);
+    var local_b = 5;
+    print(global_a + local_b == 15);
 }
-print(a);
-print(b);
-print(c);
+{
+    var local_b = 10;
+    print(global_a + local_b == 20);
+
+    {
+        // This should shadow the top declaration
+        var global_a = 1;
+        print(global_a + local_b == 11);
+    }
+}

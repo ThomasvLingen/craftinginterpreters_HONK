@@ -23,9 +23,10 @@ namespace Honk
         // Statement visitor methods
         void visit_Expression(Stmt::Expression& stmt) override;
         void visit_Print(Stmt::Print& stmt) override;
+        void visit_Block(Stmt::Block& stmt) override;
         void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
 
-        // Expression visitor methods TODO: Make this consistent with the above...
+        // Expression visitor methods
         Value visit_Literal(Expr::Literal& expr) override;
         Value visit_Grouped(Expr::Grouped& expr) override;
         Value visit_Unary(Expr::Unary& expr) override;
@@ -47,7 +48,7 @@ namespace Honk
 
     private:
         const Interpreter& _parent;
-        VariableBucket _env;
+        VariableBucket::Scoped _scopes;
 
         Value _evaluate(Expr& expr);
         void _interpret(Stmt& statement);
@@ -62,6 +63,7 @@ namespace Honk
         bool _values_are(const Value& left, const Value& right);
         template <typename T>
         std::pair<T, T> _try_get_as(const Value& left, const Value& right, const char* throw_msg);
+        VariableBucket& _env();
 
         // Helper exception throwers
         void _throw_if_not_integer(const Value& left, const Value& right, const char* throw_msg);
