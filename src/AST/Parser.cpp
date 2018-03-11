@@ -82,6 +82,10 @@ namespace Honk
             return this->_parse_statement_print();
         }
 
+        if (this->_match(TokenType::CURLY_OPEN)) {
+            return this->_parse_statement_block();
+        }
+
         return this->_parse_statement_expression();
     }
 
@@ -93,6 +97,19 @@ namespace Honk
         this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_PRINT);
 
         return std::make_unique<Stmt::Print>(std::move(expression));
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_block()
+    {
+        Stmt::stream statements;
+
+        while (!this->_check(TokenType::CURLY_CLOSE) && !this->_is_at_end()) {
+            statements.push_back(this->_parse_declaration());
+        }
+
+        this->_assert_next_token_is(TokenType::CURLY_CLOSE, PARSER_ERROR::UNCLOSED_BLOCK);
+
+        return std::make_unique<Stmt::Block>(std::move(statements));
     }
 
     Stmt::u_ptr Parser::_parse_statement_expression()
@@ -293,6 +310,11 @@ namespace Honk
         return this->_peek([&type] (const Token& peeked) {
             return peeked.type == type;
         });
+    }
+
+    bool Parser::_check(TokenType type)
+    {
+        return this->_get_current().type == type;
     }
 
     const Token& Parser::_get_current()

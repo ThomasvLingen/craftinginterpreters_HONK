@@ -77,6 +77,18 @@ namespace Honk
         return output;
     }
 
+    std::string PrettyASTPrinter::visit_Block(Stmt::Block& stmt)
+    {
+        std::string output;
+
+        output += "{\n";
+        for (Stmt::u_ptr& statement : stmt.statements) {
+            output += statement->accept(*this) + "\n";
+        }
+        output += "}";
+        return output;
+    }
+
     std::string PrettyASTPrinter::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
     {
         std::string output;

@@ -18,6 +18,9 @@ namespace Honk
         // Statement visitors
         std::string visit_Expression(Stmt::Expression& stmt) override;
         std::string visit_Print(Stmt::Print& stmt) override;
+
+        std::string visit_Block(Stmt::Block& stmt) override;
+
         std::string visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
 
         // Expression visitors
