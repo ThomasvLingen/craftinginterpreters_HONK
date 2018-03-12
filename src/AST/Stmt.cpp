@@ -31,4 +31,11 @@ namespace Honk
         : statements(std::move(statements))
     {
     }
+
+    Stmt::If::If(Expr::u_ptr condition, Stmt::u_ptr true_branch, std::optional<Stmt::u_ptr> false_branch)
+        : condition(std::move(condition))
+        , true_branch(std::move(true_branch))
+        , false_branch(std::move(false_branch))
+    {
+    }
 }

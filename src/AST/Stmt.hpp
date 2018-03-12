@@ -40,6 +40,7 @@ namespace Honk
         struct Print;
         struct Block;
         struct VarDeclaration;
+        struct If;
     };
 
     template<typename T>
@@ -48,6 +49,7 @@ namespace Honk
         virtual T visit_Expression(Stmt::Expression& stmt) = 0;
         virtual T visit_Print(Stmt::Print& stmt) = 0;
         virtual T visit_Block(Stmt::Block& stmt) = 0;
+        virtual T visit_If(Stmt::If& stmt) = 0;
         virtual T visit_VarDeclaration(Stmt::VarDeclaration& stmt) = 0;
     };
 
@@ -76,6 +78,17 @@ namespace Honk
         Stmt::stream statements;
 
         STMTVISITORS_ACCEPT(Block)
+    };
+
+    struct Stmt::If : Stmt
+    {
+        If(Expr::u_ptr condition, Stmt::u_ptr true_branch, std::optional<Stmt::u_ptr> false_branch);
+
+        Expr::u_ptr condition;
+        Stmt::u_ptr true_branch;
+        std::optional<Stmt::u_ptr> false_branch;
+
+        STMTVISITORS_ACCEPT(If)
     };
 
     struct Stmt::VarDeclaration : Stmt

@@ -24,6 +24,7 @@ namespace Honk
         void visit_Expression(Stmt::Expression& stmt) override;
         void visit_Print(Stmt::Print& stmt) override;
         void visit_Block(Stmt::Block& stmt) override;
+        void visit_If(Stmt::If& stmt) override;
         void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
 
         // Expression visitor methods
@@ -54,6 +55,7 @@ namespace Honk
         void _interpret(Stmt& statement);
 
         bool _is_truthy(const Value& val);
+        bool _is_truthy(Expr& expr);
         bool _is_equal(const Value& a, const Value& b);
 
         // Other helpers

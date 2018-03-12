@@ -89,6 +89,22 @@ namespace Honk
         return output;
     }
 
+    std::string PrettyASTPrinter::visit_If(Stmt::If& stmt)
+    {
+        std::string output;
+        output += "[if ";
+        output += stmt.condition->accept(*this) + " ";
+        output += stmt.true_branch->accept(*this);
+
+        if (stmt.false_branch) {
+            Stmt& false_branch = **stmt.false_branch;
+            output += " else " + false_branch.accept(*this);
+        }
+
+        output += "]";
+        return output;
+    }
+
     std::string PrettyASTPrinter::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
     {
         std::string output;
