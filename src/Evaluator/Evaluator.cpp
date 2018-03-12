@@ -262,6 +262,15 @@ namespace Honk
         }
     }
 
+    void Evaluator::visit_If(Stmt::If& stmt)
+    {
+        if (this->_is_truthy(*stmt.condition)) {
+            this->_interpret(*stmt.true_branch);
+        } else if (stmt.false_branch) {
+            this->_interpret(**stmt.false_branch);
+        }
+    }
+
     void Evaluator::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
     {
         Value initial_value { null };
@@ -276,5 +285,10 @@ namespace Honk
     VariableBucket& Evaluator::_env()
     {
         return this->_scopes.get_current_env();
+    }
+
+    bool Evaluator::_is_truthy(Expr& expr)
+    {
+        return this->_is_truthy(this->_evaluate(expr));
     }
 }
