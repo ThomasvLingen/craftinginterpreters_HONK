@@ -86,6 +86,10 @@ namespace Honk
             return this->_parse_statement_block();
         }
 
+        if (this->_match(TokenType::IF)) {
+            return this->_parse_statement_if();
+        }
+
         return this->_parse_statement_expression();
     }
 
@@ -110,6 +114,35 @@ namespace Honk
         this->_assert_next_token_is(TokenType::CURLY_CLOSE, PARSER_ERROR::UNCLOSED_BLOCK);
 
         return std::make_unique<Stmt::Block>(std::move(statements));
+    }
+
+    Stmt::u_ptr Parser::_parse_if_block()
+    {
+        this->_assert_next_token_is(TokenType::CURLY_OPEN, PARSER_ERROR::IF::EXPECTED_BLOCK);
+
+        return this->_parse_statement_block();
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_if()
+    {
+        // if (expr)
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::IF::NO_OPEN);
+        Expr::u_ptr condition = this->_parse_expression();
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::IF::NO_CLOSE);
+
+        // { true_branch }
+        Stmt::u_ptr true_branch = this->_parse_if_block();
+
+        // else { false_branch }
+        std::optional<Stmt::u_ptr> false_branch;
+        if (this->_match(TokenType::ELSE)) {
+            false_branch = this->_parse_if_block();
+        }
+
+        return std::make_unique<Stmt::If> (
+            std::move(condition),
+            std::move(true_branch), std::move(false_branch)
+        );
     }
 
     Stmt::u_ptr Parser::_parse_statement_expression()

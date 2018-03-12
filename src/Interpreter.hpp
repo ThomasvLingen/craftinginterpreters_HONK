@@ -29,7 +29,7 @@ namespace Honk
         void report_message(const string& type, uint32_t line, const string& message) const;
 
     private:
-        Evaluator _evaluator;
+        // Evaluator _evaluator;
         PrettyASTPrinter _printer;
 
         bool _debug = false;

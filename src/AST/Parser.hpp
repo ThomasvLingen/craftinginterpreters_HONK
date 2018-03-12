@@ -28,6 +28,12 @@ namespace Honk
         constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
         constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
         constexpr char INVALID_ASSIGNMENT_TARGET[] = "Expected an identifier to the left of the '='";
+        namespace IF
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after the 'if' keyword";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the 'if' condition";
+            constexpr char EXPECTED_BLOCK[] = "Expected a code block '{ ... }'";
+        }
     }
 
     struct parse_exception : std::runtime_error
@@ -67,10 +73,12 @@ namespace Honk
         //     statement   → exprStmt
         //                   | printStmt ;
         //                   | blockStmt ;
+        //                   | ifStmt ;
         //
         //     exprStmt    → expression ";" ;
         //     printStmt   → "print" "(" expression ")" ";" ;
         //     blockStmt   → "{" declaration* "}" ;
+        //     ifStmt      → "if" "(" expression ")" blockStmt ( "else" blockStmt )? ;
 
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
@@ -78,6 +86,7 @@ namespace Honk
         Stmt::u_ptr _parse_statement_print();
         Stmt::u_ptr _parse_statement_expression();
         Stmt::u_ptr _parse_statement_block();
+        Stmt::u_ptr _parse_statement_if();
 
         // Expression grammar:
         //     expression     → assignment ;
@@ -100,6 +109,9 @@ namespace Honk
         Expr::u_ptr _parse_multiplication();
         Expr::u_ptr _parse_unary();
         Expr::u_ptr _parse_primary();
+
+        // _parse_helpers
+        Stmt::u_ptr _parse_if_block();
 
         // this->_is_at_end() is not interwoven with this.
         // It is in the book, but it clutters everything imo.

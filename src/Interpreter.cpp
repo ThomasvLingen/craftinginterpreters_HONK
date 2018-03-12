@@ -16,8 +16,8 @@
 namespace Honk
 {
     Interpreter::Interpreter(bool debug)
-        : _evaluator(*this)
-        , _debug(debug)
+        // : _evaluator(*this)
+        : _debug(debug)
     {
     }
 
@@ -72,7 +72,8 @@ namespace Honk
         }
 
         // Run the code!
-        this->_evaluator.interpret(*AST);
+        // TODO: re-enable this
+        // this->_evaluator.interpret(*AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const

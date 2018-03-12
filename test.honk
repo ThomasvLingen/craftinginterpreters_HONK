@@ -1,8 +1,8 @@
 // Print statements
 print("Hello" + " " + "HONK!");
-print("This should read 6:");
+print("Expect 6:");
 print(1 + 2 + 3);
-print("Printing booleans:");
+print("Expect true");
 print(true);
 
 // Expression statements
@@ -33,4 +33,25 @@ var global_a = 10;
         var global_a = 1;
         print(global_a + local_b == 11);
     }
+}
+
+// if statements
+print("Expect 3 trues");
+if (true) {
+    print(true);
+}
+
+if (false) {
+    print(false);
+}
+
+var if_test_assign = 0;
+if (if_test_assign = if_test_assign + 1) {
+    print(true);
+}
+
+if (true == false) {
+    print(false);
+} else {
+    print(true);
 }
