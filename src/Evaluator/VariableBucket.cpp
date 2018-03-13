@@ -42,26 +42,15 @@ namespace Honk
         return this->_scopes.top();
     }
 
-    void VariableBucket::Scoped::enter_scope()
+    void VariableBucket::Scoped::scope_enter()
     {
         VariableBucket& enclosing = this->get_current_env();
 
         this->_scopes.push(VariableBucket(&enclosing));
     }
 
-    void VariableBucket::Scoped::exit_scope()
+    void VariableBucket::Scoped::scope_exit()
     {
         this->_scopes.pop();
-    }
-
-    VariableBucket::Scoped::Guard::Guard(VariableBucket::Scoped& target)
-        : _target(target)
-    {
-        this->_target.enter_scope();
-    }
-
-    VariableBucket::Scoped::Guard::~Guard()
-    {
-        this->_target.exit_scope();
     }
 }

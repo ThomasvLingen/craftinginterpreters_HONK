@@ -247,7 +247,7 @@ namespace Honk
     void Evaluator::visit_Block(Stmt::Block& stmt)
     {
         // A scope guard is used to guarantee exception safety
-        VariableBucket::Scoped::Guard scope_entry_guard(this->_scopes);
+        Util::ScopeGuard guard(this->_scopes);
 
         for (Stmt::u_ptr& block_stmt : stmt.statements) {
             this->_interpret(*block_stmt);

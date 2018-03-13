@@ -33,28 +33,16 @@ namespace Honk
     };
 
     // The same as a VariableBucket, but this supports multiple scopes.
-    struct VariableBucket::Scoped
+    struct VariableBucket::Scoped : Util::I_Scopable
     {
-        struct Guard;
-
         Scoped();
 
-        void enter_scope();
-        void exit_scope();
+        void scope_enter() override;
+        void scope_exit() override;
         VariableBucket& get_current_env();
 
     private:
         std::stack<VariableBucket> _scopes;
-    };
-
-    // Lock guard for use in entering and exiting scopes
-    struct VariableBucket::Scoped::Guard
-    {
-        Guard(VariableBucket::Scoped& target);
-        ~Guard();
-
-    private:
-        VariableBucket::Scoped& _target;
     };
 }
 

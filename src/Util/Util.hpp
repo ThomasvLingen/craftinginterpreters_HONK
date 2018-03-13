@@ -8,5 +8,6 @@
 #include "Type_attr.hpp"
 #include "Container.hpp"
 #include "Misc.hpp"
+#include "ScopeGuard.hpp"
 
 #endif //HONK_UTIL_HPP
