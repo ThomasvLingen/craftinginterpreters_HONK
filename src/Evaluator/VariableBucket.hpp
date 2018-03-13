@@ -10,7 +10,7 @@
 #include <stack>
 
 #include "AST/Value.hpp"
-#include "Util.hpp"
+#include "Util/Util.hpp"
 
 namespace Honk
 {

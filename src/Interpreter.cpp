@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "Util.hpp"
+#include "Util/Util.hpp"
 #include "Lexer/Lexer.hpp"
 #include "AST/Parser.hpp"
 #include "AST/Visitors/PrettyPrinter.hpp"

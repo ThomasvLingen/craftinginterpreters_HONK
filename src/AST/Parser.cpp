@@ -5,7 +5,7 @@
 #include "Parser.hpp"
 
 #include "Interpreter.hpp"
-#include "Util.hpp"
+#include "Util/Util.hpp"
 #include "AST/Expr.hpp"
 
 namespace Honk

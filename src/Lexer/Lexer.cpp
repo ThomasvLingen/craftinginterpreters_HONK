@@ -9,7 +9,7 @@
 #include <optional>
 
 #include "Interpreter.hpp"
-#include "Util.hpp"
+#include "Util/Util.hpp"
 
 namespace Honk
 {
