@@ -26,6 +26,8 @@ namespace Honk
         std::string visit_Binary(Expr::Binary& expr) override;
         std::string visit_Grouped(Expr::Grouped& expr) override;
         std::string visit_Literal(Expr::Literal& expr) override;
+        std::string visit_LogicalOr(Expr::LogicalOr& expr) override;
+        std::string visit_LogicalAnd(Expr::LogicalAnd& expr) override;
         std::string visit_Unary(Expr::Unary& expr) override;
         std::string visit_VarAccess(Expr::VarAccess& expr) override;
         std::string visit_VarAssign(Expr::VarAssign& expr) override;

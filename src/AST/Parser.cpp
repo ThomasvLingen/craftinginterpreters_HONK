@@ -162,8 +162,8 @@ namespace Honk
     Expr::u_ptr Parser::_parse_assignment()
     {
         if (!this->_peek(TokenType::ASSIGNMENT)) {
-            // This means we fall through to equality
-            return this->_parse_equality();
+            // This means we fall through to logic_or
+            return this->_parse_logic_or();
         }
 
         this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::INVALID_ASSIGNMENT_TARGET);
@@ -171,8 +171,30 @@ namespace Honk
 
         this->_advance();
 
-        Expr::u_ptr new_value = this->_parse_equality();
+        Expr::u_ptr new_value = this->_parse_logic_or();
         return std::make_unique<Expr::VarAssign>(identifier, std::move(new_value));
+    }
+
+    Expr::u_ptr Parser::_parse_logic_or()
+    {
+        Expr::u_ptr left = this->_parse_logic_and();
+
+        while (this->_match(TokenType::OR)) {
+            left = std::make_unique<Expr::LogicalOr>(std::move(left), this->_parse_logic_and());
+        }
+
+        return left;
+    }
+
+    Expr::u_ptr Parser::_parse_logic_and()
+    {
+        Expr::u_ptr left = this->_parse_equality();
+
+        while (this->_match(TokenType::AND)) {
+            left = std::make_unique<Expr::LogicalAnd>(std::move(left), this->_parse_equality());
+        }
+
+        return left;
     }
 
     bool _match_equality(const Token& token)

@@ -90,8 +90,12 @@ namespace Honk
 
         // Expression grammar:
         //     expression     → assignment ;
-        //     assignment     → IDENTIFIER "=" equality
-        //                      | equality ;
+        //     assignment     → IDENTIFIER "=" logic_or
+        //                      | logic_or ;
+        //
+        //     logic_or       → logic_and ( "or" logic_and )* ;
+        //     logic_and      → equality ( "and" equality )* ;
+        //
         //     equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         //     comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
         //     addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -103,6 +107,8 @@ namespace Honk
         //                      | "(" expression ")" ;
         Expr::u_ptr _parse_expression();
         Expr::u_ptr _parse_assignment();
+        Expr::u_ptr _parse_logic_or();
+        Expr::u_ptr _parse_logic_and();
         Expr::u_ptr _parse_equality();
         Expr::u_ptr _parse_comparison();
         Expr::u_ptr _parse_addition();

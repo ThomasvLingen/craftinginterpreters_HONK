@@ -307,4 +307,26 @@ namespace Honk
     {
         return EvaluateError(msg.c_str(), &this->_callstack.get_last_token());
     }
+
+    Value Evaluator::visit_LogicalOr(Expr::LogicalOr& expr)
+    {
+        Value left = this->_evaluate(*expr.left);
+
+        if (this->_is_truthy(left)) {
+            return left;
+        }
+
+        return this->_evaluate(*expr.right);
+    }
+
+    Value Evaluator::visit_LogicalAnd(Expr::LogicalAnd& expr)
+    {
+        Value left = this->_evaluate(*expr.left);
+
+        if (!this->_is_truthy(left)) {
+            return left;
+        }
+
+        return this->_evaluate(*expr.right);
+    }
 }
