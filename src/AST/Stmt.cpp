@@ -6,6 +6,16 @@
 
 namespace Honk
 {
+    Stmt::Stmt()
+        : diagnostics_token(Token::null)
+    {
+    }
+
+    Stmt::Stmt(const Token& diagnostics_token)
+        : diagnostics_token(diagnostics_token)
+    {
+    }
+
     Stmt::Expression::Expression(Expr::u_ptr expression)
         : expression(std::move(expression))
     {
@@ -17,7 +27,8 @@ namespace Honk
     }
 
     Stmt::VarDeclaration::VarDeclaration(Token identifier, std::optional<Expr::u_ptr> initializer)
-        : identifier_token(identifier)
+        : Stmt(this->identifier_token)
+        , identifier_token(identifier)
         , initializer(std::move(initializer))
     {
     }

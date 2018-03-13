@@ -33,6 +33,8 @@ namespace Honk
         virtual void accept(StmtVisitor<void>& visitor) = 0;
         virtual std::string accept(StmtVisitor<std::string>& visitor) = 0;
 
+        const Token& diagnostics_token;
+
         using u_ptr = std::unique_ptr<Stmt>;
         using stream = std::vector<u_ptr>;
 
@@ -41,6 +43,10 @@ namespace Honk
         struct Block;
         struct VarDeclaration;
         struct If;
+
+    private:
+        Stmt();
+        Stmt(const Token& diagnostics_token);
     };
 
     template<typename T>

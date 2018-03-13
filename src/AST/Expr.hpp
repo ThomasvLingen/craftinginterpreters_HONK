@@ -40,6 +40,8 @@ namespace Honk
         virtual std::string accept(ExprVisitor<std::string>& visitor) = 0;
         virtual Value accept(ExprVisitor<Value>& visitor) = 0;
 
+        const Token& diagnostics_token;
+
         using u_ptr = std::unique_ptr<Expr>;
 
         struct Binary;
@@ -48,6 +50,10 @@ namespace Honk
         struct Unary;
         struct VarAccess;
         struct VarAssign;
+
+    protected:
+        Expr();
+        Expr(const Token& diagnostics_token);
     };
 
     template<typename T>

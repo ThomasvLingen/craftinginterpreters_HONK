@@ -11,8 +11,19 @@
 
 namespace Honk
 {
+    Expr::Expr(const Token& diagnostics_token)
+        : diagnostics_token(diagnostics_token)
+    {
+    }
+
+    Expr::Expr()
+        : diagnostics_token(Token::null)
+    {
+    }
+
     Expr::Binary::Binary(Expr::u_ptr left, Token op, Expr::u_ptr right)
-        : left(std::move(left))
+        : Expr(this->op)
+        , left(std::move(left))
         , op(op)
         , right(std::move(right))
     {
@@ -68,7 +79,8 @@ namespace Honk
     }
 
     Expr::Unary::Unary(Token op, Expr::u_ptr right)
-        : op(op)
+        : Expr(this->op)
+        , op(op)
         , right(std::move(right))
     {
     }
@@ -79,7 +91,8 @@ namespace Honk
     }
 
     Expr::VarAccess::VarAccess(Token identifier)
-        : identifier_tok(identifier)
+        : Expr(this->identifier_tok)
+        , identifier_tok(identifier)
     {
     }
 
@@ -89,7 +102,8 @@ namespace Honk
     }
 
     Expr::VarAssign::VarAssign(Token identifier_tok, Expr::u_ptr new_value)
-        : identifier_tok(identifier_tok)
+        : Expr(this->identifier_tok)
+        , identifier_tok(identifier_tok)
         , new_value(std::move(new_value))
     {
     }

@@ -8,10 +8,18 @@
 #include "AST/Expr.hpp"
 #include "AST/Stmt.hpp"
 #include "VariableBucket.hpp"
+#include "DiagnosticsTokenTracker.hpp"
 
 namespace Honk
 {
     struct Interpreter;
+
+    struct EvaluateError : std::runtime_error
+    {
+        EvaluateError(const char* msg, const Token* error_token);
+
+        const Token* error_token = nullptr;
+    };
 
     struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor, StmtVisitor<void>
     {
@@ -50,6 +58,7 @@ namespace Honk
     private:
         const Interpreter& _parent;
         VariableBucket::Scoped _scopes;
+        DiagnosticsTokenTracker _callstack;
 
         Value _evaluate(Expr& expr);
         Value _evaluate_optional(std::optional<Expr::u_ptr>& expr);
@@ -67,6 +76,8 @@ namespace Honk
         template <typename T>
         std::pair<T, T> _try_get_as(const Value& left, const Value& right, const char* throw_msg);
         VariableBucket& _env();
+
+        EvaluateError _error(const std::string& msg);
     };
 }
 

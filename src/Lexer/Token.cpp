@@ -8,6 +8,8 @@
 
 namespace Honk
 {
+    Token Token::null {TokenType::VAL_NULL, "", "", 0};
+
     bool Token::has_value() const
     {
         return this->type == TokenType::INT ||

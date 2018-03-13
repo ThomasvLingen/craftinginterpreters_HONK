@@ -15,15 +15,20 @@ namespace Honk
     {
     }
 
+    EvaluateError::EvaluateError(const char* msg, const Token* error_token)
+        : std::runtime_error(msg)
+        , error_token(error_token)
+    {
+    }
+
     void Evaluator::interpret(Stmt::stream& code)
     {
         try {
             for (Stmt::u_ptr& statement : code) {
                 this->_interpret(*statement);
             }
-        } catch (std::runtime_error& e) {
-            // TODO: make sure the line number is correct here
-            this->_parent.report_error(0, e.what());
+        } catch (EvaluateError& e) {
+            this->_parent.report_error(e.error_token->line, e.what());
         }
     }
 
@@ -31,9 +36,8 @@ namespace Honk
     {
         try {
             return this->_evaluate(expression);
-        } catch (std::runtime_error& e) {
-            // TODO: make sure the line number is correct here
-            this->_parent.report_error(0, e.what());
+        } catch (EvaluateError& e) {
+            this->_parent.report_error(e.error_token->line, e.what());
         }
     }
 
@@ -49,11 +53,17 @@ namespace Honk
 
     Value Evaluator::_evaluate(Expr& expr)
     {
+        this->_callstack.add_call(&expr.diagnostics_token);
+
+        Util::ScopeGuard guard(this->_callstack);
         return expr.accept(*this);
     }
 
     void Evaluator::_interpret(Stmt& statement)
     {
+        this->_callstack.add_call(&statement.diagnostics_token);
+
+        Util::ScopeGuard guard(this->_callstack);
         statement.accept(*this);
     }
 
@@ -66,14 +76,14 @@ namespace Honk
                 return Value {-*val};
             }
 
-            throw std::runtime_error {"Unary expression cannot be evaluated: minus used on something other than an integer"};
+            throw this->_error("Unary expression cannot be evaluated: minus used on something other than an integer");
         }
 
         if (expr.op_type() == TokenType::NOT) {
             return Value {!this->_is_truthy(right)};
         }
 
-        throw std::runtime_error {"Unary expression cannot be evaluated: invalid operator"};
+        throw this->_error("Unary expression cannot be evaluated: invalid operator");
     }
 
     bool Evaluator::_is_truthy(const Value& val)
@@ -122,7 +132,7 @@ namespace Honk
         auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Division expression cannot be evaluated: operands are not integers");
 
         if (right_val == 0) {
-            throw std::runtime_error {"Division expression cannot be evaluated: divide by 0"};
+            throw this->_error("Division expression cannot be evaluated: divide by 0");
         }
 
         return Value {left_val / right_val};
@@ -148,7 +158,7 @@ namespace Honk
             return Value {left_val + right_val};
         }
 
-        throw std::runtime_error{"Plus expression cannot be evaluated: operands aren't either strings or integers"};
+        throw this->_error("Plus expression cannot be evaluated: operands aren't either strings or integers");
     }
 
     Value Evaluator::visit_greater(const Value& left, const Value& right)
@@ -194,7 +204,7 @@ namespace Honk
         Value* accessed_value = this->_env().get_var(expr.get_identifier());
 
         if (!accessed_value) {
-            throw std::runtime_error {"Accessing an undefined variable: " + expr.get_identifier()};
+            throw this->_error("Accessing an undefined variable: " + expr.get_identifier());
         }
 
         return *accessed_value;
@@ -204,7 +214,7 @@ namespace Honk
     {
         Value* assigned_value = this->_env().get_var(expr.get_identifier());
         if (!assigned_value) {
-            throw std::runtime_error {"Trying to assign to an undefined variable: " + expr.get_identifier()};
+            throw this->_error("Trying to assign to an undefined variable: " + expr.get_identifier());
         }
 
         return *assigned_value = this->evaluate(*expr.new_value);
@@ -226,7 +236,7 @@ namespace Honk
     std::pair<T, T> Evaluator::_try_get_as(const Value& left, const Value& right, const char* throw_msg)
     {
         if (!this->_values_are<T>(left, right)) {
-            throw std::runtime_error{throw_msg};
+            throw this->_error(throw_msg);
         }
 
         return this->_get_as<T>(left, right);
@@ -267,7 +277,7 @@ namespace Honk
     {
         std::string identifier = stmt.get_identifier();
         if (this->_env().has_var_in_local(identifier)) {
-            throw std::runtime_error {"Redeclaring variable in same scope: " + identifier};
+            throw this->_error("Redeclaring variable in same scope: " + identifier);
         }
 
         Value initial_value = this->_evaluate_optional(stmt.initializer);
@@ -291,5 +301,10 @@ namespace Honk
         }
 
         return this->_evaluate(**expr);
+    }
+
+    EvaluateError Evaluator::_error(const std::string& msg)
+    {
+        return EvaluateError(msg.c_str(), &this->_callstack.get_last_token());
     }
 }
