@@ -37,6 +37,8 @@ namespace Honk
 
         // Expression visitor methods
         Value visit_Literal(Expr::Literal& expr) override;
+        Value visit_LogicalOr(Expr::LogicalOr& expr) override;
+        Value visit_LogicalAnd(Expr::LogicalAnd& expr) override;
         Value visit_Grouped(Expr::Grouped& expr) override;
         Value visit_Unary(Expr::Unary& expr) override;
         Value visit_VarAccess(Expr::VarAccess& expr) override;
