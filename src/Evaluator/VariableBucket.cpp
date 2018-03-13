@@ -13,7 +13,6 @@ namespace Honk
 
     void VariableBucket::new_var(const std::string& identifier, Value initial_value)
     {
-        // TODO: Maybe throw an error upon redefinition
         this->_values[identifier] = initial_value;
     }
 

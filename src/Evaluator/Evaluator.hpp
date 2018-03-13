@@ -66,9 +66,6 @@ namespace Honk
         template <typename T>
         std::pair<T, T> _try_get_as(const Value& left, const Value& right, const char* throw_msg);
         VariableBucket& _env();
-
-        // Helper exception throwers
-        void _throw_if_not_integer(const Value& left, const Value& right, const char* throw_msg);
     };
 }
 

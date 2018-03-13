@@ -232,17 +232,9 @@ namespace Honk
         return this->_get_as<T>(left, right);
     }
 
-    void Evaluator::_throw_if_not_integer(const Value& left, const Value& right, const char* throw_msg)
-    {
-        if (!this->_values_are<int32_t>(left, right)) {
-            throw std::runtime_error {throw_msg};
-        }
-    }
-
     void Evaluator::visit_Expression(Stmt::Expression& stmt)
     {
         // Nothing is done with this
-        // TODO: might want to print this or emit a warning?
         this->_evaluate(*stmt.expression);
     }
 
