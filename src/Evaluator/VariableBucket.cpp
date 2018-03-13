@@ -26,6 +26,11 @@ namespace Honk
         return this->_enclosing->get_var(identifier);
     }
 
+    bool VariableBucket::has_var_in_local(const std::string& identifier)
+    {
+        return Util::map_get_ptr(this->_values, identifier) != nullptr;
+    }
+
     VariableBucket::Scoped::Scoped()
     {
         // Initial (global) scope

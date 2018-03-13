@@ -265,13 +265,13 @@ namespace Honk
 
     void Evaluator::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
     {
-        Value initial_value { null };
-
-        if (stmt.initializer) {
-            initial_value = this->_evaluate(**stmt.initializer);
+        std::string identifier = stmt.get_identifier();
+        if (this->_env().has_var_in_local(identifier)) {
+            throw std::runtime_error {"Redeclaring variable in same scope: " + identifier};
         }
 
-        this->_env().new_var(stmt.get_identifier(), initial_value);
+        Value initial_value = this->_evaluate_optional(stmt.initializer);
+        this->_env().new_var(identifier, initial_value);
     }
 
     VariableBucket& Evaluator::_env()
@@ -282,5 +282,14 @@ namespace Honk
     bool Evaluator::_is_truthy(Expr& expr)
     {
         return this->_is_truthy(this->_evaluate(expr));
+    }
+
+    Value Evaluator::_evaluate_optional(std::optional<Expr::u_ptr>& expr)
+    {
+        if (!expr) {
+            return Value { null };
+        }
+
+        return this->_evaluate(**expr);
     }
 }

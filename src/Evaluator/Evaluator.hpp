@@ -52,6 +52,7 @@ namespace Honk
         VariableBucket::Scoped _scopes;
 
         Value _evaluate(Expr& expr);
+        Value _evaluate_optional(std::optional<Expr::u_ptr>& expr);
         void _interpret(Stmt& statement);
 
         bool _is_truthy(const Value& val);

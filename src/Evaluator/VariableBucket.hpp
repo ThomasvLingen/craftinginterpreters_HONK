@@ -23,6 +23,7 @@ namespace Honk
         VariableBucket() = default;
         VariableBucket(VariableBucket* enclosing);
 
+        bool has_var_in_local(const std::string& identifier);
         void new_var(const std::string& identifier, Value initial_value);
         __maybe_nullptr __non_owning Value* get_var(const std::string& identifier);
 
