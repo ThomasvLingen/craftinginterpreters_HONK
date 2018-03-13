@@ -112,4 +112,16 @@ namespace Honk
     {
         return this->identifier_tok.text;
     }
+
+    Expr::LogicalOr::LogicalOr(Expr::u_ptr left, Expr::u_ptr right)
+        : left(std::move(left))
+        , right(std::move(right))
+    {
+    }
+
+    Expr::LogicalAnd::LogicalAnd(Expr::u_ptr left, Expr::u_ptr right)
+        : left(std::move(left))
+        , right(std::move(right))
+    {
+    }
 }

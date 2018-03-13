@@ -47,6 +47,8 @@ namespace Honk
         struct Binary;
         struct Grouped;
         struct Literal;
+        struct LogicalOr;
+        struct LogicalAnd;
         struct Unary;
         struct VarAccess;
         struct VarAssign;
@@ -62,6 +64,8 @@ namespace Honk
         virtual T visit_Binary(Expr::Binary& expr) = 0;
         virtual T visit_Grouped(Expr::Grouped& expr) = 0;
         virtual T visit_Literal(Expr::Literal& expr) = 0;
+        virtual T visit_LogicalOr(Expr::LogicalOr& expr) = 0;
+        virtual T visit_LogicalAnd(Expr::LogicalAnd& expr) = 0;
         virtual T visit_Unary(Expr::Unary& expr) = 0;
         virtual T visit_VarAccess(Expr::VarAccess& expr) = 0;
         virtual T visit_VarAssign(Expr::VarAssign& expr) = 0;
@@ -154,6 +158,26 @@ namespace Honk
         Expr::u_ptr new_value;
 
         EXPRVISITORS_ACCEPT(VarAssign);
+    };
+
+    struct Expr::LogicalOr : Expr
+    {
+        LogicalOr(Expr::u_ptr left, Expr::u_ptr right);
+
+        Expr::u_ptr left;
+        Expr::u_ptr right;
+
+        EXPRVISITORS_ACCEPT(LogicalOr);
+    };
+
+    struct Expr::LogicalAnd : Expr
+    {
+        LogicalAnd(Expr::u_ptr left, Expr::u_ptr right);
+
+        Expr::u_ptr left;
+        Expr::u_ptr right;
+
+        EXPRVISITORS_ACCEPT(LogicalAnd);
     };
 }
 

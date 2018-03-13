@@ -126,4 +126,14 @@ namespace Honk
     {
         return parenthesize(expr.identifier_tok.text + "=", {expr.new_value.get()});
     }
+
+    std::string PrettyASTPrinter::visit_LogicalOr(Expr::LogicalOr& expr)
+    {
+        return parenthesize("or", {expr.left.get(), expr.right.get()});
+    }
+
+    std::string PrettyASTPrinter::visit_LogicalAnd(Expr::LogicalAnd& expr)
+    {
+        return parenthesize("and", {expr.left.get(), expr.right.get()});
+    }
 }
