@@ -78,6 +78,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_statement()
     {
+        // TODO: Consider mapping this to somekind of datastructure
         if (this->_match(TokenType::PRINT)) {
             return this->_parse_statement_print();
         }
@@ -90,15 +91,17 @@ namespace Honk
             return this->_parse_statement_if();
         }
 
+        if (this->_match(TokenType::WHILE)) {
+            return this->_parse_statement_while();
+        }
+
         return this->_parse_statement_expression();
     }
 
     Stmt::u_ptr Parser::_parse_statement_print()
     {
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::PRINT_NO_OPEN);
-        Expr::u_ptr expression = this->_parse_expression();
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::PRINT_NO_CLOSE);
-        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_PRINT);
+        Expr::u_ptr expression = this->_parse_condition(PARSER_ERROR::PRINT::NO_OPEN, PARSER_ERROR::PRINT::NO_CLOSE);
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::PRINT::UNTERMINATED);
 
         return std::make_unique<Stmt::Print>(std::move(expression));
     }
@@ -116,33 +119,32 @@ namespace Honk
         return std::make_unique<Stmt::Block>(std::move(statements));
     }
 
-    Stmt::u_ptr Parser::_parse_if_block()
-    {
-        this->_assert_next_token_is(TokenType::CURLY_OPEN, PARSER_ERROR::IF::EXPECTED_BLOCK);
-
-        return this->_parse_statement_block();
-    }
-
     Stmt::u_ptr Parser::_parse_statement_if()
     {
         // if (expr)
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::IF::NO_OPEN);
-        Expr::u_ptr condition = this->_parse_expression();
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::IF::NO_CLOSE);
+        Expr::u_ptr condition = this->_parse_condition(PARSER_ERROR::IF::NO_OPEN, PARSER_ERROR::IF::NO_CLOSE);
 
         // { true_branch }
-        Stmt::u_ptr true_branch = this->_parse_if_block();
+        Stmt::u_ptr true_branch = this->_parse_block();
 
         // else { false_branch }
         std::optional<Stmt::u_ptr> false_branch;
         if (this->_match(TokenType::ELSE)) {
-            false_branch = this->_parse_if_block();
+            false_branch = this->_parse_block();
         }
 
         return std::make_unique<Stmt::If> (
             std::move(condition),
             std::move(true_branch), std::move(false_branch)
         );
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_while()
+    {
+        Expr::u_ptr condition = this->_parse_condition(PARSER_ERROR::WHILE::NO_OPEN, PARSER_ERROR::WHILE::NO_CLOSE);
+        Stmt::u_ptr body      = this->_parse_block();
+
+        return std::make_unique<Stmt::While>(std::move(condition), std::move(body));
     }
 
     Stmt::u_ptr Parser::_parse_statement_expression()
@@ -414,5 +416,21 @@ namespace Honk
         if (!this->_match(type)) {
             this->_panic(message);
         }
+    }
+
+    Stmt::u_ptr Parser::_parse_block()
+    {
+        this->_assert_next_token_is(TokenType::CURLY_OPEN, PARSER_ERROR::EXPECTED_BLOCK);
+
+        return this->_parse_statement_block();
+    }
+
+    Expr::u_ptr Parser::_parse_condition(const char* paren_open_msg, const char* paren_close_msg)
+    {
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, paren_open_msg);
+        Expr::u_ptr condition = this->_parse_expression();
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, paren_close_msg);
+
+        return condition;
     }
 }

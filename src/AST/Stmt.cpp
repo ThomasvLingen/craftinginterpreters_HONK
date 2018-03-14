@@ -49,4 +49,10 @@ namespace Honk
         , false_branch(std::move(false_branch))
     {
     }
+
+    Stmt::While::While(Expr::u_ptr condition, Stmt::u_ptr body)
+        : condition(std::move(condition))
+        , body(std::move(body))
+    {
+    }
 }
