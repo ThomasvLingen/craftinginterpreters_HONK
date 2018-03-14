@@ -55,3 +55,10 @@ if (true == false) {
 } else {
     print(true);
 }
+
+// while statements
+print("Expect a count from 1 to 3");
+var a = 0;
+while ((a = a + 1) < 4) {
+    print(a);
+}
