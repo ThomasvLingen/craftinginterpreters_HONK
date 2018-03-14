@@ -284,6 +284,13 @@ namespace Honk
         this->_env().new_var(identifier, initial_value);
     }
 
+    void Evaluator::visit_While(Stmt::While& stmt)
+    {
+        while (this->_is_truthy(*stmt.condition)) {
+            this->_interpret(*stmt.body);
+        }
+    }
+
     VariableBucket& Evaluator::_env()
     {
         return this->_scopes.get_current_env();

@@ -16,7 +16,7 @@
 namespace Honk
 {
     Interpreter::Interpreter(bool debug)
-        : _evaluator(*this)
+         : _evaluator(*this)
         , _debug(debug)
     {
     }

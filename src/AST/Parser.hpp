@@ -18,21 +18,32 @@ namespace Honk
 
     namespace PARSER_ERROR
     {
+        // TODO: refactor to be namespaced for clarity
         constexpr char BROKEN_EXPR[] = "An expression is broken (unrecognised symbols)";
         constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
         constexpr char UNCLOSED_BLOCK[] = "The start of a code block '{' was not closed";
-        constexpr char PRINT_NO_OPEN[] = "Expected a '(' after print";
-        constexpr char PRINT_NO_CLOSE[] = "Expected a ')' after the operand of print";
-        constexpr char UNTERMINATED_PRINT[] = "Expected a ';' after the print call";
         constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
         constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
         constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
         constexpr char INVALID_ASSIGNMENT_TARGET[] = "Expected an identifier to the left of the '='";
+
+        constexpr char EXPECTED_BLOCK[] = "Expected a code block '{ ... }'";
+
+        namespace PRINT
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after print";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the operand of print";
+            constexpr char UNTERMINATED[] = "Expected a ';' after the print call";
+        }
         namespace IF
         {
             constexpr char NO_OPEN[] = "Expected a '(' after the 'if' keyword";
             constexpr char NO_CLOSE[] = "Expected a ')' after the 'if' condition";
-            constexpr char EXPECTED_BLOCK[] = "Expected a code block '{ ... }'";
+        }
+        namespace WHILE
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after the 'while' keyword";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the 'while' condition";
         }
     }
 
@@ -74,11 +85,13 @@ namespace Honk
         //                     | stmt_print ;
         //                     | stmt_block ;
         //                     | stmt_if ;
+        //                     | stmt_while ;
         //
         //     stmt_expr       → expression ";" ;
         //     stmt_print      → "print" "(" expression ")" ";" ;
         //     stmt_block      → "{" declaration* "}" ;
         //     stmt_if         → "if" "(" expression ")" stmt_block ( "else" stmt_block )? ;
+        //     stmt_while      → "while" "(" expression ")" stmt_block ;
 
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
@@ -87,6 +100,7 @@ namespace Honk
         Stmt::u_ptr _parse_statement_expression();
         Stmt::u_ptr _parse_statement_block();
         Stmt::u_ptr _parse_statement_if();
+        Stmt::u_ptr _parse_statement_while();
 
         // Expression grammar:
         //     expression     → assignment ;
@@ -117,7 +131,8 @@ namespace Honk
         Expr::u_ptr _parse_primary();
 
         // _parse_helpers
-        Stmt::u_ptr _parse_if_block();
+        Stmt::u_ptr _parse_block();
+        Expr::u_ptr _parse_condition(const char* paren_open_msg, const char* paren_close_msg);
 
         // this->_is_at_end() is not interwoven with this.
         // It is in the book, but it clutters everything imo.
