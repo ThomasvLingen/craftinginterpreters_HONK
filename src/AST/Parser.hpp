@@ -64,21 +64,21 @@ namespace Honk
         bool _is_at_end();
 
         // Program grammar:
-        //     program     → declaration* EOF ;
+        //     program         → declaration* EOF ;
         //
-        //     declaration → varDecl
-        //                   | statement ;
+        //     declaration     → var_declaration
+        //                     | statement ;
         //
-        //     varDecl     → "var" IDENTIFIER ( "=" expression )? ";" ;
-        //     statement   → exprStmt
-        //                   | printStmt ;
-        //                   | blockStmt ;
-        //                   | ifStmt ;
+        //     var_declaration → "var" IDENTIFIER ( "=" expression )? ";" ;
+        //     statement       → stmt_expr
+        //                     | stmt_print ;
+        //                     | stmt_block ;
+        //                     | stmt_if ;
         //
-        //     exprStmt    → expression ";" ;
-        //     printStmt   → "print" "(" expression ")" ";" ;
-        //     blockStmt   → "{" declaration* "}" ;
-        //     ifStmt      → "if" "(" expression ")" blockStmt ( "else" blockStmt )? ;
+        //     stmt_expr       → expression ";" ;
+        //     stmt_print      → "print" "(" expression ")" ";" ;
+        //     stmt_block      → "{" declaration* "}" ;
+        //     stmt_if         → "if" "(" expression ")" stmt_block ( "else" stmt_block )? ;
 
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
@@ -91,7 +91,7 @@ namespace Honk
         // Expression grammar:
         //     expression     → assignment ;
         //     assignment     → IDENTIFIER "=" logic_or
-        //                      | logic_or ;
+        //                    | logic_or ;
         //
         //     logic_or       → logic_and ( "or" logic_and )* ;
         //     logic_and      → equality ( "and" equality )* ;
@@ -101,10 +101,10 @@ namespace Honk
         //     addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
         //     multiplication → unary ( ( "/" | "*" ) unary )* ;
         //     unary          → ( "!" | "-" ) unary
-        //                      | primary ;
+        //                    | primary ;
         //     primary        → INT | STRING | BOOL | "null"
-        //                      | IDENTIFIER
-        //                      | "(" expression ")" ;
+        //                    | IDENTIFIER
+        //                    | "(" expression ")" ;
         Expr::u_ptr _parse_expression();
         Expr::u_ptr _parse_assignment();
         Expr::u_ptr _parse_logic_or();
