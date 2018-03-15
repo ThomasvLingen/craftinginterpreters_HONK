@@ -151,25 +151,16 @@ namespace Honk
         return std::make_unique<Stmt::While>(std::move(condition), std::move(body));
     }
 
-    // Jesus christ what a clusterfuck
     Stmt::u_ptr Parser::_parse_statement_for()
     {
         this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::FOR::NO_OPEN);
 
         std::optional<Stmt::u_ptr> init = this->_parse_for_initializer();
+        Expr::u_ptr cond                = this->_parse_for_condition();
+        std::optional<Expr::u_ptr> inc  = this->_parse_for_increment();
+        Stmt::u_ptr body                = this->_parse_block();
 
-        Expr::u_ptr cond = this->_parse_for_condition();
-        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::FOR::UNTERMINATED_CONDITION);
-
-        std::optional<Expr::u_ptr> inc = this->_parse_for_increment();
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::FOR::NO_CLOSE);
-
-        Stmt::u_ptr body = this->_parse_block();
-
-        return std::make_unique<Stmt::For> (
-            std::move(init), std::move(cond), std::move(inc),
-            std::move(body)
-        );
+        return std::make_unique<Stmt::For> (std::move(init), std::move(cond), std::move(inc), std::move(body));
     }
 
     Stmt::u_ptr Parser::_parse_statement_expression()
@@ -478,15 +469,19 @@ namespace Honk
             this->_panic(PARSER_ERROR::FOR::NO_CONDITION);
         }
 
-        return this->_parse_expression();
+        Expr::u_ptr expression = this->_parse_expression();
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::FOR::UNTERMINATED_CONDITION);
+        return expression;
     }
 
     std::optional<Expr::u_ptr> Parser::_parse_for_increment()
     {
-        if (this->_check(TokenType::PAREN_CLOSE)) {
-            return std::nullopt;
+        std::optional<Expr::u_ptr> opt_inc;
+        if (!this->_check(TokenType::PAREN_CLOSE)) {
+            opt_inc = this->_parse_expression();
         }
 
-        return this->_parse_expression();
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::FOR::NO_CLOSE);
+        return opt_inc;
     }
 }
