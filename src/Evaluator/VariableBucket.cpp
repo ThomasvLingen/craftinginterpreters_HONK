@@ -23,12 +23,21 @@ namespace Honk
             return local_var;
         }
 
-        return this->_enclosing->get_var(identifier);
+        return this->_try_get_from_enclosing(identifier);
     }
 
     bool VariableBucket::has_var_in_local(const std::string& identifier)
     {
         return Util::map_get_ptr(this->_values, identifier) != nullptr;
+    }
+
+    Value* VariableBucket::_try_get_from_enclosing(const std::string& identifier)
+    {
+        if (!this->_enclosing) {
+            return nullptr;
+        }
+
+        return this->_enclosing->get_var(identifier);
     }
 
     VariableBucket::Scoped::Scoped()

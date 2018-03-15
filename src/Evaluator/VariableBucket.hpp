@@ -29,6 +29,7 @@ namespace Honk
 
     private:
         __maybe_nullptr __non_owning VariableBucket* _enclosing = nullptr;
+        __maybe_nullptr Value* _try_get_from_enclosing(const std::string& identifier);
         Bucket _values;
     };
 
