@@ -217,7 +217,7 @@ namespace Honk
             throw this->_error("Trying to assign to an undefined variable: " + expr.get_identifier());
         }
 
-        return *assigned_value = this->evaluate(*expr.new_value);
+        return *assigned_value = this->_evaluate(*expr.new_value);
     }
 
     template<typename T>
