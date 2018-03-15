@@ -22,6 +22,7 @@ namespace Honk
         std::string visit_If(Stmt::If& stmt) override;
         std::string visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
         std::string visit_While(Stmt::While& stmt) override;
+        std::string visit_For(Stmt::For& stmt) override;
 
         // Expression visitors
         std::string visit_Binary(Expr::Binary& expr) override;
@@ -34,6 +35,10 @@ namespace Honk
         std::string visit_VarAssign(Expr::VarAssign& expr) override;
 
         std::string parenthesize(const std::string& name, std::initializer_list<Expr*> expressions);
+
+    private:
+        std::string _to_str(Stmt& stmt);
+        std::string _to_str(Expr& expr);
     };
 }
 

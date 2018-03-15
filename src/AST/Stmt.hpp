@@ -44,6 +44,7 @@ namespace Honk
         struct VarDeclaration;
         struct If;
         struct While;
+        struct For;
 
     private:
         Stmt();
@@ -59,6 +60,7 @@ namespace Honk
         virtual T visit_If(Stmt::If& stmt) = 0;
         virtual T visit_VarDeclaration(Stmt::VarDeclaration& stmt) = 0;
         virtual T visit_While(Stmt::While& stmt) = 0;
+        virtual T visit_For(Stmt::For& stmt) = 0;
     };
 
     struct Stmt::Expression : Stmt
@@ -119,6 +121,19 @@ namespace Honk
         Stmt::u_ptr body;
 
         STMTVISITORS_ACCEPT(While)
+    };
+
+    struct Stmt::For : Stmt
+    {
+        For(std::optional<Stmt::u_ptr> init, Expr::u_ptr condition, std::optional<Expr::u_ptr> inc, Stmt::u_ptr body);
+
+        std::optional<Stmt::u_ptr> initializer;
+        Expr::u_ptr condition;
+        std::optional<Expr::u_ptr> increment;
+
+        Stmt::u_ptr body;
+
+        STMTVISITORS_ACCEPT(For);
     };
 }
 

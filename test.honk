@@ -62,3 +62,13 @@ var a = 0;
 while ((a = a + 1) < 4) {
     print(a);
 }
+
+// for statements
+for (var i = 1; i < 4; i = i + 1) {
+    print(i);
+}
+
+var b = 1;
+for (;(b = b + 1) < 4;) {
+    print(b);
+}

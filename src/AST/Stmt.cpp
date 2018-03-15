@@ -55,4 +55,12 @@ namespace Honk
         , body(std::move(body))
     {
     }
+
+    Stmt::For::For(std::optional<Stmt::u_ptr> init, Expr::u_ptr condition, std::optional<Expr::u_ptr> inc, Stmt::u_ptr body)
+        : initializer(std::move(init))
+        , condition(std::move(condition))
+        , increment(std::move(inc))
+        , body(std::move(body))
+    {
+    }
 }

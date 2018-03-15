@@ -95,6 +95,10 @@ namespace Honk
             return this->_parse_statement_while();
         }
 
+        if (this->_match(TokenType::FOR)) {
+            return this->_parse_statement_for();
+        }
+
         return this->_parse_statement_expression();
     }
 
@@ -145,6 +149,27 @@ namespace Honk
         Stmt::u_ptr body      = this->_parse_block();
 
         return std::make_unique<Stmt::While>(std::move(condition), std::move(body));
+    }
+
+    // Jesus christ what a clusterfuck
+    Stmt::u_ptr Parser::_parse_statement_for()
+    {
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::FOR::NO_OPEN);
+
+        std::optional<Stmt::u_ptr> init = this->_parse_for_initializer();
+
+        Expr::u_ptr cond = this->_parse_for_condition();
+        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::FOR::UNTERMINATED_CONDITION);
+
+        std::optional<Expr::u_ptr> inc = this->_parse_for_increment();
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::FOR::NO_CLOSE);
+
+        Stmt::u_ptr body = this->_parse_block();
+
+        return std::make_unique<Stmt::For> (
+            std::move(init), std::move(cond), std::move(inc),
+            std::move(body)
+        );
     }
 
     Stmt::u_ptr Parser::_parse_statement_expression()
@@ -432,5 +457,36 @@ namespace Honk
         this->_assert_next_token_is(TokenType::PAREN_CLOSE, paren_close_msg);
 
         return condition;
+    }
+
+    std::optional<Stmt::u_ptr> Parser::_parse_for_initializer()
+    {
+        if (this->_match(TokenType::SEMICOLON)) {
+            return std::nullopt;
+        }
+
+        if (this->_match(TokenType::VAR)) {
+            return this->_parse_declaration_vardeclaration();
+        }
+
+        return this->_parse_statement_expression();
+    }
+
+    Expr::u_ptr Parser::_parse_for_condition()
+    {
+        if (this->_check(TokenType::SEMICOLON)) {
+            this->_panic(PARSER_ERROR::FOR::NO_CONDITION);
+        }
+
+        return this->_parse_expression();
+    }
+
+    std::optional<Expr::u_ptr> Parser::_parse_for_increment()
+    {
+        if (this->_check(TokenType::PAREN_CLOSE)) {
+            return std::nullopt;
+        }
+
+        return this->_parse_expression();
     }
 }

@@ -133,6 +133,25 @@ namespace Honk
         return output;
     }
 
+    std::string PrettyASTPrinter::visit_For(Stmt::For& stmt)
+    {
+        std::string output;
+        output += "[for ";
+
+        if (stmt.initializer) {
+            output += "init = " + this->_to_str(**stmt.initializer) + " ";
+        }
+
+        output += "cond = " + this->_to_str(*stmt.condition) + " ";
+
+        if (stmt.increment) {
+            output += "inc = " + this->_to_str(**stmt.increment) + " ";
+        }
+
+        output += "]";
+        return output;
+    }
+
     std::string PrettyASTPrinter::visit_VarAssign(Expr::VarAssign& expr)
     {
         return parenthesize(expr.identifier_tok.text + "=", {expr.new_value.get()});
@@ -146,5 +165,15 @@ namespace Honk
     std::string PrettyASTPrinter::visit_LogicalAnd(Expr::LogicalAnd& expr)
     {
         return parenthesize("and", {expr.left.get(), expr.right.get()});
+    }
+
+    std::string PrettyASTPrinter::_to_str(Stmt& stmt)
+    {
+        return stmt.accept(*this);
+    }
+
+    std::string PrettyASTPrinter::_to_str(Expr& expr)
+    {
+        return expr.accept(*this);
     }
 }
