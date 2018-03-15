@@ -291,6 +291,25 @@ namespace Honk
         }
     }
 
+    void Evaluator::visit_For(Stmt::For& stmt)
+    {
+        // Make a new scope for the for loop's clauses
+        Util::ScopeGuard guard(this->_scopes);
+
+        // Execute the initializer
+        if (stmt.initializer) {
+            this->_interpret(**stmt.initializer);
+        }
+
+        // Main for body loop
+        while (this->_is_truthy(*stmt.condition)) {
+            this->_interpret(*stmt.body);
+            if (stmt.increment) {
+                this->_evaluate(**stmt.increment);
+            }
+        }
+    }
+
     VariableBucket& Evaluator::_env()
     {
         return this->_scopes.get_current_env();

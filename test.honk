@@ -57,8 +57,18 @@ if (true == false) {
 }
 
 // while statements
-print("Expect a count from 1 to 3");
+print("Expect a count from 1 to 9");
 var a = 0;
 while ((a = a + 1) < 4) {
     print(a);
+}
+
+// for statements
+for (var i = 4; i < 8; i = i + 1) {
+    print(i);
+}
+
+var i = 7; // Note, this declaration doesn't clash with the one above
+for (;(i = i + 1) < 10;) {
+    print(i);
 }

@@ -6,6 +6,7 @@
 #define HONK_PARSER_HPP
 
 #include <vector>
+#include <optional>
 
 #include "Lexer/Token.hpp"
 #include "Expr.hpp"
@@ -44,6 +45,13 @@ namespace Honk
         {
             constexpr char NO_OPEN[] = "Expected a '(' after the 'while' keyword";
             constexpr char NO_CLOSE[] = "Expected a ')' after the 'while' condition";
+        }
+        namespace FOR
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after the 'for' keyword";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the 'for' clauses";
+            constexpr char NO_CONDITION[] = "Expected an expression as the second clause for a 'for' loop";
+            constexpr char UNTERMINATED_CONDITION[] = "Expected a ';' after the for loop's condition";
         }
     }
 
@@ -86,12 +94,18 @@ namespace Honk
         //                     | stmt_block ;
         //                     | stmt_if ;
         //                     | stmt_while ;
+        //                     | stmt_for ;
         //
         //     stmt_expr       → expression ";" ;
         //     stmt_print      → "print" "(" expression ")" ";" ;
         //     stmt_block      → "{" declaration* "}" ;
         //     stmt_if         → "if" "(" expression ")" stmt_block ( "else" stmt_block )? ;
         //     stmt_while      → "while" "(" expression ")" stmt_block ;
+        //     stmt_for        → "for" "("
+        //                                 (var_declaration | stmt_expr | ";")
+        //                                 expression ";"
+        //                                 expression?
+        //                              ")" stmt_block ;
 
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
@@ -101,6 +115,7 @@ namespace Honk
         Stmt::u_ptr _parse_statement_block();
         Stmt::u_ptr _parse_statement_if();
         Stmt::u_ptr _parse_statement_while();
+        Stmt::u_ptr _parse_statement_for();
 
         // Expression grammar:
         //     expression     → assignment ;
@@ -133,6 +148,9 @@ namespace Honk
         // _parse_helpers
         Stmt::u_ptr _parse_block();
         Expr::u_ptr _parse_condition(const char* paren_open_msg, const char* paren_close_msg);
+        std::optional<Stmt::u_ptr> _parse_for_initializer();
+        Expr::u_ptr _parse_for_condition();
+        std::optional<Expr::u_ptr> _parse_for_increment();
 
         // this->_is_at_end() is not interwoven with this.
         // It is in the book, but it clutters everything imo.
