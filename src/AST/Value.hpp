@@ -5,10 +5,14 @@
 #ifndef HONK_VALUE_HPP
 #define HONK_VALUE_HPP
 
-#include "Lexer/Token.hpp"
+#include <vector>
+
+#include "Lexer/TokenLiteral.hpp"
 
 namespace Honk
 {
+    struct Callable;
+
     // This only exists to make interacting with Variant a bit more simple.
     // Also, the implementation could be swapped for a union + tagging as well.
     struct Value
@@ -27,6 +31,8 @@ namespace Honk
             return std::get<T>(this->value);
         }
 
+        Callable* get_as_callable();
+
         template<typename T>
         bool is_a() const
         {
@@ -39,6 +45,8 @@ namespace Honk
 
         friend bool operator==(const Value& a, const Value& b);
     };
+
+    using Arguments = std::vector<Value>;
 };
 
 

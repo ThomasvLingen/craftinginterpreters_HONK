@@ -26,6 +26,7 @@ namespace Honk
 
         // Expression visitors
         std::string visit_Binary(Expr::Binary& expr) override;
+        std::string visit_Call(Expr::Call& expr) override;
         std::string visit_Grouped(Expr::Grouped& expr) override;
         std::string visit_Literal(Expr::Literal& expr) override;
         std::string visit_LogicalOr(Expr::LogicalOr& expr) override;
@@ -34,7 +35,8 @@ namespace Honk
         std::string visit_VarAccess(Expr::VarAccess& expr) override;
         std::string visit_VarAssign(Expr::VarAssign& expr) override;
 
-        std::string parenthesize(const std::string& name, std::initializer_list<Expr*> expressions);
+        std::string parenthesize(const std::string& name, std::vector<Expr*> expressions);
+        std::string parenthesize(const std::string& name, std::vector<Expr::u_ptr>& exprs);
 
     private:
         std::string _to_str(Stmt& stmt);

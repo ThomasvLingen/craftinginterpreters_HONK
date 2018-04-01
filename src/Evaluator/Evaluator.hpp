@@ -46,6 +46,7 @@ namespace Honk
         Value visit_VarAccess(Expr::VarAccess& expr) override;
         Value visit_Binary(Expr::Binary& expr) override;
         Value visit_VarAssign(Expr::VarAssign& expr) override;
+        Value visit_Call(Expr::Call& expr) override;
 
         // Binary expression visitor methods
         virtual Value visit_minus(const Value& left, const Value& right) override;
@@ -81,6 +82,7 @@ namespace Honk
         std::pair<T, T> _try_get_as(const Value& left, const Value& right, const char* throw_msg);
         VariableBucket& _env();
 
+        EvaluateError _invalid_call_error(size_t expected_n_args, size_t actual);
         EvaluateError _error(const std::string& msg);
     };
 }

@@ -53,6 +53,11 @@ namespace Honk
             constexpr char NO_CONDITION[] = "Expected an expression as the second clause for a 'for' loop";
             constexpr char UNTERMINATED_CONDITION[] = "Expected a ';' after the for loop's condition";
         }
+        namespace ARGS
+        {
+            constexpr char NO_CLOSE[] = "Expected a ')' after a list of arguments";
+            constexpr char TOO_MANY[] = "Too many arguments (max 8)";
+        }
     }
 
     struct parse_exception : std::runtime_error
@@ -74,6 +79,8 @@ namespace Honk
         std::optional<Expr::u_ptr> parse_input_as_expr();
 
     private:
+        static constexpr size_t _MAX_CALL_ARGS = 8;
+
         const Interpreter& _parent;
         const TokenStream& _tokens;
 
@@ -130,7 +137,9 @@ namespace Honk
         //     addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
         //     multiplication → unary ( ( "/" | "*" ) unary )* ;
         //     unary          → ( "!" | "-" ) unary
-        //                    | primary ;
+        //                    | call_tree ;
+        //     call_tree      → primary ( "(" arguments? ")" )*
+        //     arguments      → expression ( "," expression )*
         //     primary        → INT | STRING | BOOL | "null"
         //                    | IDENTIFIER
         //                    | "(" expression ")" ;
@@ -143,6 +152,7 @@ namespace Honk
         Expr::u_ptr _parse_addition();
         Expr::u_ptr _parse_multiplication();
         Expr::u_ptr _parse_unary();
+        Expr::u_ptr _parse_call_tree();
         Expr::u_ptr _parse_primary();
 
         // _parse_helpers
@@ -151,6 +161,7 @@ namespace Honk
         std::optional<Stmt::u_ptr> _parse_for_initializer();
         Expr::u_ptr _parse_for_condition();
         std::optional<Expr::u_ptr> _parse_for_increment();
+        std::vector<Expr::u_ptr> _parse_arguments();
 
         // this->_is_at_end() is not interwoven with this.
         // It is in the book, but it clutters everything imo.

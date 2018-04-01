@@ -31,18 +31,6 @@ namespace Honk
         return str.str();
     }
 
-    std::string _to_string(TokenLiteral literal)
-    {
-        std::stringstream str;
-
-        auto value_variant_printer = [&str] (const auto& value) {
-            str << value;
-        };
-        std::visit(value_variant_printer, literal);
-
-        return str.str();
-    }
-
     std::string _to_string(TokenType type)
     {
         // There is still not a better way to do this.
@@ -75,17 +63,5 @@ namespace Honk
             default:
                 return "BIG FAT ERROR";
         }
-    }
-
-    std::ostream& operator<<(std::ostream& os, null_t)
-    {
-        os << "null";
-        return os;
-    }
-
-    bool operator==(const null_t&, const null_t&)
-    {
-        // null is always equal to null
-        return true;
     }
 }

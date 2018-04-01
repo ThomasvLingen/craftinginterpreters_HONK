@@ -4,7 +4,9 @@
 
 #include "Evaluator.hpp"
 
+#include <algorithm>
 #include <iostream>
+#include <sstream>
 
 #include "Interpreter.hpp"
 
@@ -13,6 +15,14 @@ namespace Honk
     Evaluator::Evaluator(const Interpreter& parent)
         : _parent(parent)
     {
+        // TODO: Move this elsewhere. These are native function definitions
+        this->_env().new_var(NativeCallable {
+            "honk_get_scope_depth", [] (Evaluator& runtime, Arguments)
+            {
+                size_t scope_depth = runtime._scopes.get_scope_depth();
+                return Value {int32_t(scope_depth)};
+            }, 0
+        });
     }
 
     EvaluateError::EvaluateError(const char* msg, const Token* error_token)
@@ -220,6 +230,48 @@ namespace Honk
         return *assigned_value = this->_evaluate(*expr.new_value);
     }
 
+    Value Evaluator::visit_LogicalOr(Expr::LogicalOr& expr)
+    {
+        Value left = this->_evaluate(*expr.left);
+
+        if (this->_is_truthy(left)) {
+            return left;
+        }
+
+        return this->_evaluate(*expr.right);
+    }
+
+    Value Evaluator::visit_LogicalAnd(Expr::LogicalAnd& expr)
+    {
+        Value left = this->_evaluate(*expr.left);
+
+        if (!this->_is_truthy(left)) {
+            return left;
+        }
+
+        return this->_evaluate(*expr.right);
+    }
+
+    Value Evaluator::visit_Call(Expr::Call& expr)
+    {
+        Value callee = this->_evaluate(*expr.callee);
+
+        Arguments args = Util::map<Arguments>(expr.args,
+            [this] (Expr::u_ptr& arg_expr) {
+                return this->_evaluate(*arg_expr);
+            });
+
+        if (Callable* function = callee.get_as_callable()) {
+            if (args.size() != function->n_args()) {
+                throw this->_invalid_call_error(function->n_args(), args.size());
+            }
+
+            return function->call(*this, args);
+        } else {
+            throw this->_error("Attempting to call a non-callable value");
+        }
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {
@@ -334,25 +386,12 @@ namespace Honk
         return EvaluateError(msg.c_str(), &this->_callstack.get_last_token());
     }
 
-    Value Evaluator::visit_LogicalOr(Expr::LogicalOr& expr)
+    EvaluateError Evaluator::_invalid_call_error(size_t expected_n_args, size_t actual)
     {
-        Value left = this->_evaluate(*expr.left);
+        std::stringstream error_msg;
+        error_msg << "Invalid call, expected " << expected_n_args
+                  << " arguments, got " << actual << ".";
 
-        if (this->_is_truthy(left)) {
-            return left;
-        }
-
-        return this->_evaluate(*expr.right);
-    }
-
-    Value Evaluator::visit_LogicalAnd(Expr::LogicalAnd& expr)
-    {
-        Value left = this->_evaluate(*expr.left);
-
-        if (!this->_is_truthy(left)) {
-            return left;
-        }
-
-        return this->_evaluate(*expr.right);
+        return this->_error(error_msg.str());
     }
 }

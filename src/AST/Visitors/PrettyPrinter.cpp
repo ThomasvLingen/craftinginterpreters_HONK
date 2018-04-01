@@ -6,6 +6,9 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+
+#include "Util/Util.hpp"
 
 namespace Honk
 {
@@ -19,7 +22,17 @@ namespace Honk
         std::cout << statement.accept(*this) << std::endl;
     }
 
-    std::string PrettyASTPrinter::parenthesize(const std::string& name, std::initializer_list<Expr*> expressions)
+    std::string PrettyASTPrinter::parenthesize(const std::string& name, std::vector<Expr::u_ptr>& exprs)
+    {
+        std::vector<Expr*> expr_ptrs = Util::map<std::vector<Expr*>>(exprs,
+            [] (Expr::u_ptr& arg) {
+                return arg.get();
+            });
+
+        return this->parenthesize(name, expr_ptrs);
+    }
+
+    std::string PrettyASTPrinter::parenthesize(const std::string& name, std::vector<Expr*> expressions)
     {
         std::stringstream output;
 
@@ -165,6 +178,19 @@ namespace Honk
     std::string PrettyASTPrinter::visit_LogicalAnd(Expr::LogicalAnd& expr)
     {
         return parenthesize("and", {expr.left.get(), expr.right.get()});
+    }
+
+    std::string PrettyASTPrinter::visit_Call(Expr::Call& expr)
+    {
+        std::string output;
+        output += "[call=";
+        output += this->_to_str(*expr.callee);
+        if (expr.args.size() > 0) {
+            output += " " + parenthesize("args", expr.args);
+        }
+        output += "]";
+
+        return output;
     }
 
     std::string PrettyASTPrinter::_to_str(Stmt& stmt)

@@ -38,6 +38,19 @@ namespace Honk
         {
             return std::find(container.begin(), container.end(), val) != container.end();
         };
+
+        template <typename TargetContainer, typename Container, typename Callable>
+        TargetContainer map(Container& original, const Callable& map_fn)
+        {
+            using mapped_type = typename Container::value_type;
+            TargetContainer mapped_values;
+
+            for (mapped_type& value : original) {
+                mapped_values.push_back(map_fn(value));
+            }
+
+            return mapped_values;
+        }
     }
 }
 

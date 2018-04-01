@@ -124,4 +124,11 @@ namespace Honk
         , right(std::move(right))
     {
     }
+
+    Expr::Call::Call(Expr::u_ptr callee, std::vector<Expr::u_ptr> args)
+        : Expr(callee->diagnostics_token)
+        , callee(std::move(callee))
+        , args(std::move(args))
+    {
+    }
 }

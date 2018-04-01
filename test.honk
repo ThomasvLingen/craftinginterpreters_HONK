@@ -72,3 +72,16 @@ var i = 7; // Note, this declaration doesn't clash with the one above
 for (;(i = i + 1) < 10;) {
     print(i);
 }
+
+// Native Function calls
+print("scope depth (expect 1):");
+print(honk_get_scope_depth());
+{
+    print("scope depth (expect 2):");
+    print(honk_get_scope_depth());
+
+    {
+        print("scope depth (expect 3):");
+        print(honk_get_scope_depth());
+    }
+}
