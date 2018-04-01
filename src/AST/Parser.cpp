@@ -300,12 +300,44 @@ namespace Honk
     Expr::u_ptr Parser::_parse_unary()
     {
         if (!this->_match(_match_unary)) {
-            return this->_parse_primary();
+            return this->_parse_call_tree();
         }
 
         Token op = this->_get_previous();
         return std::make_unique<Expr::Unary>(op, this->_parse_unary());
     };
+
+    // First ( is parsed
+    std::vector<Expr::u_ptr> Parser::_parse_arguments()
+    {
+        // Special case: no args
+        if (this->_match(TokenType::PAREN_CLOSE)) {
+            return {};
+        }
+
+        std::vector<Expr::u_ptr> args;
+        do {
+            args.push_back(this->_parse_expression());
+        } while (this->_match(TokenType::COMMA));
+
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::ARGS::NO_CLOSE);
+        return args;
+    }
+
+    Expr::u_ptr Parser::_parse_call_tree()
+    {
+        Expr::u_ptr left = this->_parse_primary();
+
+        while (this->_match(TokenType::PAREN_OPEN)) {
+            std::vector<Expr::u_ptr> args = this->_parse_arguments();
+            if (args.size() > this->_MAX_CALL_ARGS) {
+                this->_panic(PARSER_ERROR::ARGS::TOO_MANY);
+            }
+            left = std::make_unique<Expr::Call>(std::move(left), std::move(args));
+        }
+
+        return left;
+    }
 
     bool _match_literal(const Token& token)
     {

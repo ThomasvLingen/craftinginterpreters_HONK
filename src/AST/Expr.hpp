@@ -52,6 +52,7 @@ namespace Honk
         struct Unary;
         struct VarAccess;
         struct VarAssign;
+        struct Call;
 
     protected:
         Expr();
@@ -69,6 +70,7 @@ namespace Honk
         virtual T visit_Unary(Expr::Unary& expr) = 0;
         virtual T visit_VarAccess(Expr::VarAccess& expr) = 0;
         virtual T visit_VarAssign(Expr::VarAssign& expr) = 0;
+        virtual T visit_Call(Expr::Call& stmt) = 0;
     };
 
     struct BinaryExprVisitor
@@ -178,6 +180,16 @@ namespace Honk
         Expr::u_ptr right;
 
         EXPRVISITORS_ACCEPT(LogicalAnd);
+    };
+
+    struct Expr::Call : Expr
+    {
+        Call(Expr::u_ptr callee, std::vector<Expr::u_ptr> args);
+
+        Expr::u_ptr callee;
+        std::vector<Expr::u_ptr> args;
+
+        EXPRVISITORS_ACCEPT(Call);
     };
 }
 

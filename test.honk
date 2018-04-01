@@ -72,3 +72,8 @@ var i = 7; // Note, this declaration doesn't clash with the one above
 for (;(i = i + 1) < 10;) {
     print(i);
 }
+
+// Calls (functions or other)
+var foo = value_or(null, "yo");
+explode();
+get_explode_fn()();
