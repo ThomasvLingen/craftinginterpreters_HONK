@@ -8,6 +8,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include "Util/Util.hpp"
+
 namespace Honk
 {
     void PrettyASTPrinter::print(Expr& expression)
@@ -22,8 +24,7 @@ namespace Honk
 
     std::string PrettyASTPrinter::parenthesize(const std::string& name, std::vector<Expr::u_ptr>& exprs)
     {
-        std::vector<Expr*> expr_ptrs(exprs.size());
-        std::transform(exprs.begin(), exprs.end(), expr_ptrs.begin(),
+        std::vector<Expr*> expr_ptrs = Util::map<std::vector<Expr*>>(exprs,
             [] (Expr::u_ptr& arg) {
                 return arg.get();
             });

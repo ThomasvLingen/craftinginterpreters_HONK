@@ -5,6 +5,7 @@
 #include "Value.hpp"
 
 #include "Util/Util.hpp"
+#include "AST/Callable.hpp"
 
 namespace Honk
 {
@@ -39,5 +40,14 @@ namespace Honk
         // * Valueless by exception? true
         // * Otherwise just a regular left == right
         return a.value == b.value;
+    }
+
+    Callable* Value::get_as_callable()
+    {
+        if (this->is_a<NativeCallable>()) {
+            return this->get<NativeCallable>();
+        }
+
+        return nullptr;
     }
 }

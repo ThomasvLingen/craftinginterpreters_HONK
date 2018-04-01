@@ -25,6 +25,7 @@ namespace Honk
 
         bool has_var_in_local(const std::string& identifier);
         void new_var(const std::string& identifier, Value initial_value);
+        void new_var(NativeCallable native_fn);
         __maybe_nullptr __non_owning Value* get_var(const std::string& identifier);
 
     private:
@@ -42,6 +43,7 @@ namespace Honk
         void scope_exit() override;
         VariableBucket& get_current_env();
 
+        size_t get_scope_depth();
     private:
         std::stack<VariableBucket> _scopes;
     };

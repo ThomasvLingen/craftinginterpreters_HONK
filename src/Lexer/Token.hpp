@@ -11,6 +11,8 @@
 #include <vector>
 #include <ostream>
 
+#include "TokenLiteral.hpp"
+
 namespace Honk
 {
     enum struct TokenType : int
@@ -38,24 +40,8 @@ namespace Honk
         END_OF_FILE
     };
 
-    // This exists to represent a "null" value.
-    struct null_t
-    {
-        friend std::ostream& operator<<(std::ostream& os, null_t);
-        friend bool operator==(const null_t&, const null_t&);
-    };
-    static const null_t null {};
-
-    using TokenLiteral = std::variant<
-        std::string,
-        int32_t,
-        bool,
-        null_t
-    >;
-
     // Helpers for stringifying
     std::string _to_string(TokenType type);
-    std::string _to_string(TokenLiteral literal);
 
     // The order of members is used in aggregate initialisation.
     // Don't fuck with it.

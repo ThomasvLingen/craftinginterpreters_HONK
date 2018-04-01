@@ -16,6 +16,11 @@ namespace Honk
         this->_values[identifier] = initial_value;
     }
 
+    void VariableBucket::new_var(NativeCallable native_fn)
+    {
+        this->new_var(native_fn.identifier, Value {native_fn});
+    }
+
     Value* VariableBucket::get_var(const std::string& identifier)
     {
         Value* local_var = Util::map_get_ptr(this->_values, identifier);
@@ -61,5 +66,10 @@ namespace Honk
     void VariableBucket::Scoped::scope_exit()
     {
         this->_scopes.pop();
+    }
+
+    size_t VariableBucket::Scoped::get_scope_depth()
+    {
+        return this->_scopes.size();
     }
 }

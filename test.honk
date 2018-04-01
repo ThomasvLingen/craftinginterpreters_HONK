@@ -73,7 +73,15 @@ for (;(i = i + 1) < 10;) {
     print(i);
 }
 
-// Calls (functions or other)
-var foo = value_or(null, "yo");
-explode();
-get_explode_fn()();
+// Native Function calls
+print("scope depth (expect 1):");
+print(honk_get_scope_depth());
+{
+    print("scope depth (expect 2):");
+    print(honk_get_scope_depth());
+
+    {
+        print("scope depth (expect 3):");
+        print(honk_get_scope_depth());
+    }
+}
