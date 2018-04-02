@@ -13,6 +13,7 @@
 namespace Honk
 {
     struct Interpreter;
+    struct StandardLibrary;
 
     struct EvaluateError : std::runtime_error
     {
@@ -60,9 +61,12 @@ namespace Honk
         virtual Value visit_equals(const Value& left, const Value& right) override;
         virtual Value visit_not_equals(const Value& left, const Value& right) override;
 
+        friend class StandardLibrary;
     private:
         const Interpreter& _parent;
         VariableBucket::Scoped _scopes;
+        VariableBucket& _globals = _scopes.get_global_env();
+
         DiagnosticsTokenTracker _callstack;
 
         Value _evaluate(Expr& expr);

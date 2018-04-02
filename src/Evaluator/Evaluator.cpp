@@ -9,20 +9,14 @@
 #include <sstream>
 
 #include "Interpreter.hpp"
+#include "StandardLibrary.hpp"
 
 namespace Honk
 {
     Evaluator::Evaluator(const Interpreter& parent)
         : _parent(parent)
     {
-        // TODO: Move this elsewhere. These are native function definitions
-        this->_env().new_var(NativeCallable {
-            "honk_get_scope_depth", [] (Evaluator& runtime, Arguments)
-            {
-                size_t scope_depth = runtime._scopes.get_scope_depth();
-                return Value {int32_t(scope_depth)};
-            }, 0
-        });
+        StandardLibrary::register_in(this->_scopes);
     }
 
     EvaluateError::EvaluateError(const char* msg, const Token* error_token)

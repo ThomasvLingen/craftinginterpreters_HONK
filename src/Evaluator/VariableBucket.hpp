@@ -41,11 +41,13 @@ namespace Honk
 
         void scope_enter() override;
         void scope_exit() override;
+        VariableBucket& get_global_env();
         VariableBucket& get_current_env();
 
         size_t get_scope_depth();
     private:
         std::stack<VariableBucket> _scopes;
+        VariableBucket& _global_scope;
     };
 }
 

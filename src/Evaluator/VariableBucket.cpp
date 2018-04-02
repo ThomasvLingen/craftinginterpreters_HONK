@@ -46,9 +46,9 @@ namespace Honk
     }
 
     VariableBucket::Scoped::Scoped()
+        : _scopes({VariableBucket {}}) // global scope
+        , _global_scope(_scopes.top())
     {
-        // Initial (global) scope
-        this->_scopes.push(VariableBucket {});
     }
 
     VariableBucket& VariableBucket::Scoped::get_current_env()
@@ -71,5 +71,10 @@ namespace Honk
     size_t VariableBucket::Scoped::get_scope_depth()
     {
         return this->_scopes.size();
+    }
+
+    VariableBucket& VariableBucket::Scoped::get_global_env()
+    {
+        return this->_global_scope;
     }
 }
