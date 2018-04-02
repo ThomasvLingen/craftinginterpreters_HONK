@@ -31,7 +31,6 @@ namespace Honk
 
         // Statement visitor methods
         void visit_Expression(Stmt::Expression& stmt) override;
-        void visit_Print(Stmt::Print& stmt) override;
         void visit_Block(Stmt::Block& stmt) override;
         void visit_If(Stmt::If& stmt) override;
         void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;

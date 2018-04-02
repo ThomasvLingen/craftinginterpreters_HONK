@@ -34,9 +34,6 @@ namespace Honk
         IF, ELSE, WHILE, FOR,
         AND, OR,
 
-        // TODO: Temporary Token types
-        PRINT,
-
         END_OF_FILE
     };
 

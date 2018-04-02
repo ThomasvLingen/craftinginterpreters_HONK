@@ -77,7 +77,7 @@ int main(int argc, char** argv)
     Honk::Interpreter interpreter(args.flags.debug);
 
     if (args.target_filename != "") {
-        std::cout << "Source file = " << args.target_filename << "\n";
+        std::cout << "Source file = " << args.target_filename << "\n\n";
         interpreter.run_from_file(args.target_filename);
     } else {
         std::cout << "REPL\n";

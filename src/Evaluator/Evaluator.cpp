@@ -294,12 +294,6 @@ namespace Honk
         this->_evaluate(*stmt.expression);
     }
 
-    void Evaluator::visit_Print(Stmt::Print& stmt)
-    {
-        Value expression_result = this->_evaluate(*stmt.expression);
-        std::cout << expression_result.to_str() << std::endl;
-    }
-
     void Evaluator::visit_Block(Stmt::Block& stmt)
     {
         // A scope guard is used to guarantee exception safety

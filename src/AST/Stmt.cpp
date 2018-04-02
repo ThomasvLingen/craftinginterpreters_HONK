@@ -21,11 +21,6 @@ namespace Honk
     {
     }
 
-    Stmt::Print::Print(Expr::u_ptr expression)
-        : expression(std::move(expression))
-    {
-    }
-
     Stmt::VarDeclaration::VarDeclaration(Token identifier, std::optional<Expr::u_ptr> initializer)
         : Stmt(this->identifier_token)
         , identifier_token(identifier)

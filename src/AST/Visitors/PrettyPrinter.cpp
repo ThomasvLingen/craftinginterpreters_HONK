@@ -80,16 +80,6 @@ namespace Honk
         return output;
     }
 
-    std::string PrettyASTPrinter::visit_Print(Stmt::Print& stmt)
-    {
-        std::string output;
-        output += "[print ";
-        output += stmt.expression->accept(*this);
-        output += "]";
-
-        return output;
-    }
-
     std::string PrettyASTPrinter::visit_Block(Stmt::Block& stmt)
     {
         std::string output;

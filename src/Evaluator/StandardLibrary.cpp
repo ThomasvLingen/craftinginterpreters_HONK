@@ -5,12 +5,15 @@
 #include "StandardLibrary.hpp"
 
 #include <chrono>
+#include <iostream>
 
 #include "Evaluator.hpp"
 
 namespace Honk
 {
     std::vector<NativeCallable> StandardLibrary::Native::_fns {
+        {"print"               , StandardLibrary::Native::print          , 1},
+        {"println"             , StandardLibrary::Native::println        , 1},
         {"honk_get_scope_depth", StandardLibrary::Native::get_scope_depth, 0},
         {"honk_get_time_ms"    , StandardLibrary::Native::get_time_ms    , 0}
     };
@@ -31,6 +34,29 @@ namespace Honk
         honk_int_t ms = time_ms.count();
 
         return Value {ms};
+    }
+
+    std::string _get_printable(Value& val)
+    {
+        if (bool* val_bool = val.get<bool>()) {
+            return Util::bool_str(*val_bool);
+        }
+
+        return _to_string(val.value);
+    }
+
+    Value StandardLibrary::Native::print(Evaluator&, Arguments args)
+    {
+        std::cout << _get_printable(args[0]);
+
+        return { null };
+    }
+
+    Value StandardLibrary::Native::println(Evaluator& runtime, Arguments args)
+    {
+        std::cout << _get_printable(args[0]) << std::endl;
+
+        return { null };
     }
 
     void StandardLibrary::register_in(VariableBucket::Scoped& scopes)

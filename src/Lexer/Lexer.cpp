@@ -25,8 +25,7 @@ namespace Honk
         {"fun",   TokenType::FUN},   {"return", TokenType::RETURN},
         {"const", TokenType::CONST}, {"var",    TokenType::VAR},
         {"if",    TokenType::IF},    {"else",   TokenType::ELSE},   {"while", TokenType::WHILE},    {"for", TokenType::FOR},
-        {"and",   TokenType::AND},   {"or",     TokenType::OR},
-        {"print", TokenType::PRINT},
+        {"and",   TokenType::AND},   {"or",     TokenType::OR}
     };
 
     Lexer::Lexer(const Interpreter& parent, const std::string& source)
