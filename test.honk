@@ -1,7 +1,7 @@
 var start_timestamp = honk_get_time_ms(); // This is used for timing the test script
 var end_timestamp;
 
-{
+{ // Printing variables
     var example_var_str = "Hello HONK!";
     var example_var_int = 12345;
     var example_var_bool = true;
@@ -24,93 +24,100 @@ var end_timestamp;
     println(example_var_nativefn);
 }
 
-
-// Print statements with expressions
-print("Expect 6: ");
-println(1 + 2 + 3);
-
-// Expression statements
-3 * 4;
-3 > 2;
-3 != 1;
-
-// Variables + expressions
-var three = 3;
-var five = 5;
-println("Expect true for the following:");
-println(three + five == 8);
-println(three < five);
-println(!(three > five));
-
-// Scopes + shadowing
-var global_a = 10;
-{
-    var local_b = 5;
-    println(global_a + local_b == 15);
+{ // Print statements with expressions
+    print("Expect 6: ");
+    println(1 + 2 + 3);
 }
-{
-    var local_b = 10;
-    println(global_a + local_b == 20);
 
+{ // Expression statements
+    3 * 4;
+    3 > 2;
+    3 != 1;
+}
+
+{ // Variables + expressions
+    var three = 3;
+    var five = 5;
+    println("Expect true for the following:");
+    println(three + five == 8);
+    println(three < five);
+    println(!(three > five));
+}
+
+{ // Scopes + shadowing
+    var global_a = 10;
     {
-        // This should shadow the top declaration
-        var global_a = 1;
-        println(global_a + local_b == 11);
+        var local_b = 5;
+        println(global_a + local_b == 15);
+    }
+    {
+        var local_b = 10;
+        println(global_a + local_b == 20);
+
+        {
+            // This should shadow the top declaration
+            var global_a = 1;
+            println(global_a + local_b == 11);
+        }
     }
 }
 
-// if statements
-println("Expect 3 trues:");
-if (true) {
-    println(true);
+{ // If statements
+    println("Expect 3 trues:");
+    if (true) {
+        println(true);
+    }
+
+    if (false) {
+        println(false);
+    }
+
+    var if_test_assign = 0;
+    if (if_test_assign = if_test_assign + 1) {
+        println(true);
+    }
+
+    if (true == false) {
+        println(false);
+    } else {
+        println(true);
+    }
 }
 
-if (false) {
-    println(false);
+{ // While statements
+    print("Expect a count from 1 to 9: ");
+    var a = 0;
+    while ((a = a + 1) < 4) {
+        print(a);
+        print(" ");
+    }
 }
 
-var if_test_assign = 0;
-if (if_test_assign = if_test_assign + 1) {
-    println(true);
+{ // For statements
+  for (var i = 4; i < 8; i = i + 1) {
+      print(i);
+      print(" ");
+  }
+
+  var i = 7; // Note, this declaration doesn't clash with the one above
+  for (;(i = i + 1) < 10;) {
+      print(i);
+      print(" ");
+  }
+  println("");
 }
 
-if (true == false) {
-    println(false);
-} else {
-    println(true);
-}
-
-// while statements
-print("Expect a count from 1 to 9: ");
-var a = 0;
-while ((a = a + 1) < 4) {
-    print(a);
-    print(" ");
-}
-
-// for statements
-for (var i = 4; i < 8; i = i + 1) {
-    print(i);
-    print(" ");
-}
-
-var i = 7; // Note, this declaration doesn't clash with the one above
-for (;(i = i + 1) < 10;) {
-    print(i);
-    print(" ");
-}
-println("");
-
-// Native Function calls
-print("scope depth (expect 1): ");
-println(honk_get_scope_depth());
-{
+{ // Native Function calls
     print("scope depth (expect 2): ");
     println(honk_get_scope_depth());
-
     {
         print("scope depth (expect 3): ");
         println(honk_get_scope_depth());
+
+        {
+            print("scope depth (expect 4): ");
+            println(honk_get_scope_depth());
+        }
     }
 }
 
