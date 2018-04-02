@@ -21,9 +21,11 @@ namespace Honk
     };
     static const null_t null {};
 
+    using honk_int_t = int64_t;
+
     using TokenLiteral = std::variant<
         std::string,
-        int32_t,
+        honk_int_t,
         bool,
         null_t,
         NativeCallable

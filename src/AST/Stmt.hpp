@@ -39,7 +39,6 @@ namespace Honk
         using stream = std::vector<u_ptr>;
 
         struct Expression;
-        struct Print;
         struct Block;
         struct VarDeclaration;
         struct If;
@@ -55,7 +54,6 @@ namespace Honk
     struct StmtVisitor
     {
         virtual T visit_Expression(Stmt::Expression& stmt) = 0;
-        virtual T visit_Print(Stmt::Print& stmt) = 0;
         virtual T visit_Block(Stmt::Block& stmt) = 0;
         virtual T visit_If(Stmt::If& stmt) = 0;
         virtual T visit_VarDeclaration(Stmt::VarDeclaration& stmt) = 0;
@@ -70,15 +68,6 @@ namespace Honk
         Expr::u_ptr expression;
 
         STMTVISITORS_ACCEPT(Expression)
-    };
-
-    struct Stmt::Print : Stmt
-    {
-        Print(Expr::u_ptr expression);
-
-        Expr::u_ptr expression;
-
-        STMTVISITORS_ACCEPT(Print)
     };
 
     struct Stmt::Block : Stmt

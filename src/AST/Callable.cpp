@@ -28,8 +28,8 @@ namespace Honk
 
     std::ostream& operator<<(std::ostream& os, const NativeCallable& obj)
     {
-        os << obj.identifier;
-        os << "(" << obj.n_args() << " args)";
+        os << "<" << obj.identifier;
+        os << "(" << obj.n_args() << " args)>";
         return os;
     }
 

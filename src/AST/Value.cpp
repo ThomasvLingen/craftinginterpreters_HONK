@@ -29,8 +29,8 @@ namespace Honk
 
     bool Value::is_integer() const
     {
-        // For now this is just int32_t. Later this may be more int types
-        return this->is_a<int32_t>();
+        // For now this is just int64_t. Later this may be more int types
+        return this->is_a<honk_int_t>();
     }
 
     bool operator==(const Value& a, const Value& b)

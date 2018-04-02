@@ -79,9 +79,6 @@ namespace Honk
     Stmt::u_ptr Parser::_parse_statement()
     {
         // TODO: Consider mapping this to somekind of datastructure
-        if (this->_match(TokenType::PRINT)) {
-            return this->_parse_statement_print();
-        }
 
         if (this->_match(TokenType::CURLY_OPEN)) {
             return this->_parse_statement_block();
@@ -100,14 +97,6 @@ namespace Honk
         }
 
         return this->_parse_statement_expression();
-    }
-
-    Stmt::u_ptr Parser::_parse_statement_print()
-    {
-        Expr::u_ptr expression = this->_parse_condition(PARSER_ERROR::PRINT::NO_OPEN, PARSER_ERROR::PRINT::NO_CLOSE);
-        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::PRINT::UNTERMINATED);
-
-        return std::make_unique<Stmt::Print>(std::move(expression));
     }
 
     Stmt::u_ptr Parser::_parse_statement_block()

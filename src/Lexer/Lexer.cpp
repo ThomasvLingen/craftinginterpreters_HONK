@@ -25,8 +25,7 @@ namespace Honk
         {"fun",   TokenType::FUN},   {"return", TokenType::RETURN},
         {"const", TokenType::CONST}, {"var",    TokenType::VAR},
         {"if",    TokenType::IF},    {"else",   TokenType::ELSE},   {"while", TokenType::WHILE},    {"for", TokenType::FOR},
-        {"and",   TokenType::AND},   {"or",     TokenType::OR},
-        {"print", TokenType::PRINT},
+        {"and",   TokenType::AND},   {"or",     TokenType::OR}
     };
 
     Lexer::Lexer(const Interpreter& parent, const std::string& source)
@@ -249,7 +248,7 @@ namespace Honk
             // Just keep eating the number
         }
 
-        this->_add_token(TokenType::INT, std::stoi(this->_get_token_text()));
+        this->_add_token(TokenType::INT, std::stoll(this->_get_token_text()));
         return true;
     }
 

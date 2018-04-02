@@ -9,20 +9,14 @@
 #include <sstream>
 
 #include "Interpreter.hpp"
+#include "StandardLibrary.hpp"
 
 namespace Honk
 {
     Evaluator::Evaluator(const Interpreter& parent)
         : _parent(parent)
     {
-        // TODO: Move this elsewhere. These are native function definitions
-        this->_env().new_var(NativeCallable {
-            "honk_get_scope_depth", [] (Evaluator& runtime, Arguments)
-            {
-                size_t scope_depth = runtime._scopes.get_scope_depth();
-                return Value {int32_t(scope_depth)};
-            }, 0
-        });
+        StandardLibrary::register_in(this->_scopes);
     }
 
     EvaluateError::EvaluateError(const char* msg, const Token* error_token)
@@ -82,7 +76,7 @@ namespace Honk
         Value right = this->_evaluate(*expr.right);
 
         if (expr.op_type() == TokenType::MINUS) {
-            if (int32_t* val = right.get<int32_t>()) {
+            if (honk_int_t* val = right.get<honk_int_t>()) {
                 return Value {-*val};
             }
 
@@ -107,7 +101,7 @@ namespace Honk
         }
 
         if (val.is_integer()) {
-            return val.get_as<int32_t>() != 0;
+            return val.get_as<honk_int_t>() != 0;
         }
 
         return val.get_as<bool>();
@@ -132,14 +126,14 @@ namespace Honk
 
     Value Evaluator::visit_minus(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Substraction expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Substraction expression cannot be evaluated: operands are not integers");
 
         return Value {left_val - right_val};
     }
 
     Value Evaluator::visit_slash(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Division expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Division expression cannot be evaluated: operands are not integers");
 
         if (right_val == 0) {
             throw this->_error("Division expression cannot be evaluated: divide by 0");
@@ -150,7 +144,7 @@ namespace Honk
 
     Value Evaluator::visit_star(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Multiplication expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Multiplication expression cannot be evaluated: operands are not integers");
 
         return Value {left_val * right_val};
     }
@@ -158,8 +152,8 @@ namespace Honk
     Value Evaluator::visit_plus(const Value& left, const Value& right)
     {
         // TODO: Might be able to refactor this into a single std::visit call on top of the variant inside of Value...
-        if (this->_values_are<int32_t>(left, right)) {
-            auto [left_val, right_val] = this->_get_as<int32_t>(left, right);
+        if (this->_values_are<honk_int_t>(left, right)) {
+            auto [left_val, right_val] = this->_get_as<honk_int_t>(left, right);
             return Value {left_val + right_val};
         }
 
@@ -173,28 +167,28 @@ namespace Honk
 
     Value Evaluator::visit_greater(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Greater Than expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Greater Than expression cannot be evaluated: operands are not integers");
 
         return Value { left_val > right_val };
     }
 
     Value Evaluator::visit_greater_eq(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Greater Than Or Equal To expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Greater Than Or Equal To expression cannot be evaluated: operands are not integers");
 
         return Value {left_val >= right_val};
     }
 
     Value Evaluator::visit_less_than(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Less Than expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Less Than expression cannot be evaluated: operands are not integers");
 
         return Value {left_val < right_val};
     }
 
     Value Evaluator::visit_less_than_eq(const Value& left, const Value& right)
     {
-        auto [left_val, right_val] = this->_try_get_as<int32_t>(left, right, "Less Than Or Equal To expression cannot be evaluated: operands are not integers");
+        auto [left_val, right_val] = this->_try_get_as<honk_int_t>(left, right, "Less Than Or Equal To expression cannot be evaluated: operands are not integers");
 
         return Value {left_val <= right_val};
     }
@@ -298,12 +292,6 @@ namespace Honk
     {
         // Nothing is done with this
         this->_evaluate(*stmt.expression);
-    }
-
-    void Evaluator::visit_Print(Stmt::Print& stmt)
-    {
-        Value expression_result = this->_evaluate(*stmt.expression);
-        std::cout << expression_result.to_str() << std::endl;
     }
 
     void Evaluator::visit_Block(Stmt::Block& stmt)

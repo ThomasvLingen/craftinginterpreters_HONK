@@ -30,12 +30,6 @@ namespace Honk
 
         constexpr char EXPECTED_BLOCK[] = "Expected a code block '{ ... }'";
 
-        namespace PRINT
-        {
-            constexpr char NO_OPEN[] = "Expected a '(' after print";
-            constexpr char NO_CLOSE[] = "Expected a ')' after the operand of print";
-            constexpr char UNTERMINATED[] = "Expected a ';' after the print call";
-        }
         namespace IF
         {
             constexpr char NO_OPEN[] = "Expected a '(' after the 'if' keyword";
@@ -97,14 +91,12 @@ namespace Honk
         //
         //     var_declaration → "var" IDENTIFIER ( "=" expression )? ";" ;
         //     statement       → stmt_expr
-        //                     | stmt_print ;
         //                     | stmt_block ;
         //                     | stmt_if ;
         //                     | stmt_while ;
         //                     | stmt_for ;
         //
         //     stmt_expr       → expression ";" ;
-        //     stmt_print      → "print" "(" expression ")" ";" ;
         //     stmt_block      → "{" declaration* "}" ;
         //     stmt_if         → "if" "(" expression ")" stmt_block ( "else" stmt_block )? ;
         //     stmt_while      → "while" "(" expression ")" stmt_block ;
@@ -117,7 +109,6 @@ namespace Honk
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
         Stmt::u_ptr _parse_statement();
-        Stmt::u_ptr _parse_statement_print();
         Stmt::u_ptr _parse_statement_expression();
         Stmt::u_ptr _parse_statement_block();
         Stmt::u_ptr _parse_statement_if();
