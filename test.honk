@@ -1,3 +1,6 @@
+var start_timestamp = honk_get_time_ms(); // This is used for timing the test script
+var end_timestamp;
+
 // Print statements
 print("Hello" + " " + "HONK!");
 print("Expect 6:");
@@ -85,3 +88,7 @@ print(honk_get_scope_depth());
         print(honk_get_scope_depth());
     }
 }
+
+end_timestamp = honk_get_time_ms(); // End timestamp
+print("Time taken in ms:");
+print(end_timestamp - start_timestamp);

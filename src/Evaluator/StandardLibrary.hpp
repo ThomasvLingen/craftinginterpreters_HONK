@@ -25,6 +25,7 @@ namespace Honk
 
         private:
             static Value get_scope_depth(Evaluator& runtime, Arguments);
+            static Value get_time_ms(Evaluator& runtime, Arguments);
         };
     };
 }
