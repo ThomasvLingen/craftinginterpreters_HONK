@@ -10,6 +10,7 @@
 #include <variant>
 #include <vector>
 #include <ostream>
+#include <optional>
 
 #include "TokenLiteral.hpp"
 
@@ -44,6 +45,8 @@ namespace Honk
     // Don't fuck with it.
     struct Token
     {
+        using opt = std::optional<Token>;
+
         TokenType type;
         std::string text;
 

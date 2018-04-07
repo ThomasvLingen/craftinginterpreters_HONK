@@ -300,10 +300,9 @@ namespace Honk
     {
         Expr::u_ptr left = this->_parse_comparison();
 
-        while (this->_match(_match_equality)) {
-            Token op = this->_get_previous();
+        while (Token::opt op = this->_match(_match_equality)) {
             Expr::u_ptr right = this->_parse_comparison();
-            left = std::make_unique<Expr::Binary>(std::move(left), op, std::move(right));
+            left = std::make_unique<Expr::Binary>(std::move(left), *op, std::move(right));
         }
 
         return left;
@@ -319,10 +318,9 @@ namespace Honk
     {
         Expr::u_ptr left = this->_parse_addition();
 
-        while (this->_match(_match_comparison)) {
-            Token op = this->_get_previous();
+        while (Token::opt op = this->_match(_match_comparison)) {
             Expr::u_ptr right = this->_parse_addition();
-            left = std::make_unique<Expr::Binary>(std::move(left), op, std::move(right));
+            left = std::make_unique<Expr::Binary>(std::move(left), *op, std::move(right));
         }
 
         return left;
@@ -338,10 +336,9 @@ namespace Honk
     {
         Expr::u_ptr left = this->_parse_multiplication();
 
-        while (this->_match(_match_addition)) {
-            Token op = this->_get_previous();
+        while (Token::opt op = this->_match(_match_addition)) {
             Expr::u_ptr right = this->_parse_multiplication();
-            left = std::make_unique<Expr::Binary>(std::move(left), op, std::move(right));
+            left = std::make_unique<Expr::Binary>(std::move(left), *op, std::move(right));
         }
 
         return left;
@@ -357,10 +354,9 @@ namespace Honk
     {
         Expr::u_ptr left = this->_parse_unary();
 
-        while (this->_match(_match_multiplication)) {
-            Token op = this->_get_previous();
+        while (Token::opt op = this->_match(_match_multiplication)) {
             Expr::u_ptr right = this->_parse_unary();
-            left = std::make_unique<Expr::Binary>(std::move(left), op, std::move(right));
+            left = std::make_unique<Expr::Binary>(std::move(left), *op, std::move(right));
         }
 
         return left;
@@ -374,12 +370,11 @@ namespace Honk
 
     Expr::u_ptr Parser::_parse_unary()
     {
-        if (!this->_match(_match_unary)) {
-            return this->_parse_call_tree();
+        if (Token::opt op = this->_match(_match_unary)) {
+            return std::make_unique<Expr::Unary>(*op, this->_parse_unary());
         }
 
-        Token op = this->_get_previous();
-        return std::make_unique<Expr::Unary>(op, this->_parse_unary());
+        return this->_parse_call_tree();
     };
 
     // First ( is parsed
@@ -439,13 +434,12 @@ namespace Honk
 
     Expr::u_ptr Parser::_parse_primary()
     {
-        if (this->_match(_match_literal)) {
-            TokenLiteral value = this->_get_previous().value;
-            return std::make_unique<Expr::Literal>(value);
+        if (Token::opt literal = this->_match(_match_literal)) {
+            return std::make_unique<Expr::Literal>(literal->value);
         }
 
-        if (this->_match(TokenType::IDENTIFIER)) {
-            return std::make_unique<Expr::VarAccess>(this->_get_previous());
+        if (Token::opt identifier = this->_match(TokenType::IDENTIFIER)) {
+            return std::make_unique<Expr::VarAccess>(*identifier);
         }
 
         if (this->_match(TokenType::PAREN_OPEN)) {
@@ -486,20 +480,28 @@ namespace Honk
         return this->_check_source(1, type_comparator(type));
     }
 
-    bool Parser::_match(TokenType type)
+    Token::opt Parser::_match(TokenType type)
     {
         return this->_match(type_comparator(type));
     }
 
     template <typename Callable>
-    bool Parser::_match(Callable comparator)
+    Token::opt Parser::_match(Callable comparator)
     {
         if (!this->_check_source(0, comparator)) {
-            return false;
+            return std::nullopt;
         }
 
-        this->_advance();
-        return true;
+        return this->_advance();
+    }
+
+    Token Parser::_assert_match(TokenType type, const char* message)
+    {
+        if (Token::opt token = this->_match(type)) {
+            return *token;
+        }
+
+        this->_panic(message);
     }
 
     template<typename Callable>
@@ -551,15 +553,6 @@ namespace Honk
         while (!this->_is_at_end()) {
             this->_advance();
         }
-    }
-
-    const Token& Parser::_assert_match(TokenType type, const char* message)
-    {
-        if (this->_match(type)) {
-            return this->_get_previous();
-        }
-
-        this->_panic(message);
     }
 
     Stmt::u_ptr Parser::_parse_block()

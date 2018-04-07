@@ -130,10 +130,11 @@ namespace Honk
         const Token& _get_current();
         const Token& _get_previous();
 
-        bool _match(TokenType type);
+        Token::opt _match(TokenType type);
         template <typename Callable>
-        bool _match(Callable comparator);
-        const Token& _assert_match(TokenType type, const char* message);
+        Token::opt _match(Callable comparator);
+
+        Token _assert_match(TokenType type, const char* message);
 
         bool _peek(TokenType type);
         bool _check(TokenType type);
