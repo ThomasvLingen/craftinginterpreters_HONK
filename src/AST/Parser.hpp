@@ -17,55 +17,6 @@ namespace Honk
     // Forward declarations
     struct Interpreter;
 
-    namespace PARSER_ERROR
-    {
-        // TODO: refactor to be namespaced for clarity
-        constexpr char BROKEN_EXPR[] = "An expression is broken (unrecognised symbols)";
-        constexpr char UNCLOSED_GROUP[] = "An opening parenthesis '(' was not closed";
-        constexpr char UNCLOSED_BLOCK[] = "The start of a code block '{' was not closed";
-        constexpr char UNTERMINATED_EXPR[] = "Expected a ';' after the expression";
-        constexpr char NO_IDENTIFIER_AFTER_VAR[] = "Expected an identifier after the 'var' keyword";
-        constexpr char UNTERMINATED_VAR[] = "Expected a ';' after the variable declaration";
-        constexpr char INVALID_ASSIGNMENT_TARGET[] = "Expected an identifier to the left of the '='";
-
-        constexpr char EXPECTED_BLOCK[] = "Expected a code block '{ ... }'";
-
-        namespace IF
-        {
-            constexpr char NO_OPEN[] = "Expected a '(' after the 'if' keyword";
-            constexpr char NO_CLOSE[] = "Expected a ')' after the 'if' condition";
-        }
-        namespace WHILE
-        {
-            constexpr char NO_OPEN[] = "Expected a '(' after the 'while' keyword";
-            constexpr char NO_CLOSE[] = "Expected a ')' after the 'while' condition";
-        }
-        namespace FOR
-        {
-            constexpr char NO_OPEN[] = "Expected a '(' after the 'for' keyword";
-            constexpr char NO_CLOSE[] = "Expected a ')' after the 'for' clauses";
-            constexpr char NO_CONDITION[] = "Expected an expression as the second clause for a 'for' loop";
-            constexpr char UNTERMINATED_CONDITION[] = "Expected a ';' after the for loop's condition";
-        }
-        namespace FUN
-        {
-            constexpr char NO_IDENTIFIER[] = "Expected identifier in function declaration";
-            constexpr char NO_PARAMS[] = "Expected a '(' (parameter declarations) after the function identifier";
-            constexpr char NO_BODY[] = "Expected a '{' (function body) after a parameter declaration";
-        }
-        namespace ARGS
-        {
-            constexpr char NO_CLOSE[] = "Expected a ')' after a list of arguments";
-            constexpr char TOO_MANY[] = "Too many arguments (max 8)";
-        }
-        namespace PARAMS
-        {
-            constexpr char NOT_IDEN[] = "Expected an identifier in param list";
-            constexpr char NO_CLOSE[] = "Expected a ')' after a list of parameters";
-            constexpr char TOO_MANY[] = "Too many parameters (max 8)";
-        }
-    }
-
     struct parse_exception : std::runtime_error
     {
         parse_exception(const char* error_msg, const Token& token)

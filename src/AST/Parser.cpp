@@ -10,6 +10,67 @@
 
 namespace Honk
 {
+    namespace ERROR
+    {
+        namespace ASSIGNMENT
+        {
+            constexpr char INVALID_TARGET[] = "Expected an identifier to the left of the '='";
+        }
+        namespace GROUP
+        {
+            constexpr char UNCLOSED[] = "An opening parenthesis '(' was not closed";
+        }
+        namespace VAR
+        {
+            constexpr char NO_IDENTIFIER[] = "Expected an identifier after the 'var' keyword";
+            constexpr char UNTERMINATED[] = "Expected a ';' after the variable declaration";
+        }
+        namespace BLOCK
+        {
+            constexpr char EXPECTED[] = "Expected a code block '{ ... }'";
+            constexpr char UNCLOSED[] = "The start of a code block '{' was not closed";
+        }
+        namespace EXPR
+        {
+            constexpr char BROKEN[] = "An expression is broken (unrecognised symbols)";
+            constexpr char UNTERMINATED[] = "Expected a ';' after the expression";
+        }
+        namespace IF
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after the 'if' keyword";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the 'if' condition";
+        }
+        namespace WHILE
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after the 'while' keyword";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the 'while' condition";
+        }
+        namespace FOR
+        {
+            constexpr char NO_OPEN[] = "Expected a '(' after the 'for' keyword";
+            constexpr char NO_CLOSE[] = "Expected a ')' after the 'for' clauses";
+            constexpr char NO_CONDITION[] = "Expected an expression as the second clause for a 'for' loop";
+            constexpr char UNTERMINATED_CONDITION[] = "Expected a ';' after the for loop's condition";
+        }
+        namespace FUN
+        {
+            constexpr char NO_IDENTIFIER[] = "Expected identifier in function declaration";
+            constexpr char NO_PARAMS[] = "Expected a '(' (parameter declarations) after the function identifier";
+            constexpr char NO_BODY[] = "Expected a '{' (function body) after a parameter declaration";
+        }
+        namespace ARGS
+        {
+            constexpr char NO_CLOSE[] = "Expected a ')' after a list of arguments";
+            constexpr char TOO_MANY[] = "Too many arguments (max 8)";
+        }
+        namespace PARAMS
+        {
+            constexpr char NOT_IDEN[] = "Expected an identifier in param list";
+            constexpr char NO_CLOSE[] = "Expected a ')' after a list of parameters";
+            constexpr char TOO_MANY[] = "Too many parameters (max 8)";
+        }
+    }
+
     Parser::Parser(const Interpreter& parent, const TokenStream& input)
         : _parent(parent)
         , _tokens(input)
@@ -74,7 +135,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
     {
-        this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::NO_IDENTIFIER_AFTER_VAR);
+        this->_assert_next_token_is(TokenType::IDENTIFIER, ERROR::VAR::NO_IDENTIFIER);
         Token identifier = this->_get_previous();
 
         std::optional<Expr::u_ptr> initializer;
@@ -82,19 +143,19 @@ namespace Honk
             initializer = std::move(this->_parse_expression());
         }
 
-        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_VAR);
+        this->_assert_next_token_is(TokenType::SEMICOLON, ERROR::VAR::UNTERMINATED);
         return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
     }
 
     // fun keyword is parsed
     Stmt::u_ptr Parser::_parse_declaration_fun()
     {
-        Token identifier = this->_assert_match(TokenType::IDENTIFIER, PARSER_ERROR::FUN::NO_IDENTIFIER);
+        Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::FUN::NO_IDENTIFIER);
 
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::FUN::NO_PARAMS);
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, ERROR::FUN::NO_PARAMS);
         std::vector<Token> param_tokens = this->_parse_parameters();
         if (param_tokens.size() > this->_MAX_CALL_ARGS) {
-            this->_panic(PARSER_ERROR::PARAMS::TOO_MANY, param_tokens[0]);
+            this->_panic(ERROR::PARAMS::TOO_MANY, param_tokens[0]);
         }
         std::vector<std::string> params = Util::map<std::vector<std::string>>(param_tokens, Token::get_text);
 
@@ -134,7 +195,7 @@ namespace Honk
             statements.push_back(this->_parse_declaration());
         }
 
-        this->_assert_next_token_is(TokenType::CURLY_CLOSE, PARSER_ERROR::UNCLOSED_BLOCK);
+        this->_assert_next_token_is(TokenType::CURLY_CLOSE, ERROR::BLOCK::UNCLOSED);
 
         return std::make_unique<Stmt::Block>(std::move(statements));
     }
@@ -142,7 +203,7 @@ namespace Honk
     Stmt::u_ptr Parser::_parse_statement_if()
     {
         // if (expr)
-        Expr::u_ptr condition = this->_parse_condition(PARSER_ERROR::IF::NO_OPEN, PARSER_ERROR::IF::NO_CLOSE);
+        Expr::u_ptr condition = this->_parse_condition(ERROR::IF::NO_OPEN, ERROR::IF::NO_CLOSE);
 
         // { true_branch }
         Stmt::u_ptr true_branch = this->_parse_block();
@@ -161,7 +222,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_statement_while()
     {
-        Expr::u_ptr condition = this->_parse_condition(PARSER_ERROR::WHILE::NO_OPEN, PARSER_ERROR::WHILE::NO_CLOSE);
+        Expr::u_ptr condition = this->_parse_condition(ERROR::WHILE::NO_OPEN, ERROR::WHILE::NO_CLOSE);
         Stmt::u_ptr body      = this->_parse_block();
 
         return std::make_unique<Stmt::While>(std::move(condition), std::move(body));
@@ -169,7 +230,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_statement_for()
     {
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::FOR::NO_OPEN);
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, ERROR::FOR::NO_OPEN);
 
         std::optional<Stmt::u_ptr> init = this->_parse_for_initializer();
         Expr::u_ptr cond                = this->_parse_for_condition();
@@ -183,7 +244,7 @@ namespace Honk
     {
         Expr::u_ptr expression = this->_parse_expression();
 
-        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_EXPR);
+        this->_assert_next_token_is(TokenType::SEMICOLON, ERROR::EXPR::UNTERMINATED);
 
         return std::make_unique<Stmt::Expression>(std::move(expression));
     }
@@ -200,7 +261,7 @@ namespace Honk
             return this->_parse_logic_or();
         }
 
-        this->_assert_next_token_is(TokenType::IDENTIFIER, PARSER_ERROR::INVALID_ASSIGNMENT_TARGET);
+        this->_assert_next_token_is(TokenType::IDENTIFIER, ERROR::ASSIGNMENT::INVALID_TARGET);
         Token identifier = this->_get_previous();
 
         this->_advance();
@@ -336,7 +397,7 @@ namespace Honk
             args.push_back(this->_parse_expression());
         } while (this->_match(TokenType::COMMA));
 
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::ARGS::NO_CLOSE);
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::ARGS::NO_CLOSE);
         return args;
     }
 
@@ -349,11 +410,11 @@ namespace Honk
 
         std::vector<Token> params;
         do {
-            const Token& param = this->_assert_match(TokenType::IDENTIFIER, PARSER_ERROR::PARAMS::NOT_IDEN);
+            const Token& param = this->_assert_match(TokenType::IDENTIFIER, ERROR::PARAMS::NOT_IDEN);
             params.push_back(param);
         } while(this->_match(TokenType::COMMA));
 
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::PARAMS::NO_CLOSE);
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::PARAMS::NO_CLOSE);
         return params;
     }
 
@@ -364,7 +425,7 @@ namespace Honk
         while (this->_match(TokenType::PAREN_OPEN)) {
             std::vector<Expr::u_ptr> args = this->_parse_arguments();
             if (args.size() > this->_MAX_CALL_ARGS) {
-                this->_panic(PARSER_ERROR::ARGS::TOO_MANY);
+                this->_panic(ERROR::ARGS::TOO_MANY);
             }
             left = std::make_unique<Expr::Call>(std::move(left), std::move(args));
         }
@@ -391,12 +452,12 @@ namespace Honk
 
         if (this->_match(TokenType::PAREN_OPEN)) {
             Expr::u_ptr grouped_expr = this->_parse_expression();
-            this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::UNCLOSED_GROUP);
+            this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::GROUP::UNCLOSED);
 
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
 
-        this->_panic(PARSER_ERROR::BROKEN_EXPR);
+        this->_panic(ERROR::EXPR::BROKEN);
         return nullptr;
     }
 
@@ -507,7 +568,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_block()
     {
-        this->_assert_next_token_is(TokenType::CURLY_OPEN, PARSER_ERROR::EXPECTED_BLOCK);
+        this->_assert_next_token_is(TokenType::CURLY_OPEN, ERROR::BLOCK::EXPECTED);
 
         return this->_parse_statement_block();
     }
@@ -537,11 +598,11 @@ namespace Honk
     Expr::u_ptr Parser::_parse_for_condition()
     {
         if (this->_check(TokenType::SEMICOLON)) {
-            this->_panic(PARSER_ERROR::FOR::NO_CONDITION);
+            this->_panic(ERROR::FOR::NO_CONDITION);
         }
 
         Expr::u_ptr expression = this->_parse_expression();
-        this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::FOR::UNTERMINATED_CONDITION);
+        this->_assert_next_token_is(TokenType::SEMICOLON, ERROR::FOR::UNTERMINATED_CONDITION);
         return expression;
     }
 
@@ -552,7 +613,7 @@ namespace Honk
             opt_inc = this->_parse_expression();
         }
 
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::FOR::NO_CLOSE);
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::FOR::NO_CLOSE);
         return opt_inc;
     }
 }
