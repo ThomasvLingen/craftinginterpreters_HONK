@@ -58,4 +58,12 @@ namespace Honk
         , body(std::move(body))
     {
     }
+
+    Stmt::FunDeclaration::FunDeclaration(Token identifier, std::vector<std::string> parameters, Stmt::u_ptr body)
+        : Stmt(this->identifier)
+        , identifier(identifier)
+        , parameters(parameters)
+        , body(std::move(body))
+    {
+    }
 }

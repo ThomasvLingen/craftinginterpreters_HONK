@@ -23,7 +23,7 @@ namespace Honk
 
         Stmt::stream statements;
         while (!this->_is_at_end()) {
-            statements.push_back(this->_parse_declaration());
+            statements.push_back(this->_parse_protected_decl());
         }
 
         if (this->_has_error) {
@@ -47,19 +47,29 @@ namespace Honk
         return expression;
     }
 
-    Stmt::u_ptr Parser::_parse_declaration()
+
+    Stmt::u_ptr Parser::_parse_protected_decl()
     {
         try {
-            if (this->_match(TokenType::VAR)) {
-                return this->_parse_declaration_vardeclaration();
-            }
-
-            return this->_parse_statement();
+            return this->_parse_declaration();
         } catch (const parse_exception& e) {
             // Parsing is fucked, meaning that syntax is in some way incorrect, better synchronise
             this->_synchronise();
             return nullptr;
         }
+    }
+
+    Stmt::u_ptr Parser::_parse_declaration()
+    {
+        if (this->_match(TokenType::VAR)) {
+            return this->_parse_declaration_vardeclaration();
+        }
+
+        if (this->_match(TokenType::FUN)) {
+            return this->_parse_declaration_fun();
+        }
+
+        return this->_parse_statement();
     }
 
     Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
@@ -74,6 +84,23 @@ namespace Honk
 
         this->_assert_next_token_is(TokenType::SEMICOLON, PARSER_ERROR::UNTERMINATED_VAR);
         return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
+    }
+
+    // fun keyword is parsed
+    Stmt::u_ptr Parser::_parse_declaration_fun()
+    {
+        Token identifier = this->_assert_match(TokenType::IDENTIFIER, PARSER_ERROR::FUN::NO_IDENTIFIER);
+
+        this->_assert_next_token_is(TokenType::PAREN_OPEN, PARSER_ERROR::FUN::NO_PARAMS);
+        std::vector<Token> param_tokens = this->_parse_parameters();
+        if (param_tokens.size() > this->_MAX_CALL_ARGS) {
+            this->_panic(PARSER_ERROR::PARAMS::TOO_MANY, param_tokens[0]);
+        }
+        std::vector<std::string> params = Util::map<std::vector<std::string>>(param_tokens, Token::get_text);
+
+        Stmt::u_ptr body = this->_parse_block();
+
+        return std::make_unique<Stmt::FunDeclaration>(identifier, params, std::move(body));
     }
 
     Stmt::u_ptr Parser::_parse_statement()
@@ -313,6 +340,23 @@ namespace Honk
         return args;
     }
 
+    // First ( is parsed
+    std::vector<Token> Parser::_parse_parameters()
+    {
+        if (this->_match(TokenType::PAREN_CLOSE)) {
+            return {};
+        }
+
+        std::vector<Token> params;
+        do {
+            const Token& param = this->_assert_match(TokenType::IDENTIFIER, PARSER_ERROR::PARAMS::NOT_IDEN);
+            params.push_back(param);
+        } while(this->_match(TokenType::COMMA));
+
+        this->_assert_next_token_is(TokenType::PAREN_CLOSE, PARSER_ERROR::PARAMS::NO_CLOSE);
+        return params;
+    }
+
     Expr::u_ptr Parser::_parse_call_tree()
     {
         Expr::u_ptr left = this->_parse_primary();
@@ -453,6 +497,12 @@ namespace Honk
         if (!this->_match(type)) {
             this->_panic(message);
         }
+    }
+
+    const Token& Parser::_assert_match(TokenType type, const char* message)
+    {
+        this->_assert_next_token_is(type, message);
+        return this->_get_previous();
     }
 
     Stmt::u_ptr Parser::_parse_block()

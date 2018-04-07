@@ -44,6 +44,7 @@ namespace Honk
         struct If;
         struct While;
         struct For;
+        struct FunDeclaration;
 
     private:
         Stmt();
@@ -59,6 +60,7 @@ namespace Honk
         virtual T visit_VarDeclaration(Stmt::VarDeclaration& stmt) = 0;
         virtual T visit_While(Stmt::While& stmt) = 0;
         virtual T visit_For(Stmt::For& stmt) = 0;
+        virtual T visit_FunDeclaration(Stmt::FunDeclaration& stmt) = 0;
     };
 
     struct Stmt::Expression : Stmt
@@ -123,6 +125,17 @@ namespace Honk
         Stmt::u_ptr body;
 
         STMTVISITORS_ACCEPT(For);
+    };
+
+    struct Stmt::FunDeclaration : Stmt
+    {
+        FunDeclaration(Token identifier, std::vector<std::string> parameters, Stmt::u_ptr body);
+
+        Token identifier;
+        std::vector<std::string> parameters;
+        Stmt::u_ptr body;
+
+        STMTVISITORS_ACCEPT(FunDeclaration);
     };
 }
 
