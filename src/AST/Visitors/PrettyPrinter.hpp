@@ -20,6 +20,7 @@ namespace Honk
         std::string visit_Block(Stmt::Block& stmt) override;
         std::string visit_If(Stmt::If& stmt) override;
         std::string visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
+        std::string visit_FunDeclaration(Stmt::FunDeclaration& stmt) override;
         std::string visit_While(Stmt::While& stmt) override;
         std::string visit_For(Stmt::For& stmt) override;
 
@@ -36,6 +37,7 @@ namespace Honk
 
         std::string parenthesize(const std::string& name, std::vector<Expr*> expressions);
         std::string parenthesize(const std::string& name, std::vector<Expr::u_ptr>& exprs);
+        std::string parenthesize(const std::string& name, std::vector<std::string>& strs);
 
     private:
         std::string _to_str(Stmt& stmt);

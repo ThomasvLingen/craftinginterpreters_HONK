@@ -47,10 +47,22 @@ namespace Honk
             constexpr char NO_CONDITION[] = "Expected an expression as the second clause for a 'for' loop";
             constexpr char UNTERMINATED_CONDITION[] = "Expected a ';' after the for loop's condition";
         }
+        namespace FUN
+        {
+            constexpr char NO_IDENTIFIER[] = "Expected identifier in function declaration";
+            constexpr char NO_PARAMS[] = "Expected a '(' (parameter declarations) after the function identifier";
+            constexpr char NO_BODY[] = "Expected a '{' (function body) after a parameter declaration";
+        }
         namespace ARGS
         {
             constexpr char NO_CLOSE[] = "Expected a ')' after a list of arguments";
             constexpr char TOO_MANY[] = "Too many arguments (max 8)";
+        }
+        namespace PARAMS
+        {
+            constexpr char NOT_IDEN[] = "Expected an identifier in param list";
+            constexpr char NO_CLOSE[] = "Expected a ')' after a list of parameters";
+            constexpr char TOO_MANY[] = "Too many parameters (max 8)";
         }
     }
 
@@ -87,13 +99,17 @@ namespace Honk
         //     program         → declaration* EOF ;
         //
         //     declaration     → var_declaration
+        //                     | fun_declaration
         //                     | statement ;
         //
         //     var_declaration → "var" IDENTIFIER ( "=" expression )? ";" ;
+        //     fun_declaration → "fun" function ;
+        //     function        → IDENTIFIER "(" parameters? ")" stmt_block ;
+        //     parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
         //     statement       → stmt_expr
-        //                     | stmt_block ;
-        //                     | stmt_if ;
-        //                     | stmt_while ;
+        //                     | stmt_block
+        //                     | stmt_if
+        //                     | stmt_while
         //                     | stmt_for ;
         //
         //     stmt_expr       → expression ";" ;
@@ -106,8 +122,10 @@ namespace Honk
         //                                 expression?
         //                              ")" stmt_block ;
 
+        Stmt::u_ptr _parse_protected_decl();
         Stmt::u_ptr _parse_declaration();
         Stmt::u_ptr _parse_declaration_vardeclaration();
+        Stmt::u_ptr _parse_declaration_fun();
         Stmt::u_ptr _parse_statement();
         Stmt::u_ptr _parse_statement_expression();
         Stmt::u_ptr _parse_statement_block();
@@ -129,8 +147,8 @@ namespace Honk
         //     multiplication → unary ( ( "/" | "*" ) unary )* ;
         //     unary          → ( "!" | "-" ) unary
         //                    | call_tree ;
-        //     call_tree      → primary ( "(" arguments? ")" )*
-        //     arguments      → expression ( "," expression )*
+        //     call_tree      → primary ( "(" arguments? ")" )* ;
+        //     arguments      → expression ( "," expression )* ;
         //     primary        → INT | STRING | BOOL | "null"
         //                    | IDENTIFIER
         //                    | "(" expression ")" ;
@@ -153,6 +171,7 @@ namespace Honk
         Expr::u_ptr _parse_for_condition();
         std::optional<Expr::u_ptr> _parse_for_increment();
         std::vector<Expr::u_ptr> _parse_arguments();
+        std::vector<Token> _parse_parameters();
 
         // this->_is_at_end() is not interwoven with this.
         // It is in the book, but it clutters everything imo.
@@ -176,6 +195,7 @@ namespace Honk
         void _panic(const char* message, const Token& token);
 
         void _assert_next_token_is(TokenType type, const char* message);
+        const Token& _assert_match(TokenType type, const char* message);
 
         void _synchronise();
     };

@@ -12,6 +12,8 @@
 
 namespace Honk
 {
+    // TODO: The code for this class is REALLY dupey.
+    // Consider rewriting it.
     void PrettyASTPrinter::print(Expr& expression)
     {
         std::cout << expression.accept(*this) << std::endl;
@@ -34,11 +36,21 @@ namespace Honk
 
     std::string PrettyASTPrinter::parenthesize(const std::string& name, std::vector<Expr*> expressions)
     {
+        std::vector<std::string> expr_strings = Util::map<std::vector<std::string>>(expressions,
+            [this] (Expr* expr) {
+                return expr->accept(*this);
+            });
+
+        return this->parenthesize(name, expr_strings);
+    }
+
+    std::string PrettyASTPrinter::parenthesize(const std::string& name, std::vector<std::string>& strings)
+    {
         std::stringstream output;
 
         output << "(" << name;
-        for (Expr* expr : expressions) {
-            output << " " << expr->accept(*this);
+        for (std::string& str : strings) {
+            output << " " << str;
         }
         output << ")";
 
@@ -121,6 +133,21 @@ namespace Honk
         }
 
         output += "]";
+
+        return output;
+    }
+
+    std::string PrettyASTPrinter::visit_FunDeclaration(Stmt::FunDeclaration& stmt)
+    {
+        std::string output;
+        output += "[fun=";
+        output += Token::get_text(stmt.identifier);
+
+        if (stmt.parameters.size() > 0) {
+            output += " " + this->parenthesize("params", stmt.parameters);
+        }
+
+        output += stmt.body->accept(*this);
 
         return output;
     }

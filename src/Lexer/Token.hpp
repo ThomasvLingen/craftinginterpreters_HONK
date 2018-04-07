@@ -56,6 +56,8 @@ namespace Honk
         bool has_value() const;
 
         static Token null;
+
+        static std::string get_text(const Token& token);
     };
 
     using TokenStream = std::vector<Token>;

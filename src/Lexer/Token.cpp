@@ -62,4 +62,10 @@ namespace Honk
                 return "BIG FAT ERROR";
         }
     }
+
+    // Helper function for use in conjunction with `Util::map`
+    std::string Token::get_text(const Token& token)
+    {
+        return token.text;
+    }
 }

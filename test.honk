@@ -121,6 +121,20 @@ var end_timestamp;
     }
 }
 
+{ // Function declarations
+    fun honk()
+    {
+        println("HONK!");
+    }
+
+    fun honk_x_times(times_to_honk)
+    {
+        for (;times_to_honk > 0; times_to_honk = times_to_honk - 1) {
+            honk();
+        }
+    }
+}
+
 end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");
 println(end_timestamp - start_timestamp);
