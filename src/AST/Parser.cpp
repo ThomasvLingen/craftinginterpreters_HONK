@@ -469,54 +469,56 @@ namespace Honk
         return this->_get_current().type == TokenType::END_OF_FILE;
     }
 
+    auto type_comparator(TokenType type)
+    {
+        return [type] (const Token& token) {
+            return token.type == type;
+        };
+    }
+
     bool Parser::_check(TokenType type)
     {
-        return this->_internal_peek(0, type);
+        return this->_check_source(0, type_comparator(type));
     }
 
     bool Parser::_peek(TokenType type)
     {
-        return this->_internal_peek(1, type);
+        return this->_check_source(1, type_comparator(type));
+    }
+
+    bool Parser::_match(TokenType type)
+    {
+        return this->_match(type_comparator(type));
     }
 
     template <typename Callable>
     bool Parser::_match(Callable comparator)
     {
-        if (this->_is_at_end()) {
+        if (!this->_check_source(0, comparator)) {
             return false;
         }
 
-        if (comparator(this->_get_current())) {
-            this->_advance();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    bool Parser::_match(TokenType type)
-    {
-        return this->_match([&type] (const Token& current) {
-            return current.type == type;
-        });
-    }
-
-    bool Parser::_internal_peek(size_t steps, TokenType type)
-    {
-        return this->_internal_peek(steps, [&type] (const Token& peeked) {
-            return peeked.type == type;
-        });
+        this->_advance();
+        return true;
     }
 
     template<typename Callable>
-    bool Parser::_internal_peek(size_t steps, Callable comparator)
+    TokenStream::const_iterator Parser::_inspect_source(size_t steps, Callable comparator)
     {
         TokenStream::const_iterator target_it = std::next(this->_current_token, steps);
-        if (target_it >= this->_tokens.end()) {
-            return false;
+        if (target_it < this->_tokens.end()) {
+            if (comparator(*target_it)) {
+                return target_it;
+            }
         }
 
-        return comparator(*target_it);
+        return this->_tokens.end();
+    }
+
+    template<typename Callable>
+    bool Parser::_check_source(size_t steps, Callable comparator)
+    {
+        return this->_inspect_source(steps, comparator) != this->_tokens.end();
     }
 
     const Token& Parser::_get_current()

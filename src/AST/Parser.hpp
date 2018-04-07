@@ -130,23 +130,22 @@ namespace Honk
         const Token& _get_current();
         const Token& _get_previous();
 
-        // TODO: I am not happy with the amount of utility match/peek/check code I have...
         bool _match(TokenType type);
         template <typename Callable>
         bool _match(Callable comparator);
+        const Token& _assert_match(TokenType type, const char* message);
 
         bool _peek(TokenType type);
         bool _check(TokenType type);
 
         template <typename Callable>
-        bool _internal_peek(size_t steps, Callable comparator);
-        bool _internal_peek(size_t steps, TokenType type);
+        TokenStream::const_iterator _inspect_source(size_t steps, Callable comparator);
+        template <typename Callable>
+        bool _check_source(size_t steps, Callable comparator);
+
 
         void _panic(const char* message);
         void _panic(const char* message, const Token& token);
-
-        const Token& _assert_match(TokenType type, const char* message);
-
         void _synchronise();
     };
 }
