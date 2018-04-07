@@ -135,15 +135,14 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
     {
-        this->_assert_next_token_is(TokenType::IDENTIFIER, ERROR::VAR::NO_IDENTIFIER);
-        Token identifier = this->_get_previous();
+        Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::VAR::NO_IDENTIFIER);
 
         std::optional<Expr::u_ptr> initializer;
         if (this->_match(TokenType::ASSIGNMENT)) {
             initializer = std::move(this->_parse_expression());
         }
 
-        this->_assert_next_token_is(TokenType::SEMICOLON, ERROR::VAR::UNTERMINATED);
+        this->_assert_match(TokenType::SEMICOLON, ERROR::VAR::UNTERMINATED);
         return std::make_unique<Stmt::VarDeclaration>(identifier, std::move(initializer));
     }
 
@@ -152,7 +151,7 @@ namespace Honk
     {
         Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::FUN::NO_IDENTIFIER);
 
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, ERROR::FUN::NO_PARAMS);
+        this->_assert_match(TokenType::PAREN_OPEN, ERROR::FUN::NO_PARAMS);
         std::vector<Token> param_tokens = this->_parse_parameters();
         if (param_tokens.size() > this->_MAX_CALL_ARGS) {
             this->_panic(ERROR::PARAMS::TOO_MANY, param_tokens[0]);
@@ -195,7 +194,7 @@ namespace Honk
             statements.push_back(this->_parse_declaration());
         }
 
-        this->_assert_next_token_is(TokenType::CURLY_CLOSE, ERROR::BLOCK::UNCLOSED);
+        this->_assert_match(TokenType::CURLY_CLOSE, ERROR::BLOCK::UNCLOSED);
 
         return std::make_unique<Stmt::Block>(std::move(statements));
     }
@@ -230,7 +229,7 @@ namespace Honk
 
     Stmt::u_ptr Parser::_parse_statement_for()
     {
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, ERROR::FOR::NO_OPEN);
+        this->_assert_match(TokenType::PAREN_OPEN, ERROR::FOR::NO_OPEN);
 
         std::optional<Stmt::u_ptr> init = this->_parse_for_initializer();
         Expr::u_ptr cond                = this->_parse_for_condition();
@@ -244,7 +243,7 @@ namespace Honk
     {
         Expr::u_ptr expression = this->_parse_expression();
 
-        this->_assert_next_token_is(TokenType::SEMICOLON, ERROR::EXPR::UNTERMINATED);
+        this->_assert_match(TokenType::SEMICOLON, ERROR::EXPR::UNTERMINATED);
 
         return std::make_unique<Stmt::Expression>(std::move(expression));
     }
@@ -261,8 +260,7 @@ namespace Honk
             return this->_parse_logic_or();
         }
 
-        this->_assert_next_token_is(TokenType::IDENTIFIER, ERROR::ASSIGNMENT::INVALID_TARGET);
-        Token identifier = this->_get_previous();
+        Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::ASSIGNMENT::INVALID_TARGET);
 
         this->_advance();
 
@@ -397,7 +395,7 @@ namespace Honk
             args.push_back(this->_parse_expression());
         } while (this->_match(TokenType::COMMA));
 
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::ARGS::NO_CLOSE);
+        this->_assert_match(TokenType::PAREN_CLOSE, ERROR::ARGS::NO_CLOSE);
         return args;
     }
 
@@ -414,7 +412,7 @@ namespace Honk
             params.push_back(param);
         } while(this->_match(TokenType::COMMA));
 
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::PARAMS::NO_CLOSE);
+        this->_assert_match(TokenType::PAREN_CLOSE, ERROR::PARAMS::NO_CLOSE);
         return params;
     }
 
@@ -452,7 +450,7 @@ namespace Honk
 
         if (this->_match(TokenType::PAREN_OPEN)) {
             Expr::u_ptr grouped_expr = this->_parse_expression();
-            this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::GROUP::UNCLOSED);
+            this->_assert_match(TokenType::PAREN_CLOSE, ERROR::GROUP::UNCLOSED);
 
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
@@ -553,31 +551,27 @@ namespace Honk
         }
     }
 
-    void Parser::_assert_next_token_is(TokenType type, const char* message)
-    {
-        if (!this->_match(type)) {
-            this->_panic(message);
-        }
-    }
-
     const Token& Parser::_assert_match(TokenType type, const char* message)
     {
-        this->_assert_next_token_is(type, message);
-        return this->_get_previous();
+        if (this->_match(type)) {
+            return this->_get_previous();
+        }
+
+        this->_panic(message);
     }
 
     Stmt::u_ptr Parser::_parse_block()
     {
-        this->_assert_next_token_is(TokenType::CURLY_OPEN, ERROR::BLOCK::EXPECTED);
+        this->_assert_match(TokenType::CURLY_OPEN, ERROR::BLOCK::EXPECTED);
 
         return this->_parse_statement_block();
     }
 
     Expr::u_ptr Parser::_parse_condition(const char* paren_open_msg, const char* paren_close_msg)
     {
-        this->_assert_next_token_is(TokenType::PAREN_OPEN, paren_open_msg);
+        this->_assert_match(TokenType::PAREN_OPEN, paren_open_msg);
         Expr::u_ptr condition = this->_parse_expression();
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, paren_close_msg);
+        this->_assert_match(TokenType::PAREN_CLOSE, paren_close_msg);
 
         return condition;
     }
@@ -602,7 +596,7 @@ namespace Honk
         }
 
         Expr::u_ptr expression = this->_parse_expression();
-        this->_assert_next_token_is(TokenType::SEMICOLON, ERROR::FOR::UNTERMINATED_CONDITION);
+        this->_assert_match(TokenType::SEMICOLON, ERROR::FOR::UNTERMINATED_CONDITION);
         return expression;
     }
 
@@ -613,7 +607,7 @@ namespace Honk
             opt_inc = this->_parse_expression();
         }
 
-        this->_assert_next_token_is(TokenType::PAREN_CLOSE, ERROR::FOR::NO_CLOSE);
+        this->_assert_match(TokenType::PAREN_CLOSE, ERROR::FOR::NO_CLOSE);
         return opt_inc;
     }
 }
