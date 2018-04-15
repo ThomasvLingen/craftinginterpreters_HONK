@@ -35,7 +35,7 @@ namespace Honk
     };
 
     // The same as a VariableBucket, but this supports multiple scopes.
-    struct VariableBucket::Scoped : Util::I_Scopable
+    struct VariableBucket::Scoped : Util::I_Scopable<>
     {
         Scoped();
 
