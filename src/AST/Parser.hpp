@@ -145,8 +145,8 @@ namespace Honk
         bool _check_source(size_t steps, Callable comparator);
 
 
-        void _panic(const char* message);
-        void _panic(const char* message, const Token& token);
+        [[noreturn]] void _panic(const char* message);
+        [[noreturn]] void _panic(const char* message, const Token& token);
         void _synchronise();
     };
 }
