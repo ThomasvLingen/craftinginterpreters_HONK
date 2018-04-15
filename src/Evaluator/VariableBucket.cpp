@@ -63,6 +63,11 @@ namespace Honk
         this->_scopes.push(VariableBucket(&enclosing));
     }
 
+    void VariableBucket::Scoped::scope_enter(VariableBucket*& enclosing)
+    {
+        this->_scopes.push(VariableBucket{enclosing});
+    }
+
     void VariableBucket::Scoped::scope_exit()
     {
         this->_scopes.pop();

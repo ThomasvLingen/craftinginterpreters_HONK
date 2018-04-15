@@ -18,13 +18,13 @@ namespace Honk
         }
 
         template<typename ...Args>
-        ScopeGuard<Args...>::ScopeGuard(I_Scopable<Args...>& target, Args&& ... args)
+        ScopeGuard<Args...>::ScopeGuard(I_Scopable<Args...>& target, Args& ... args)
             : _target(target)
         {
             this->_target.scope_enter(std::forward<Args>(args)...);
         }
 
-        template <>
+        template<>
         ScopeGuard<>::~ScopeGuard()
         {
             this->_target.scope_exit();

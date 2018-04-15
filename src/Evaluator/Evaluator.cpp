@@ -297,7 +297,7 @@ namespace Honk
     void Evaluator::visit_Block(Stmt::Block& stmt)
     {
         // A scope guard is used to guarantee exception safety
-        Util::ScopeGuard guard(this->_scopes);
+        Util::ScopeGuard<> guard(this->_scopes);
 
         for (Stmt::u_ptr& block_stmt : stmt.statements) {
             this->_interpret(*block_stmt);
@@ -334,7 +334,7 @@ namespace Honk
     void Evaluator::visit_For(Stmt::For& stmt)
     {
         // Make a new scope for the for loop's clauses
-        Util::ScopeGuard guard(this->_scopes);
+        Util::ScopeGuard<> guard(this->_scopes);
 
         // Execute the initializer
         if (stmt.initializer) {
