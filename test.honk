@@ -121,19 +121,32 @@ var end_timestamp;
     }
 }
 
-{ // Function declarations
-    fun honk()
-    {
-        println("HONK!");
-    }
+// Function declarations
+fun honk()
+{
+    println("HONK!");
+}
 
-    fun honk_x_times(times_to_honk)
-    {
-        for (;times_to_honk > 0; times_to_honk = times_to_honk - 1) {
-            honk();
-        }
+fun honk_x_times(times_to_honk)
+{
+    for (;times_to_honk > 0; times_to_honk = times_to_honk - 1) {
+        honk();
     }
 }
+
+fun count(end)
+{
+    for (var i = 1; i <= end; i = i + 1) {
+        print("Count - ");
+        println(i);
+    }
+}
+
+println("Expect 3 honks");
+honk_x_times(3);
+
+println("Expect a count from 1 to 3");
+count(3);
 
 end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");

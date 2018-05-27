@@ -4,19 +4,12 @@
 
 #include "ScopeGuard.hpp"
 
+#include <utility>
+
 namespace Honk
 {
     namespace Util
     {
-        ScopeGuard::ScopeGuard(I_Scopable& target)
-            : _target(target)
-        {
-            this->_target.scope_enter();
-        }
 
-        ScopeGuard::~ScopeGuard()
-        {
-            this->_target.scope_exit();
-        }
     }
 }

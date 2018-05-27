@@ -10,13 +10,14 @@
 
 #include "Interpreter.hpp"
 #include "StandardLibrary.hpp"
+#include "Function.hpp"
 
 namespace Honk
 {
     Evaluator::Evaluator(const Interpreter& parent)
         : _parent(parent)
     {
-        StandardLibrary::register_in(this->_scopes);
+        StandardLibrary::register_in(this->scopes);
     }
 
     EvaluateError::EvaluateError(const char* msg, const Token* error_token)
@@ -205,7 +206,7 @@ namespace Honk
 
     Value Evaluator::visit_VarAccess(Expr::VarAccess& expr)
     {
-        Value* accessed_value = this->_env().get_var(expr.get_identifier());
+        Value* accessed_value = this->env().get_var(expr.get_identifier());
 
         if (!accessed_value) {
             throw this->_error("Accessing an undefined variable: " + expr.get_identifier());
@@ -216,7 +217,7 @@ namespace Honk
 
     Value Evaluator::visit_VarAssign(Expr::VarAssign& expr)
     {
-        Value* assigned_value = this->_env().get_var(expr.get_identifier());
+        Value* assigned_value = this->env().get_var(expr.get_identifier());
         if (!assigned_value) {
             throw this->_error("Trying to assign to an undefined variable: " + expr.get_identifier());
         }
@@ -297,9 +298,13 @@ namespace Honk
     void Evaluator::visit_Block(Stmt::Block& stmt)
     {
         // A scope guard is used to guarantee exception safety
-        Util::ScopeGuard guard(this->_scopes);
+        Util::ScopeGuard<> guard(this->scopes);
+        this->execute_block(stmt);
+    }
 
-        for (Stmt::u_ptr& block_stmt : stmt.statements) {
+    void Evaluator::execute_block(Stmt::Block& block)
+    {
+        for (Stmt::u_ptr& block_stmt : block.statements) {
             this->_interpret(*block_stmt);
         }
     }
@@ -316,12 +321,12 @@ namespace Honk
     void Evaluator::visit_VarDeclaration(Stmt::VarDeclaration& stmt)
     {
         std::string identifier = stmt.get_identifier();
-        if (this->_env().has_var_in_local(identifier)) {
+        if (this->env().has_var_in_local(identifier)) {
             throw this->_error("Redeclaring variable in same scope: " + identifier);
         }
 
         Value initial_value = this->_evaluate_optional(stmt.initializer);
-        this->_env().new_var(identifier, initial_value);
+        this->env().new_var(identifier, initial_value);
     }
 
     void Evaluator::visit_While(Stmt::While& stmt)
@@ -334,7 +339,7 @@ namespace Honk
     void Evaluator::visit_For(Stmt::For& stmt)
     {
         // Make a new scope for the for loop's clauses
-        Util::ScopeGuard guard(this->_scopes);
+        Util::ScopeGuard<> guard(this->scopes);
 
         // Execute the initializer
         if (stmt.initializer) {
@@ -350,9 +355,15 @@ namespace Honk
         }
     }
 
-    VariableBucket& Evaluator::_env()
+    void Evaluator::visit_FunDeclaration(Stmt::FunDeclaration& stmt)
     {
-        return this->_scopes.get_current_env();
+        Function fun(&stmt);
+        this->env().new_var(stmt.get_identifier(), Value {fun});
+    }
+
+    VariableBucket& Evaluator::env()
+    {
+        return this->scopes.get_current_env();
     }
 
     bool Evaluator::_is_truthy(Expr& expr)

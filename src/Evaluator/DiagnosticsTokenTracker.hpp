@@ -14,7 +14,7 @@
 namespace Honk
 {
     // Should be used in combination with Util::ScopeGuard for exception safety
-    struct DiagnosticsTokenTracker : Util::I_Scopable
+    struct DiagnosticsTokenTracker : Util::I_Scopable<>
     {
         const Token& get_last_token();
 

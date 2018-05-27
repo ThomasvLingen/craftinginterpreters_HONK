@@ -20,7 +20,7 @@ namespace Honk
 
     Value StandardLibrary::Native::get_scope_depth(Evaluator& runtime, Arguments)
     {
-        honk_int_t scope_depth = runtime._scopes.get_scope_depth();
+        honk_int_t scope_depth = runtime.scopes.get_scope_depth();
         return Value{scope_depth};
     }
 
