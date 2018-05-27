@@ -40,7 +40,7 @@ namespace Honk
         Scoped();
 
         void scope_enter() override;
-        void scope_enter(VariableBucket*& enclosing) override;
+        void scope_enter(VariableBucket*&& enclosing) override;
         void scope_exit() override;
 
         VariableBucket& get_global_env();

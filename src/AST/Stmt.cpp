@@ -66,4 +66,14 @@ namespace Honk
         , body(std::move(body))
     {
     }
+
+    Stmt::Block& Stmt::FunDeclaration::get_body()
+    {
+        return *(Stmt::Block*)this->body.get();
+    }
+
+    std::string Stmt::FunDeclaration::get_identifier()
+    {
+        return this->identifier.text;
+    }
 }

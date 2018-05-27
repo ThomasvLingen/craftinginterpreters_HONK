@@ -26,8 +26,14 @@ namespace Honk
     {
         Evaluator(const Interpreter& parent);
 
+        VariableBucket::Scoped scopes;
+        VariableBucket& globals = scopes.get_global_env();
+
         void interpret(Stmt::stream& code);
         Value evaluate(Expr& expression);
+
+        VariableBucket& env();
+        void execute_block(Stmt::Block& block);
 
         // Statement visitor methods
         void visit_Expression(Stmt::Expression& stmt) override;
@@ -36,6 +42,7 @@ namespace Honk
         void visit_VarDeclaration(Stmt::VarDeclaration& stmt) override;
         void visit_While(Stmt::While& stmt) override;
         void visit_For(Stmt::For& stmt) override;
+        void visit_FunDeclaration(Stmt::FunDeclaration& stmt) override;
 
         // Expression visitor methods
         Value visit_Literal(Expr::Literal& expr) override;
@@ -63,8 +70,6 @@ namespace Honk
         friend class StandardLibrary;
     private:
         const Interpreter& _parent;
-        VariableBucket::Scoped _scopes;
-        VariableBucket& _globals = _scopes.get_global_env();
 
         DiagnosticsTokenTracker _callstack;
 
@@ -83,7 +88,6 @@ namespace Honk
         bool _values_are(const Value& left, const Value& right);
         template <typename T>
         std::pair<T, T> _try_get_as(const Value& left, const Value& right, const char* throw_msg);
-        VariableBucket& _env();
 
         EvaluateError _invalid_call_error(size_t expected_n_args, size_t actual);
         EvaluateError _error(const std::string& msg);

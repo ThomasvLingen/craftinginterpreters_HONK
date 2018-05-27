@@ -10,6 +10,7 @@
 #include <optional>
 
 #include "Expr.hpp"
+#include "StmtFwd.hpp"
 
 #define STMTVISITOR_ACCEPT(returntype, classname)                \
     returntype accept(StmtVisitor<returntype>& visitor) override \
@@ -23,34 +24,6 @@
 
 namespace Honk
 {
-    template<typename T>
-    struct StmtVisitor;
-
-    struct Stmt
-    {
-        virtual ~Stmt() = default;
-
-        virtual void accept(StmtVisitor<void>& visitor) = 0;
-        virtual std::string accept(StmtVisitor<std::string>& visitor) = 0;
-
-        const Token& diagnostics_token;
-
-        using u_ptr = std::unique_ptr<Stmt>;
-        using stream = std::vector<u_ptr>;
-
-        struct Expression;
-        struct Block;
-        struct VarDeclaration;
-        struct If;
-        struct While;
-        struct For;
-        struct FunDeclaration;
-
-    private:
-        Stmt();
-        Stmt(const Token& diagnostics_token);
-    };
-
     template<typename T>
     struct StmtVisitor
     {
@@ -130,6 +103,9 @@ namespace Honk
     struct Stmt::FunDeclaration : Stmt
     {
         FunDeclaration(Token identifier, std::vector<std::string> parameters, Stmt::u_ptr body);
+
+        std::string get_identifier();
+        Stmt::Block& get_body(); // TODO: This is a code smell
 
         Token identifier;
         std::vector<std::string> parameters;

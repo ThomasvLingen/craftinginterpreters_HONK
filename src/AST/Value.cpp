@@ -48,6 +48,10 @@ namespace Honk
             return this->get<NativeCallable>();
         }
 
+        if (this->is_a<Function>()) {
+            return this->get<Function>();
+        }
+
         return nullptr;
     }
 }
