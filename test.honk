@@ -148,6 +148,28 @@ honk_x_times(3);
 println("Expect a count from 1 to 3");
 count(3);
 
+// Return statements
+fun fibonacci(n)
+{
+    if (n <= 1) {
+         return n;
+    }
+
+    return fibonacci(n - 2) + fibonacci(n - 1);
+}
+
+fun empty_return_example(should_be_higher_than_0)
+{
+    if (should_be_higher_than_0 <= 0) {
+        return;
+    }
+
+    print("This is higher than 0");
+    println(should_be_higher_than_0);
+}
+
+
+
 end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");
 println(end_timestamp - start_timestamp);

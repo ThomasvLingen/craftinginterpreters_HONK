@@ -61,7 +61,8 @@ namespace Honk
         //                     | stmt_block
         //                     | stmt_if
         //                     | stmt_while
-        //                     | stmt_for ;
+        //                     | stmt_for
+        //                     | stmt_return ;
         //
         //     stmt_expr       → expression ";" ;
         //     stmt_block      → "{" declaration* "}" ;
@@ -72,6 +73,7 @@ namespace Honk
         //                                 expression ";"
         //                                 expression?
         //                              ")" stmt_block ;
+        //     stmt_return     → "return" expression? ";" ;
 
         Stmt::u_ptr _parse_protected_decl();
         Stmt::u_ptr _parse_declaration();
@@ -83,6 +85,7 @@ namespace Honk
         Stmt::u_ptr _parse_statement_if();
         Stmt::u_ptr _parse_statement_while();
         Stmt::u_ptr _parse_statement_for();
+        Stmt::u_ptr _parse_statement_return();
 
         // Expression grammar:
         //     expression     → assignment ;

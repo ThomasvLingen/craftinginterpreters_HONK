@@ -58,6 +58,10 @@ namespace Honk
             constexpr char NO_PARAMS[] = "Expected a '(' (parameter declarations) after the function identifier";
             constexpr char NO_BODY[] = "Expected a '{' (function body) after a parameter declaration";
         }
+        namespace RETURN
+        {
+            constexpr char UNTERMINATED[] = "Expected a ';' after the return statement";
+        }
         namespace ARGS
         {
             constexpr char NO_CLOSE[] = "Expected a ')' after a list of arguments";
@@ -183,6 +187,10 @@ namespace Honk
             return this->_parse_statement_for();
         }
 
+        if (this->_match(TokenType::RETURN)) {
+            return this->_parse_statement_return();
+        }
+
         return this->_parse_statement_expression();
     }
 
@@ -246,6 +254,21 @@ namespace Honk
         this->_assert_match(TokenType::SEMICOLON, ERROR::EXPR::UNTERMINATED);
 
         return std::make_unique<Stmt::Expression>(std::move(expression));
+    }
+
+    Stmt::u_ptr Parser::_parse_statement_return()
+    {
+        Token keyword = this->_get_previous();
+        Expr::u_ptr return_value;
+
+        if (this->_check(TokenType::SEMICOLON)) {
+            return_value = std::make_unique<Expr::Literal>(null);
+        } else {
+            return_value = this->_parse_expression();
+        }
+
+        this->_assert_match(TokenType::SEMICOLON, ERROR::RETURN::UNTERMINATED);
+        return std::make_unique<Stmt::Return>(keyword, std::move(return_value));
     }
 
     Expr::u_ptr Parser::_parse_expression()

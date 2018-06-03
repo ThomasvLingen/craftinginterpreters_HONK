@@ -23,6 +23,7 @@ namespace Honk
         std::string visit_FunDeclaration(Stmt::FunDeclaration& stmt) override;
         std::string visit_While(Stmt::While& stmt) override;
         std::string visit_For(Stmt::For& stmt) override;
+        std::string visit_Return(Stmt::Return& stmt) override;
 
         // Expression visitors
         std::string visit_Binary(Expr::Binary& expr) override;
