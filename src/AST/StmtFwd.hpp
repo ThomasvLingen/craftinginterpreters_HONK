@@ -34,6 +34,7 @@ namespace Honk
         struct While;
         struct For;
         struct FunDeclaration;
+        struct Return;
 
     private:
         Stmt();

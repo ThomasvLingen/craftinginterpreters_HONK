@@ -26,6 +26,11 @@ namespace Honk
     {
     }
 
+    Return::Return(Value returned_value)
+        : returned_value(returned_value)
+    {
+    }
+
     void Evaluator::interpret(Stmt::stream& code)
     {
         try {
@@ -359,6 +364,11 @@ namespace Honk
     {
         Function fun(&stmt);
         this->env().new_var(stmt.get_identifier(), Value {fun});
+    }
+
+    void Evaluator::visit_Return(Stmt::Return& stmt)
+    {
+        throw Return(this->_evaluate_optional(stmt.return_value));
     }
 
     VariableBucket& Evaluator::env()

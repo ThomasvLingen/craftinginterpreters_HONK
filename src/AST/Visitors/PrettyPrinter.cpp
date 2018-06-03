@@ -182,6 +182,17 @@ namespace Honk
         return output;
     }
 
+    std::string PrettyASTPrinter::visit_Return(Stmt::Return& stmt)
+    {
+        std::string output;
+        output += "[return ";
+        if (stmt.return_value) {
+            output += this->_to_str(**stmt.return_value);
+        }
+        output += "]";
+        return output;
+    }
+
     std::string PrettyASTPrinter::visit_VarAssign(Expr::VarAssign& expr)
     {
         return parenthesize(expr.identifier_tok.text + "=", {expr.new_value.get()});

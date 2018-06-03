@@ -34,6 +34,7 @@ namespace Honk
         virtual T visit_While(Stmt::While& stmt) = 0;
         virtual T visit_For(Stmt::For& stmt) = 0;
         virtual T visit_FunDeclaration(Stmt::FunDeclaration& stmt) = 0;
+        virtual T visit_Return(Stmt::Return& stmt) = 0;
     };
 
     struct Stmt::Expression : Stmt
@@ -112,6 +113,16 @@ namespace Honk
         Stmt::u_ptr body;
 
         STMTVISITORS_ACCEPT(FunDeclaration);
+    };
+
+    struct Stmt::Return : Stmt
+    {
+        Return(Token keyword, std::optional<Expr::u_ptr> return_value);
+
+        Token keyword;
+        std::optional<Expr::u_ptr> return_value;
+
+        STMTVISITORS_ACCEPT(Return);
     };
 }
 
