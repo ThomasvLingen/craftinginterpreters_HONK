@@ -77,7 +77,7 @@ namespace Honk
         return this->identifier.text;
     }
 
-    Stmt::Return::Return(Token keyword, Expr::u_ptr return_value)
+    Stmt::Return::Return(Token keyword, std::optional<Expr::u_ptr> return_value)
         : keyword(keyword)
         , return_value(std::move(return_value))
     {

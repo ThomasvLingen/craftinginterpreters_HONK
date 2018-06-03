@@ -26,7 +26,11 @@ namespace Honk
         Util::ScopeGuard<VariableBucket*> fn_scope(runtime.scopes, &runtime.globals);
         this->_define_args_in_bucket(runtime.env(), args);
 
-        runtime.execute_block(this->_declaration->get_body());
+        try {
+            runtime.execute_block(this->_declaration->get_body());
+        } catch(Return& return_stmt) {
+            return return_stmt.returned_value;
+        }
 
         return Value {null};
     }

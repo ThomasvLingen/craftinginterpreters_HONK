@@ -117,10 +117,10 @@ namespace Honk
 
     struct Stmt::Return : Stmt
     {
-        Return(Token keyword, Expr::u_ptr return_value);
+        Return(Token keyword, std::optional<Expr::u_ptr> return_value);
 
         Token keyword;
-        Expr::u_ptr return_value;
+        std::optional<Expr::u_ptr> return_value;
 
         STMTVISITORS_ACCEPT(Return);
     };

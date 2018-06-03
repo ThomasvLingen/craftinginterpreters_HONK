@@ -22,6 +22,13 @@ namespace Honk
         const Token* error_token = nullptr;
     };
 
+    struct Return : std::exception
+    {
+        Return(Value returned_value);
+
+        Value returned_value;
+    };
+
     struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor, StmtVisitor<void>
     {
         Evaluator(const Interpreter& parent);
@@ -43,6 +50,7 @@ namespace Honk
         void visit_While(Stmt::While& stmt) override;
         void visit_For(Stmt::For& stmt) override;
         void visit_FunDeclaration(Stmt::FunDeclaration& stmt) override;
+        void visit_Return(Stmt::Return& stmt) override;
 
         // Expression visitor methods
         Value visit_Literal(Expr::Literal& expr) override;

@@ -186,7 +186,9 @@ namespace Honk
     {
         std::string output;
         output += "[return ";
-        output += stmt.return_value->accept(*this);
+        if (stmt.return_value) {
+            output += this->_to_str(**stmt.return_value);
+        }
         output += "]";
         return output;
     }

@@ -259,11 +259,9 @@ namespace Honk
     Stmt::u_ptr Parser::_parse_statement_return()
     {
         Token keyword = this->_get_previous();
-        Expr::u_ptr return_value;
+        std::optional<Expr::u_ptr> return_value;
 
-        if (this->_check(TokenType::SEMICOLON)) {
-            return_value = std::make_unique<Expr::Literal>(null);
-        } else {
+        if (!this->_check(TokenType::SEMICOLON)) {
             return_value = this->_parse_expression();
         }
 

@@ -158,17 +158,23 @@ fun fibonacci(n)
     return fibonacci(n - 2) + fibonacci(n - 1);
 }
 
-fun empty_return_example(should_be_higher_than_0)
+for (var i = 1; i < 11; i = i + 1) {
+    print("fibb(");
+    print(i);
+    print(") = ");
+
+    println(fibonacci(i));
+}
+
+fun empty_return_example(num)
 {
-    if (should_be_higher_than_0 <= 0) {
+    if (num <= 0) {
         return;
     }
 
-    print("This is higher than 0");
-    println(should_be_higher_than_0);
+    print("This is higher than 0 --> ");
+    println(num);
 }
-
-
 
 end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");
