@@ -130,7 +130,8 @@ namespace Honk
             return this->_parse_declaration_vardeclaration();
         }
 
-        if (this->_match(TokenType::FUN)) {
+        if (this->_check(TokenType::FUN) && this->_peek(TokenType::IDENTIFIER)) {
+            this->_assert_match(TokenType::FUN, ""); // This cannot fail after the last check
             return this->_parse_declaration_fun();
         }
 
