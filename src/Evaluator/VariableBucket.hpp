@@ -19,6 +19,7 @@ namespace Honk
     {
         struct Scoped;
         using Bucket = std::unordered_map<std::string, Value>;
+        using s_ptr = std::shared_ptr<VariableBucket>;
 
         VariableBucket() = default;
         VariableBucket(VariableBucket* enclosing);
@@ -40,15 +41,16 @@ namespace Honk
         Scoped();
 
         void scope_enter() override;
-        void scope_enter(VariableBucket*&& enclosing) override;
+        void scope_enter(VariableBucket* enclosing) override;
         void scope_exit() override;
 
         VariableBucket& get_global_env();
         VariableBucket& get_current_env();
+        VariableBucket::s_ptr claim_current_env();
 
         size_t get_scope_depth();
     private:
-        std::stack<VariableBucket> _scopes;
+        std::stack<VariableBucket::s_ptr> _scopes;
         VariableBucket& _global_scope;
     };
 }

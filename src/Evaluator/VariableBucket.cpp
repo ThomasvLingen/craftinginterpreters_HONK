@@ -46,26 +46,26 @@ namespace Honk
     }
 
     VariableBucket::Scoped::Scoped()
-        : _scopes({VariableBucket {}}) // global scope
-        , _global_scope(_scopes.top())
+        : _scopes({ std::make_shared<VariableBucket>() }) // global scope
+        , _global_scope(*_scopes.top())
     {
     }
 
     VariableBucket& VariableBucket::Scoped::get_current_env()
     {
-        return this->_scopes.top();
+        return *this->_scopes.top();
     }
 
     void VariableBucket::Scoped::scope_enter()
     {
         VariableBucket& enclosing = this->get_current_env();
 
-        this->_scopes.push(VariableBucket(&enclosing));
+        this->_scopes.push(std::make_shared<VariableBucket>(&enclosing));
     }
 
-    void VariableBucket::Scoped::scope_enter(VariableBucket*&& enclosing)
+    void VariableBucket::Scoped::scope_enter(VariableBucket* enclosing)
     {
-        this->_scopes.push(VariableBucket{enclosing});
+        this->_scopes.push(std::make_shared<VariableBucket>(enclosing));
     }
 
     void VariableBucket::Scoped::scope_exit()
@@ -81,5 +81,10 @@ namespace Honk
     VariableBucket& VariableBucket::Scoped::get_global_env()
     {
         return this->_global_scope;
+    }
+
+    VariableBucket::s_ptr VariableBucket::Scoped::claim_current_env()
+    {
+        return this->_scopes.top();
     }
 }

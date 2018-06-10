@@ -17,7 +17,7 @@ namespace Honk
     struct Function : Callable
     {
         // A pointer is used to guarantee this being trivially move constructable.
-        Function(Stmt::FunDeclaration* declaration) noexcept;
+        Function(Stmt::FunDeclaration* declaration, std::shared_ptr<VariableBucket> closure) noexcept;
 
         size_t n_args() const override;
         Value call(Evaluator& runtime, Arguments args) override;
@@ -26,6 +26,7 @@ namespace Honk
         friend bool operator==(const Function& a, const Function& b);
     private:
         Stmt::FunDeclaration* _declaration;
+        std::shared_ptr<VariableBucket> _closure;
 
         void _define_args_in_bucket(VariableBucket& env, Arguments& args);
     };

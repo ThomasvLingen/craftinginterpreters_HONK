@@ -16,14 +16,14 @@ namespace Honk
         {
             virtual ~I_Scopable() = default;
 
-            virtual void scope_enter(Args&& ...args) = 0;
+            virtual void scope_enter(Args ...args) = 0;
             virtual void scope_exit() = 0;
         };
 
         template<typename ...Args>
         struct ScopeGuard
         {
-            ScopeGuard(I_Scopable<Args...>& target, Args&& ... args)
+            ScopeGuard(I_Scopable<Args...>& target, Args... args)
                 : _target(target)
             {
                 this->_target.scope_enter(std::forward<Args>(args)...);
