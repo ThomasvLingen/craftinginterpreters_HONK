@@ -11,8 +11,9 @@
 
 namespace Honk
 {
-    Function::Function(Stmt::FunDeclaration* declaration) noexcept
+    Function::Function(Stmt::FunDeclaration* declaration, VariableBucket::s_ptr closure) noexcept
         : _declaration(declaration)
+        , _closure(closure)
     {
     }
 
@@ -23,7 +24,7 @@ namespace Honk
 
     Value Function::call(Evaluator& runtime, Arguments args)
     {
-        Util::ScopeGuard<VariableBucket*> fn_scope(runtime.scopes, &runtime.globals);
+        Util::ScopeGuard<VariableBucket*> fn_scope(runtime.scopes, this->_closure.get());
         this->_define_args_in_bucket(runtime.env(), args);
 
         try {

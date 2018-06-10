@@ -362,7 +362,7 @@ namespace Honk
 
     void Evaluator::visit_FunDeclaration(Stmt::FunDeclaration& stmt)
     {
-        Function fun(&stmt);
+        Function fun(&stmt, this->claim_env());
         this->env().new_var(stmt.get_identifier(), Value {fun});
     }
 
@@ -374,6 +374,11 @@ namespace Honk
     VariableBucket& Evaluator::env()
     {
         return this->scopes.get_current_env();
+    }
+
+    VariableBucket::s_ptr Evaluator::claim_env()
+    {
+        return this->scopes.claim_current_env();
     }
 
     bool Evaluator::_is_truthy(Expr& expr)

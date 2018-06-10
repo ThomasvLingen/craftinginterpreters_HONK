@@ -40,6 +40,8 @@ namespace Honk
         Value evaluate(Expr& expression);
 
         VariableBucket& env();
+        VariableBucket::s_ptr claim_env();
+
         void execute_block(Stmt::Block& block);
 
         // Statement visitor methods
