@@ -154,17 +154,7 @@ namespace Honk
     Stmt::u_ptr Parser::_parse_declaration_fun()
     {
         Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::FUN::NO_IDENTIFIER);
-
-        this->_assert_match(TokenType::PAREN_OPEN, ERROR::FUN::NO_PARAMS);
-        std::vector<Token> param_tokens = this->_parse_parameters();
-        if (param_tokens.size() > this->_MAX_CALL_ARGS) {
-            this->_panic(ERROR::PARAMS::TOO_MANY, param_tokens[0]);
-        }
-        std::vector<std::string> params = Util::map<std::vector<std::string>>(param_tokens, Token::get_text);
-
-        Stmt::u_ptr body = this->_parse_block();
-
-        return std::make_unique<Stmt::FunDeclaration>(identifier, params, std::move(body));
+        return std::make_unique<Stmt::FunDeclaration>(identifier, this->_parse_function_body());
     }
 
     Stmt::u_ptr Parser::_parse_statement()
@@ -470,8 +460,24 @@ namespace Honk
             return std::make_unique<Expr::Grouped>(std::move(grouped_expr));
         }
 
+        if (this->_match(TokenType::FUN)) {
+            return this->_parse_function_body();
+        }
+
         this->_panic(ERROR::EXPR::BROKEN);
-        return nullptr;
+    }
+
+
+    Expr::u_ptr Parser::_parse_function_body()
+    {
+        this->_assert_match(TokenType::PAREN_OPEN, ERROR::FUN::NO_PARAMS);
+        std::vector<Token> param_tokens = this->_parse_parameters();
+        if (param_tokens.size() > this->_MAX_CALL_ARGS) {
+            this->_panic(ERROR::PARAMS::TOO_MANY, param_tokens[0]);
+        }
+        std::vector<std::string> params = Util::map<std::vector<std::string>>(param_tokens, Token::get_text);
+
+        return std::make_unique<Expr::Fun>(params, this->_parse_block());
     }
 
     const Token& Parser::_advance()

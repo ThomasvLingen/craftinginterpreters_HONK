@@ -59,22 +59,22 @@ namespace Honk
     {
     }
 
-    Stmt::FunDeclaration::FunDeclaration(Token identifier, std::vector<std::string> parameters, Stmt::u_ptr body)
+    Stmt::FunDeclaration::FunDeclaration(Token identifier, Expr::u_ptr function)
         : Stmt(this->identifier)
         , identifier(identifier)
-        , parameters(parameters)
-        , body(std::move(body))
+        , function(std::move(function))
     {
-    }
-
-    Stmt::Block& Stmt::FunDeclaration::get_body()
-    {
-        return *(Stmt::Block*)this->body.get();
     }
 
     std::string Stmt::FunDeclaration::get_identifier()
     {
         return this->identifier.text;
+    }
+
+    Expr::Fun& Stmt::FunDeclaration::get_fun()
+    {
+        // TODO: Hey, another code smell!
+        return *(Expr::Fun*)this->function.get();
     }
 
     Stmt::Return::Return(Token keyword, std::optional<Expr::u_ptr> return_value)

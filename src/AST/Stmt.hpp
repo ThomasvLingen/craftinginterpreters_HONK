@@ -103,14 +103,13 @@ namespace Honk
 
     struct Stmt::FunDeclaration : Stmt
     {
-        FunDeclaration(Token identifier, std::vector<std::string> parameters, Stmt::u_ptr body);
+        FunDeclaration(Token identifier, Expr::u_ptr function);
 
+        Expr::Fun& get_fun();
         std::string get_identifier();
-        Stmt::Block& get_body(); // TODO: This is a code smell
 
         Token identifier;
-        std::vector<std::string> parameters;
-        Stmt::u_ptr body;
+        Expr::u_ptr function;
 
         STMTVISITORS_ACCEPT(FunDeclaration);
     };

@@ -176,6 +176,43 @@ fun empty_return_example(num)
     println(num);
 }
 
+// Closures
+fun make_counter()
+{
+    var counter = 0;
+
+    fun count()
+    {
+        return counter = counter + 1;
+    }
+
+    return count;
+}
+
+print("Expect count from 1 to 3: ");
+var some_counter = make_counter();
+print(some_counter());
+print(some_counter());
+print(some_counter());
+println("");
+
+// Anonymous functions
+fun countdown(from, fn)
+{
+    for (; from >= 0; from = from - 1) {
+        fn(from);
+    }
+}
+
+countdown(3, fun(x) {
+    if (x > 0) {
+        print(x);
+        println(" bottles on the wall");
+    } else {
+        println("No bottles left on the wall :(");
+    }
+});
+
 end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");
 println(end_timestamp - start_timestamp);

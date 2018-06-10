@@ -131,4 +131,15 @@ namespace Honk
         , args(std::move(args))
     {
     }
+
+    Expr::Fun::Fun(std::vector<std::string> parameters, Stmt::u_ptr body)
+        : parameters(parameters)
+        , body(std::move(body))
+    {
+    }
+
+    Stmt::Block& Expr::Fun::get_body()
+    {
+        return *(Stmt::Block*)this->body.get();
+    }
 }

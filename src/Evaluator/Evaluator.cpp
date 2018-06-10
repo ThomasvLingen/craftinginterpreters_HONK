@@ -272,6 +272,13 @@ namespace Honk
         }
     }
 
+    Value Evaluator::visit_Fun(Expr::Fun& expr)
+    {
+        return Value {
+            Function { std::nullopt, &expr, this->claim_env()}
+        };
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {
@@ -362,7 +369,7 @@ namespace Honk
 
     void Evaluator::visit_FunDeclaration(Stmt::FunDeclaration& stmt)
     {
-        Function fun(&stmt, this->claim_env());
+        Function fun(stmt.identifier.text, &stmt.get_fun(), this->claim_env());
         this->env().new_var(stmt.get_identifier(), Value {fun});
     }
 
