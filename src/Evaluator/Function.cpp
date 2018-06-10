@@ -11,8 +11,10 @@
 
 namespace Honk
 {
-    Function::Function(Stmt::FunDeclaration* declaration, VariableBucket::s_ptr closure) noexcept
-        : _declaration(declaration)
+    Function::Function(std::optional<std::string> identifier, Expr::Fun* declaration,
+                       std::shared_ptr<VariableBucket> closure) noexcept
+        : _identifier(identifier)
+        , _declaration(declaration)
         , _closure(closure)
     {
     }
@@ -48,8 +50,13 @@ namespace Honk
 
     std::ostream& operator<<(std::ostream& os, const Function& obj)
     {
-        os << "fun:" << obj._declaration->identifier.text
-           << "("    << obj.n_args() << " args)";
+        if (obj._identifier) {
+            os << "fun:" << *obj._identifier;
+        } else {
+            os << "anon_fn";
+        }
+
+        os << "("    << obj.n_args() << " args)";
 
         return os;
     }
@@ -57,6 +64,6 @@ namespace Honk
     bool operator==(const Function& a, const Function& b)
     {
         return a.n_args() == b.n_args() &&
-               a._declaration->identifier.text == b._declaration->identifier.text;
+               &a._declaration == &b._declaration;
     }
 }

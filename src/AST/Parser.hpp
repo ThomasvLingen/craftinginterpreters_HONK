@@ -54,8 +54,8 @@ namespace Honk
         //                     | statement ;
         //
         //     var_declaration → "var" IDENTIFIER ( "=" expression )? ";" ;
-        //     fun_declaration → "fun" function ;
-        //     function        → IDENTIFIER "(" parameters? ")" stmt_block ;
+        //     fun_declaration → "fun" IDENTIFIER function_body ;
+        //     function_body   → "(" parameters? ")" stmt_block ;
         //     parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
         //     statement       → stmt_expr
         //                     | stmt_block
@@ -105,7 +105,9 @@ namespace Honk
         //     arguments      → expression ( "," expression )* ;
         //     primary        → INT | STRING | BOOL | "null"
         //                    | IDENTIFIER
+        //                    | anon_function
         //                    | "(" expression ")" ;
+        //     anon_function  → fun function_body ;
         Expr::u_ptr _parse_expression();
         Expr::u_ptr _parse_assignment();
         Expr::u_ptr _parse_logic_or();
@@ -117,6 +119,7 @@ namespace Honk
         Expr::u_ptr _parse_unary();
         Expr::u_ptr _parse_call_tree();
         Expr::u_ptr _parse_primary();
+        Expr::u_ptr _parse_function_body();
 
         // _parse_helpers
         Stmt::u_ptr _parse_block();

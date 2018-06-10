@@ -64,6 +64,7 @@ namespace Honk
         Value visit_Binary(Expr::Binary& expr) override;
         Value visit_VarAssign(Expr::VarAssign& expr) override;
         Value visit_Call(Expr::Call& expr) override;
+        Value visit_Fun(Expr::Fun& expr) override;
 
         // Binary expression visitor methods
         virtual Value visit_minus(const Value& left, const Value& right) override;

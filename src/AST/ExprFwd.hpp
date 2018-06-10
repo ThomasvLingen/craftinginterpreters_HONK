@@ -6,13 +6,14 @@
 #define HONK_EXPRFWD_HPP
 
 #include <string>
-
-#include "Value.hpp"
+#include <memory>
 
 namespace Honk
 {
     template<typename T>
     struct ExprVisitor;
+
+    struct Token;
 
     // Ok, so here's how this is set up:
     //     The Expr class is the base class for all expressions
@@ -38,6 +39,7 @@ namespace Honk
         struct VarAccess;
         struct VarAssign;
         struct Call;
+        struct Fun;
 
     protected:
         Expr();

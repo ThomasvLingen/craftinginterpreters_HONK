@@ -13,6 +13,7 @@
 #include "Value.hpp"
 
 #include "AST/ExprFwd.hpp"
+#include "AST/StmtFwd.hpp"
 
 // I am sure that somewhere, someone is cursing intently at me as I write this.
 // But I can't be fucked to write a unique accept method every time.
@@ -40,6 +41,7 @@ namespace Honk
         virtual T visit_VarAccess(Expr::VarAccess& expr) = 0;
         virtual T visit_VarAssign(Expr::VarAssign& expr) = 0;
         virtual T visit_Call(Expr::Call& stmt) = 0;
+        virtual T visit_Fun(Expr::Fun& expr) = 0;
     };
 
     struct BinaryExprVisitor
@@ -159,6 +161,18 @@ namespace Honk
         std::vector<Expr::u_ptr> args;
 
         EXPRVISITORS_ACCEPT(Call);
+    };
+
+    struct Expr::Fun : Expr
+    {
+        Fun(std::vector<std::string> parameters, Stmt::u_ptr body);
+
+        Stmt::Block& get_body(); // TODO: This is a code smell
+
+        std::vector<std::string> parameters;
+        Stmt::u_ptr body;
+
+        EXPRVISITORS_ACCEPT(Fun);
     };
 }
 

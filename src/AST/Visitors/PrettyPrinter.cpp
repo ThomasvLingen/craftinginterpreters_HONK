@@ -142,12 +142,8 @@ namespace Honk
         std::string output;
         output += "[fun=";
         output += Token::get_text(stmt.identifier);
-
-        if (stmt.parameters.size() > 0) {
-            output += " " + this->parenthesize("params", stmt.parameters);
-        }
-
-        output += stmt.body->accept(*this);
+        output += this->_to_str(*stmt.function);
+        output += "]";
 
         return output;
     }
@@ -217,6 +213,21 @@ namespace Honk
             output += " " + parenthesize("args", expr.args);
         }
         output += "]";
+
+        return output;
+    }
+
+
+    std::string PrettyASTPrinter::visit_Fun(Expr::Fun& expr)
+    {
+        std::string output;
+        output += "(fun";
+
+        if (expr.parameters.size() > 0) {
+            output += " " + this->parenthesize("params", expr.parameters);
+        }
+
+        output += expr.body->accept(*this);
 
         return output;
     }
