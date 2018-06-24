@@ -25,6 +25,7 @@ namespace Honk
 
         virtual std::string accept(ExprVisitor<std::string>& visitor) = 0;
         virtual Value accept(ExprVisitor<Value>& visitor) = 0;
+        virtual void accept(ExprVisitor<void>& visitor) = 0;
 
         const Token& diagnostics_token;
 

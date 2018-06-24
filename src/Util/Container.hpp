@@ -39,6 +39,12 @@ namespace Honk
             return std::find(container.begin(), container.end(), val) != container.end();
         };
 
+        template <typename Map_K, typename Map_V>
+        bool contains(const std::unordered_map<Map_K, Map_V>& map, const Map_K& key)
+        {
+            return map.find(key) != map.cend();
+        };
+
         template <typename TargetContainer, typename Container, typename Callable>
         TargetContainer map(Container& original, const Callable& map_fn)
         {
