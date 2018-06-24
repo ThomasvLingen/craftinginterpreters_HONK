@@ -26,6 +26,7 @@
 #define EXPRVISITORS_ACCEPT(classname)         \
     EXPRVISITOR_ACCEPT(std::string, classname) \
     EXPRVISITOR_ACCEPT(Value      , classname) \
+    EXPRVISITOR_ACCEPT(void, classname)        \
 
 namespace Honk
 {
