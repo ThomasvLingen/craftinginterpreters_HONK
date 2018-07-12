@@ -11,6 +11,7 @@
 #include "AST/Stmt.hpp"
 #include "Evaluator/Evaluator.hpp"
 #include "Lexer/Token.hpp"
+#include "Resolver/Resolver.hpp"
 
 namespace Honk
 {
@@ -40,6 +41,7 @@ namespace Honk
         // TODO: This should logically be const, but it isn't since the Visitor interface doesn't stick to it.
         void _print_expression(Expr& expr);
         void _print_statements(Stmt::stream& statements);
+        void _print_resolvemapping(VariableResolveMapping& resolved);
     };
 }
 

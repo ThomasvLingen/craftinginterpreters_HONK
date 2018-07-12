@@ -10,6 +10,7 @@ namespace Honk
 {
     ResolveError::ResolveError(const char* msg, const Token* error_token)
         : runtime_error(msg)
+        , error_token(error_token)
     {
     }
 
@@ -54,12 +55,20 @@ namespace Honk
 
     void Resolver::_declare(const std::string& identifier)
     {
+        if (this->_scopes.empty()) {
+            return;
+        }
+
         LocalScope& scope = this->_get_current_scope();
         scope[identifier] = false;
     }
 
     void Resolver::_define(const std::string& identifier)
     {
+        if (this->_scopes.empty()) {
+            return;
+        }
+
         LocalScope& scope = this->_get_current_scope();
         scope[identifier] = true;
     }
@@ -69,7 +78,7 @@ namespace Honk
         return this->_scopes.back();
     }
 
-    bool Resolver::_is_defined_in_current_scope(const std::string& identifier)
+    bool Resolver::_is_declared_in_current_scope(const std::string& identifier)
     {
         if (this->_scopes.empty()
             || !Util::contains(this->_get_current_scope(), identifier))
@@ -77,7 +86,7 @@ namespace Honk
             return false;
         }
 
-        return this->_get_current_scope()[identifier];
+        return !this->_get_current_scope()[identifier];
     }
 
     void Resolver::_resolve_function(Expr::Fun& expr)
@@ -99,16 +108,22 @@ namespace Honk
              it++)
         {
             if (Util::contains(*it, identifier)) {
-                this->_add_resolved_lookup(&expr, std::distance(it, this->_scopes.rbegin()));
+                int indirections = abs(std::distance(it, this->_scopes.rbegin()));
+
+                this->_add_resolved_lookup(&expr, ResolvedLookup {
+                    static_cast<size_t>(indirections),
+                    identifier,
+                    expr.diagnostics_token.line
+                });
             }
         }
 
         // Unresolved, assumed global
     }
 
-    void Resolver::_add_resolved_lookup(Expr* lookup, size_t steps)
+    void Resolver::_add_resolved_lookup(Expr* lookup, ResolvedLookup resolved)
     {
-        this->_resolved[lookup] = steps;
+        this->_resolved[lookup] = resolved;
     }
 
     void Resolver::visit_Expression(Stmt::Expression& stmt)
@@ -201,7 +216,7 @@ namespace Honk
 
     void Resolver::visit_VarAccess(Expr::VarAccess& expr)
     {
-        if (!this->_is_defined_in_current_scope(expr.get_identifier())) {
+        if (_is_declared_in_current_scope(expr.get_identifier())) {
             throw ResolveError("Initialiser refers to itself!", &expr.identifier_tok);
         }
 
