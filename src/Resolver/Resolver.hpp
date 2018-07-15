@@ -6,6 +6,7 @@
 #define HONK_RESOLVER_HPP
 
 #include <unordered_map>
+#include <map>
 #include <stack>
 
 #include "AST/Expr.hpp"
@@ -18,8 +19,17 @@ namespace Honk
     // Forward declarations
     struct Interpreter;
 
+    struct ResolvedLookup
+    {
+        size_t indirections;
+
+        // Debug info
+        std::string identifier;
+        size_t line;
+    };
+
     // Check how to store this. Adress or hash?
-    using VariableResolveMapping = std::unordered_map<Expr*, size_t>; // Expression -> indirections to variable
+    using VariableResolveMapping = std::map<const Expr*, ResolvedLookup>; // Expression -> ResolvedLookup
     using LocalScope = std::unordered_map<std::string, bool>;         // Local Identifier -> Is initialised?
 
     struct ResolveError : std::runtime_error
@@ -70,7 +80,7 @@ namespace Honk
 
         LocalScope& _get_current_scope();
 
-        void _add_resolved_lookup(Expr* lookup, size_t steps);
+        void _add_resolved_lookup(Expr* lookup, ResolvedLookup resolved);
 
         void _resolve(Stmt::stream& stmts);
         template <typename T>
@@ -83,7 +93,7 @@ namespace Honk
 
         void _declare(const std::string& identifier);
         void _define(const std::string& identifier);
-        bool _is_defined_in_current_scope(const std::string& identifier);
+        bool _is_declared_in_current_scope(const std::string& identifier);
     };
 }
 

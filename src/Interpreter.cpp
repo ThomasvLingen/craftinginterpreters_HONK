@@ -12,6 +12,7 @@
 #include "AST/Parser.hpp"
 #include "AST/Visitors/PrettyPrinter.hpp"
 #include "Evaluator/Evaluator.hpp"
+#include "Resolver/Resolver.hpp"
 
 namespace Honk
 {
@@ -71,7 +72,16 @@ namespace Honk
             this->_print_statements(*AST);
         }
 
+        // Resolve variable accessors
+        Resolver resolver(*this);
+        VariableResolveMapping resolved = resolver.resolve(*AST);
+
+        if (this->_debug) {
+            this->_print_resolvemapping(resolved);
+        }
+
         // Run the code!
+        this->_evaluator.add_resolves(resolved);
         this->_evaluator.interpret(*AST);
     }
 
@@ -103,6 +113,13 @@ namespace Honk
     {
         for (Stmt::u_ptr& statement : statements) {
             this->_printer.print(*statement);
+        }
+    }
+
+    void Interpreter::_print_resolvemapping(VariableResolveMapping& resolved)
+    {
+        for (const auto& [expr, lookup] : resolved) {
+            this->report_message("DEBUG", lookup.line, lookup.identifier + " has " + std::to_string(lookup.indirections) + " indirections");
         }
     }
 }
