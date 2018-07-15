@@ -7,6 +7,7 @@
 
 #include "AST/Expr.hpp"
 #include "AST/Stmt.hpp"
+#include "Resolver/Resolver.hpp"
 #include "VariableBucket.hpp"
 #include "DiagnosticsTokenTracker.hpp"
 
@@ -39,7 +40,11 @@ namespace Honk
         void interpret(Stmt::stream& code);
         Value evaluate(Expr& expression);
 
+        void add_resolves(const VariableResolveMapping& to_add);
+
         VariableBucket& env();
+        VariableBucket& env(size_t indirections);
+        VariableBucket& get_target_env(const Expr& access_expr);
         VariableBucket::s_ptr claim_env();
 
         void execute_block(Stmt::Block& block);
@@ -81,12 +86,14 @@ namespace Honk
         friend class StandardLibrary;
     private:
         const Interpreter& _parent;
-
+        VariableResolveMapping _resolved_lookups;
         DiagnosticsTokenTracker _callstack;
 
         Value _evaluate(Expr& expr);
         Value _evaluate_optional(std::optional<Expr::u_ptr>& expr);
         void _interpret(Stmt& statement);
+
+        Value* _resolved_lookup(const Expr& access_expr, std::string identifier);
 
         bool _is_truthy(const Value& val);
         bool _is_truthy(Expr& expr);

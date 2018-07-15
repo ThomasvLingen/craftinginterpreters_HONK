@@ -81,6 +81,7 @@ namespace Honk
         }
 
         // Run the code!
+        this->_evaluator.add_resolves(resolved);
         this->_evaluator.interpret(*AST);
     }
 

@@ -211,7 +211,7 @@ namespace Honk
 
     Value Evaluator::visit_VarAccess(Expr::VarAccess& expr)
     {
-        Value* accessed_value = this->env().get_var(expr.get_identifier());
+        Value* accessed_value = this->_resolved_lookup(expr, expr.get_identifier());
 
         if (!accessed_value) {
             throw this->_error("Accessing an undefined variable: " + expr.get_identifier());
@@ -222,7 +222,8 @@ namespace Honk
 
     Value Evaluator::visit_VarAssign(Expr::VarAssign& expr)
     {
-        Value* assigned_value = this->env().get_var(expr.get_identifier());
+        Value* assigned_value = this->_resolved_lookup(expr, expr.get_identifier());
+
         if (!assigned_value) {
             throw this->_error("Trying to assign to an undefined variable: " + expr.get_identifier());
         }
@@ -414,5 +415,38 @@ namespace Honk
                   << " arguments, got " << actual << ".";
 
         return this->_error(error_msg.str());
+    }
+
+    void Evaluator::add_resolves(const VariableResolveMapping& to_add)
+    {
+        this->_resolved_lookups.insert(to_add.cbegin(), to_add.cend());
+    }
+
+    Value* Evaluator::_resolved_lookup(const Expr& access_expr, std::string identifier)
+    {
+        VariableBucket& target_env = this->get_target_env(access_expr);
+
+        return target_env.get_var(identifier);
+    }
+
+    VariableBucket& Evaluator::env(size_t indirections)
+    {
+        VariableBucket* target_env = &this->env();
+
+        while (indirections-- > 0) {
+            target_env = target_env->_enclosing;
+        }
+
+        return *target_env;
+    }
+
+    VariableBucket& Evaluator::get_target_env(const Expr& access_expr)
+    {
+        if (!Util::contains(this->_resolved_lookups, &access_expr)){
+            return this->globals;
+        }
+
+        const ResolvedLookup& lookup = this->_resolved_lookups[&access_expr];
+        return this->env(lookup.indirections);
     }
 }

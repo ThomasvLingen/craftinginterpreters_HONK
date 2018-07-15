@@ -98,7 +98,7 @@ namespace Honk
             this->_define(param);
         }
 
-        this->_resolve(*expr.body);
+        this->_resolve(expr.get_body().statements);
     }
 
     void Resolver::_resolve_local(Expr& expr, const std::string& identifier)
@@ -162,6 +162,7 @@ namespace Honk
 
     void Resolver::visit_For(Stmt::For& stmt)
     {
+        Util::ScopeGuard<> scope_guard(*this); // Scope for the for clause
         this->_opt_resolve<Stmt>(stmt.initializer);
         this->_resolve(*stmt.condition);
         this->_opt_resolve<Expr>(stmt.increment);

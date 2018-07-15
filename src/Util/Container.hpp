@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <unordered_map>
+#include <map>
 #include <algorithm>
 
 namespace Honk
@@ -37,6 +38,12 @@ namespace Honk
         bool contains(const Container& container, const Value& val)
         {
             return std::find(container.begin(), container.end(), val) != container.end();
+        };
+
+        template <typename Map_K, typename Map_V>
+        bool contains(const std::map<Map_K, Map_V>& map, const Map_K& key)
+        {
+            return map.find(key) != map.cend();
         };
 
         template <typename Map_K, typename Map_V>

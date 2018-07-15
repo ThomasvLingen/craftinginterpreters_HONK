@@ -29,8 +29,9 @@ namespace Honk
         void new_var(NativeCallable native_fn);
         __maybe_nullptr __non_owning Value* get_var(const std::string& identifier);
 
-    private:
         __maybe_nullptr __non_owning VariableBucket* _enclosing = nullptr;
+
+    private:
         __maybe_nullptr Value* _try_get_from_enclosing(const std::string& identifier);
         Bucket _values;
     };

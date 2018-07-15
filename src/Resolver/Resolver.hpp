@@ -29,7 +29,7 @@ namespace Honk
     };
 
     // Check how to store this. Adress or hash?
-    using VariableResolveMapping = std::map<Expr*, ResolvedLookup>; // Expression -> ResolvedLookup
+    using VariableResolveMapping = std::map<const Expr*, ResolvedLookup>; // Expression -> ResolvedLookup
     using LocalScope = std::unordered_map<std::string, bool>;         // Local Identifier -> Is initialised?
 
     struct ResolveError : std::runtime_error
