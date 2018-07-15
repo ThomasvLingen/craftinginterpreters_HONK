@@ -19,12 +19,13 @@ namespace Honk
     {
     }
 
-    VariableResolveMapping Resolver::resolve(Stmt::stream& code)
+    std::optional<VariableResolveMapping> Resolver::resolve(Stmt::stream& code)
     {
         try {
             this->_resolve(code);
         } catch (ResolveError& e) {
             this->_parent.report_error(e.error_token->line, e.what());
+            return std::nullopt;
         }
 
         return this->_resolved;
@@ -53,13 +54,16 @@ namespace Honk
         this->_scopes.pop_back();
     }
 
-    void Resolver::_declare(const std::string& identifier)
+    void Resolver::_declare(const std::string& identifier, const Token& diagnostics_tok)
     {
         if (this->_scopes.empty()) {
             return;
         }
 
         LocalScope& scope = this->_get_current_scope();
+        if (this->_is_declared_in_current_scope(identifier)) {
+            throw ResolveError("Redeclaring variable (variable already exists in this scope)", &diagnostics_tok);
+        }
         scope[identifier] = false;
     }
 
@@ -94,7 +98,7 @@ namespace Honk
         Util::ScopeGuard<> function_scope(*this);
 
         for (std::string& param : expr.parameters) {
-            this->_declare(param);
+            this->_declare(param, expr.diagnostics_token);
             this->_define(param);
         }
 
@@ -149,7 +153,7 @@ namespace Honk
     {
         const std::string& identifier = stmt.get_identifier();
 
-        this->_declare(identifier);
+        this->_declare(identifier, stmt.diagnostics_token);
         this->_opt_resolve<Expr>(stmt.initializer);
         this->_define(identifier);
     }
@@ -171,7 +175,7 @@ namespace Honk
 
     void Resolver::visit_FunDeclaration(Stmt::FunDeclaration& stmt)
     {
-        this->_declare(stmt.get_identifier());
+        this->_declare(stmt.get_identifier(), stmt.diagnostics_token);
         this->_define(stmt.get_identifier());
 
         this->_resolve(stmt.get_fun());
@@ -179,6 +183,10 @@ namespace Honk
 
     void Resolver::visit_Return(Stmt::Return& stmt)
     {
+        if (this->_current_fn == FunctionType::NONE) {
+            throw ResolveError { "Trying to return a value when not in a function", &stmt.keyword };
+        }
+
         this->_opt_resolve<Expr>(stmt.return_value);
     }
 
@@ -241,6 +249,9 @@ namespace Honk
 
     void Resolver::visit_Fun(Expr::Fun& expr)
     {
+        CurrentFnContext context(this->_current_fn);
+        Util::ScopeGuard<FunctionType> ctx_guard(context, FunctionType::FUNCTION);
+
         this->_resolve_function(expr);
     }
 
@@ -250,5 +261,21 @@ namespace Honk
         if (opt_resolvable) {
             this->_resolve(**opt_resolvable);
         }
+    }
+
+    void Resolver::CurrentFnContext::scope_enter(Resolver::FunctionType context_type)
+    {
+        this->old_value = target;
+        this->target = context_type;
+    }
+
+    void Resolver::CurrentFnContext::scope_exit()
+    {
+        this->target = old_value;
+    }
+
+    Resolver::CurrentFnContext::CurrentFnContext(Resolver::FunctionType& target)
+        : target(target)
+    {
     }
 }

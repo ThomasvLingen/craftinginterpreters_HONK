@@ -74,14 +74,19 @@ namespace Honk
 
         // Resolve variable accessors
         Resolver resolver(*this);
-        VariableResolveMapping resolved = resolver.resolve(*AST);
+        std::optional<VariableResolveMapping> resolved = resolver.resolve(*AST);
+
+        if (!resolved) {
+            // lol not going to run that
+            return;
+        }
 
         if (this->_debug) {
-            this->_print_resolvemapping(resolved);
+            this->_print_resolvemapping(*resolved);
         }
 
         // Run the code!
-        this->_evaluator.add_resolves(resolved);
+        this->_evaluator.add_resolves(*resolved);
         this->_evaluator.interpret(*AST);
     }
 

@@ -39,13 +39,33 @@ namespace Honk
         const Token* error_token = nullptr;
     };
 
+
+
+
     struct Resolver
         : StmtVisitor<void>, ExprVisitor<void>
         , Util::I_Scopable<>
     {
+        enum struct FunctionType
+        {
+            NONE,
+            FUNCTION
+        };
+
+        struct CurrentFnContext : Util::I_Scopable<FunctionType>
+        {
+            CurrentFnContext(FunctionType& target);
+
+            FunctionType& target;
+            FunctionType old_value = FunctionType::NONE;
+
+            void scope_enter(Resolver::FunctionType context_type) override;
+            void scope_exit();
+        };
+
         Resolver(const Interpreter& parent);
 
-        VariableResolveMapping resolve(Stmt::stream& code);
+        std::optional<VariableResolveMapping> resolve(Stmt::stream& code);
 
         void scope_enter() override;
         void scope_exit() override;
@@ -78,6 +98,8 @@ namespace Honk
         VariableResolveMapping _resolved;
         std::vector<LocalScope> _scopes;
 
+        FunctionType _current_fn = FunctionType::NONE;
+
         LocalScope& _get_current_scope();
 
         void _add_resolved_lookup(Expr* lookup, ResolvedLookup resolved);
@@ -91,7 +113,7 @@ namespace Honk
         void _resolve_local(Expr& expr, const std::string& identifier);
         void _resolve_function(Expr::Fun& stmt);
 
-        void _declare(const std::string& identifier);
+        void _declare(const std::string& identifier, const Token& diagnostics_tok);
         void _define(const std::string& identifier);
         bool _is_declared_in_current_scope(const std::string& identifier);
     };
