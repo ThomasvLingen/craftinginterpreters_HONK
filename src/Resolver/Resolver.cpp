@@ -190,6 +190,14 @@ namespace Honk
         this->_opt_resolve<Expr>(stmt.return_value);
     }
 
+    void Resolver::visit_Class(Stmt::Class& stmt)
+    {
+        this->_declare(stmt.name.text, stmt.name);
+        this->_define(stmt.name.text);
+
+        // TODO: add method resolving
+    }
+
     void Resolver::visit_Binary(Expr::Binary& expr)
     {
         this->_resolve(*expr.left);

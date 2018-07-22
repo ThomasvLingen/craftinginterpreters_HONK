@@ -19,6 +19,8 @@
     }                                                            \
 
 #define STMTVISITORS_ACCEPT(classname)         \
+    using u_ptr = std::unique_ptr<classname>;  \
+                                               \
     STMTVISITOR_ACCEPT(void       , classname) \
     STMTVISITOR_ACCEPT(std::string, classname) \
 
@@ -35,6 +37,7 @@ namespace Honk
         virtual T visit_For(Stmt::For& stmt) = 0;
         virtual T visit_FunDeclaration(Stmt::FunDeclaration& stmt) = 0;
         virtual T visit_Return(Stmt::Return& stmt) = 0;
+        virtual T visit_Class(Stmt::Class& stmt) = 0;
     };
 
     struct Stmt::Expression : Stmt
@@ -122,6 +125,16 @@ namespace Honk
         std::optional<Expr::u_ptr> return_value;
 
         STMTVISITORS_ACCEPT(Return);
+    };
+
+    struct Stmt::Class : Stmt
+    {
+        Class(Token name, std::vector<Stmt::FunDeclaration::u_ptr> methods);
+
+        Token name;
+        std::vector<Stmt::FunDeclaration::u_ptr> methods;
+
+        STMTVISITORS_ACCEPT(Class);
     };
 }
 

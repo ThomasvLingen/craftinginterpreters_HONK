@@ -79,6 +79,7 @@ namespace Honk
         void visit_For(Stmt::For& stmt) override;
         void visit_FunDeclaration(Stmt::FunDeclaration& stmt) override;
         void visit_Return(Stmt::Return& stmt) override;
+        void visit_Class(Stmt::Class& stmt) override;
 
         // Expr visitor implementations
         void visit_Binary(Expr::Binary& expr) override;

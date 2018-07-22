@@ -11,6 +11,7 @@
 
 #include "AST/Callable.hpp"
 #include "Evaluator/Function.hpp"
+#include "Evaluator/Class.hpp"
 
 namespace Honk
 {
@@ -30,7 +31,8 @@ namespace Honk
         bool,
         null_t,
         NativeCallable,
-        Function
+        Function,
+        Class
     >;
 
     std::string _to_string(TokenLiteral literal);

@@ -11,6 +11,7 @@
 #include "Interpreter.hpp"
 #include "StandardLibrary.hpp"
 #include "Function.hpp"
+#include "Class.hpp"
 
 namespace Honk
 {
@@ -377,6 +378,12 @@ namespace Honk
     void Evaluator::visit_Return(Stmt::Return& stmt)
     {
         throw Return(this->_evaluate_optional(stmt.return_value));
+    }
+
+    void Evaluator::visit_Class(Stmt::Class& stmt)
+    {
+        Class cls(stmt.name.text);
+        this->env().new_var(stmt.name.text, Value {cls});
     }
 
     VariableBucket& Evaluator::env()
