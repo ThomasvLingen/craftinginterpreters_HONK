@@ -82,4 +82,10 @@ namespace Honk
         , return_value(std::move(return_value))
     {
     }
+
+    Stmt::Class::Class(Token name, std::vector<Stmt::FunDeclaration::u_ptr> methods)
+        : name(name)
+        , methods(std::move(methods))
+    {
+    }
 }

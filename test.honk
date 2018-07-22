@@ -213,6 +213,15 @@ countdown(3, fun(x) {
     }
 });
 
+// Classes!
+class Honker
+{
+    honk()
+    {
+        println("Honk!");
+    }
+}
+
 // Grammar edge-case. fun expr where a statement _could_ be
 fun () { return "do not crash please"; };
 

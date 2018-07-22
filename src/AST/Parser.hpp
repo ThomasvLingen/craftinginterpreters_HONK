@@ -51,18 +51,22 @@ namespace Honk
         //
         //     declaration     → var_declaration
         //                     | fun_declaration
+        //                     | class_declaration
         //                     | statement ;
         //
-        //     var_declaration → "var" IDENTIFIER ( "=" expression )? ";" ;
-        //     fun_declaration → "fun" IDENTIFIER function_body ;
-        //     function_body   → "(" parameters? ")" stmt_block ;
-        //     parameters      → IDENTIFIER ( "," IDENTIFIER )* ;
-        //     statement       → stmt_expr
-        //                     | stmt_block
-        //                     | stmt_if
-        //                     | stmt_while
-        //                     | stmt_for
-        //                     | stmt_return ;
+        //     class_declaration  → "class" IDENTIFIER "{" method_declaration* "}" ;
+        //     var_declaration    → "var" IDENTIFIER ( "=" expression )? ";" ;
+        //     fun_declaration    → "fun" IDENTIFIER function_body ;
+        //
+        //     method_declaration → IDENTIFIER function_body ;
+        //     function_body      → "(" parameters? ")" stmt_block ;
+        //     parameters         → IDENTIFIER ( "," IDENTIFIER )* ;
+        //     statement          → stmt_expr
+        //                        | stmt_block
+        //                        | stmt_if
+        //                        | stmt_while
+        //                        | stmt_for
+        //                        | stmt_return ;
         //
         //     stmt_expr       → expression ";" ;
         //     stmt_block      → "{" declaration* "}" ;
@@ -77,8 +81,9 @@ namespace Honk
 
         Stmt::u_ptr _parse_protected_decl();
         Stmt::u_ptr _parse_declaration();
+        Stmt::Class::u_ptr _parse_declaration_class();
         Stmt::u_ptr _parse_declaration_vardeclaration();
-        Stmt::u_ptr _parse_declaration_fun();
+        Stmt::FunDeclaration::u_ptr _parse_declaration_fun();
         Stmt::u_ptr _parse_statement();
         Stmt::u_ptr _parse_statement_expression();
         Stmt::u_ptr _parse_statement_block();

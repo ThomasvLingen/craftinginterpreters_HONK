@@ -73,6 +73,12 @@ namespace Honk
             constexpr char NO_CLOSE[] = "Expected a ')' after a list of parameters";
             constexpr char TOO_MANY[] = "Too many parameters (max 8)";
         }
+        namespace CLASS
+        {
+            constexpr char NO_IDEN[] = "Expected an identifier after 'class' keyword";
+            constexpr char NO_OPEN[] = "Expected a '{' after the class identifier";
+            constexpr char NO_CLOSE[] = "Expected a '}' at the end of a class";
+        }
     }
 
     Parser::Parser(const Interpreter& parent, const TokenStream& input)
@@ -135,7 +141,28 @@ namespace Honk
             return this->_parse_declaration_fun();
         }
 
+        if (this->_match(TokenType::CLASS)) {
+            return this->_parse_declaration_class();
+        }
+
         return this->_parse_statement();
+    }
+
+    Stmt::Class::u_ptr Parser::_parse_declaration_class()
+        // Class keyword is already parsed
+    {
+        Token class_name = this->_assert_match(TokenType::IDENTIFIER, ERROR::CLASS::NO_IDEN);
+
+        this->_assert_match(TokenType::CURLY_OPEN, ERROR::CLASS::NO_OPEN);
+
+        std::vector<Stmt::FunDeclaration::u_ptr> class_methods;
+        while (!this->_check(TokenType::CURLY_CLOSE)) {
+            class_methods.push_back(this->_parse_declaration_fun());
+        }
+
+        this->_assert_match(TokenType::CURLY_CLOSE, ERROR::CLASS::NO_CLOSE);
+
+        return std::make_unique<Stmt::Class>(class_name, std::move(class_methods));
     }
 
     Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
@@ -152,7 +179,7 @@ namespace Honk
     }
 
     // fun keyword is parsed
-    Stmt::u_ptr Parser::_parse_declaration_fun()
+    Stmt::FunDeclaration::u_ptr Parser::_parse_declaration_fun()
     {
         Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::FUN::NO_IDENTIFIER);
         return std::make_unique<Stmt::FunDeclaration>(identifier, this->_parse_function_body());

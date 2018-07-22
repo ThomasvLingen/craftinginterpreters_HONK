@@ -17,8 +17,9 @@
 namespace Honk
 {
     Interpreter::Interpreter(bool debug)
-        : _evaluator(*this)
-        , _debug(debug)
+        // : _evaluator(*this)
+        // , _debug(debug)
+        : _debug(debug)
     {
     }
 
@@ -72,22 +73,22 @@ namespace Honk
             this->_print_statements(*AST);
         }
 
-        // Resolve variable accessors
-        Resolver resolver(*this);
-        std::optional<VariableResolveMapping> resolved = resolver.resolve(*AST);
-
-        if (!resolved) {
-            // lol not going to run that
-            return;
-        }
-
-        if (this->_debug) {
-            this->_print_resolvemapping(*resolved);
-        }
+//        // Resolve variable accessors
+//        Resolver resolver(*this);
+//        std::optional<VariableResolveMapping> resolved = resolver.resolve(*AST);
+//
+//        if (!resolved) {
+//            // lol not going to run that
+//            return;
+//        }
+//
+//        if (this->_debug) {
+//            this->_print_resolvemapping(*resolved);
+//        }
 
         // Run the code!
-        this->_evaluator.add_resolves(*resolved);
-        this->_evaluator.interpret(*AST);
+//        this->_evaluator.add_resolves(*resolved);
+//        this->_evaluator.interpret(*AST);
     }
 
     void Interpreter::report_message(const string& type, uint32_t line, const string& message) const
