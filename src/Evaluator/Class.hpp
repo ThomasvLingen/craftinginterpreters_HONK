@@ -7,11 +7,17 @@
 
 #include <string>
 
+#include "AST/Callable.hpp"
+
 namespace Honk
 {
-    struct Class
+    struct Class : Callable
     {
         Class(std::string name);
+
+        // Serves as a constructor
+        Value call(Evaluator& runtime, Arguments args);
+        size_t n_args() const;
 
         std::string name;
 

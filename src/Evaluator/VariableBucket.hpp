@@ -18,7 +18,7 @@ namespace Honk
     struct VariableBucket
     {
         struct Scoped;
-        using Bucket = std::unordered_map<std::string, Value>;
+        using Bucket = std::unordered_map<std::string, Value::s_ptr>;
         using s_ptr = std::shared_ptr<VariableBucket>;
 
         VariableBucket() = default;
@@ -27,12 +27,12 @@ namespace Honk
         bool has_var_in_local(const std::string& identifier);
         void new_var(const std::string& identifier, Value initial_value);
         void new_var(NativeCallable native_fn);
-        __maybe_nullptr __non_owning Value* get_var(const std::string& identifier);
+        __maybe_nullptr __non_owning Value::s_ptr get_var(const std::string& identifier);
 
         __maybe_nullptr __non_owning VariableBucket* _enclosing = nullptr;
 
     private:
-        __maybe_nullptr Value* _try_get_from_enclosing(const std::string& identifier);
+        __maybe_nullptr Value::s_ptr _try_get_from_enclosing(const std::string& identifier);
         Bucket _values;
     };
 

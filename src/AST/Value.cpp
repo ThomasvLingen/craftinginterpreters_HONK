@@ -9,6 +9,11 @@
 
 namespace Honk
 {
+    Value::Value(Honk::TokenLiteral val)
+        : value(val)
+    {
+    }
+
     std::string Value::to_str() const
     {
         if (this->is_a<std::string>()) {
@@ -50,6 +55,10 @@ namespace Honk
 
         if (this->is_a<Function>()) {
             return this->get<Function>();
+        }
+
+        if (this->is_a<Class>()) {
+            return this->get<Class>();
         }
 
         return nullptr;

@@ -6,6 +6,9 @@
 
 #include <ostream>
 
+#include "AST/Value.hpp"
+#include "ClassInstance.hpp"
+
 namespace Honk
 {
     Class::Class(std::string name)
@@ -24,6 +27,18 @@ namespace Honk
     {
         // We compare by identity
         return &a == &b;
+    }
+
+    Value Class::call(Evaluator& runtime, Arguments args)
+    {
+        // TODO finish this
+        return Value { ClassInstance(*this) };
+    }
+
+    size_t Class::n_args() const
+    {
+        // TODO finish this
+        return 0;
     }
 }
 

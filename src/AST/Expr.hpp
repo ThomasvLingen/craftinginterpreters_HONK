@@ -27,7 +27,7 @@
     using u_ptr = std::unique_ptr<classname>;  \
                                                \
     EXPRVISITOR_ACCEPT(std::string, classname) \
-    EXPRVISITOR_ACCEPT(Value      , classname) \
+    EXPRVISITOR_ACCEPT(Value::s_ptr, classname)\
     EXPRVISITOR_ACCEPT(void, classname)        \
 
 namespace Honk

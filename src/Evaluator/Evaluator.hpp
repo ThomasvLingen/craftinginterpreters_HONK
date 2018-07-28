@@ -30,7 +30,7 @@ namespace Honk
         Value returned_value;
     };
 
-    struct Evaluator : ExprVisitor<Value>, BinaryExprVisitor, StmtVisitor<void>
+    struct Evaluator : ExprVisitor<Value::s_ptr>, BinaryExprVisitor, StmtVisitor<void>
     {
         Evaluator(const Interpreter& parent);
 
@@ -61,16 +61,16 @@ namespace Honk
         void visit_Class(Stmt::Class& stmt) override;
 
         // Expression visitor methods
-        Value visit_Literal(Expr::Literal& expr) override;
-        Value visit_LogicalOr(Expr::LogicalOr& expr) override;
-        Value visit_LogicalAnd(Expr::LogicalAnd& expr) override;
-        Value visit_Grouped(Expr::Grouped& expr) override;
-        Value visit_Unary(Expr::Unary& expr) override;
-        Value visit_VarAccess(Expr::VarAccess& expr) override;
-        Value visit_Binary(Expr::Binary& expr) override;
-        Value visit_VarAssign(Expr::VarAssign& expr) override;
-        Value visit_Call(Expr::Call& expr) override;
-        Value visit_Fun(Expr::Fun& expr) override;
+        Value::s_ptr visit_Literal(Expr::Literal& expr) override;
+        Value::s_ptr visit_LogicalOr(Expr::LogicalOr& expr) override;
+        Value::s_ptr visit_LogicalAnd(Expr::LogicalAnd& expr) override;
+        Value::s_ptr visit_Grouped(Expr::Grouped& expr) override;
+        Value::s_ptr visit_Unary(Expr::Unary& expr) override;
+        Value::s_ptr visit_VarAccess(Expr::VarAccess& expr) override;
+        Value::s_ptr visit_Binary(Expr::Binary& expr) override;
+        Value::s_ptr visit_VarAssign(Expr::VarAssign& expr) override;
+        Value::s_ptr visit_Call(Expr::Call& expr) override;
+        Value::s_ptr visit_Fun(Expr::Fun& expr) override;
 
         // Binary expression visitor methods
         virtual Value visit_minus(const Value& left, const Value& right) override;
@@ -90,11 +90,11 @@ namespace Honk
         VariableResolveMapping _resolved_lookups;
         DiagnosticsTokenTracker _callstack;
 
-        Value _evaluate(Expr& expr);
-        Value _evaluate_optional(std::optional<Expr::u_ptr>& expr);
+        Value::s_ptr _evaluate(Expr& expr);
+        Value::s_ptr _evaluate_optional(std::optional<Expr::u_ptr>& expr);
         void _interpret(Stmt& statement);
 
-        Value* _resolved_lookup(const Expr& access_expr, std::string identifier);
+        Value::s_ptr _resolved_lookup(const Expr& access_expr, std::string identifier);
 
         bool _is_truthy(const Value& val);
         bool _is_truthy(Expr& expr);

@@ -24,7 +24,7 @@ namespace Honk
         virtual ~Expr() = default;
 
         virtual std::string accept(ExprVisitor<std::string>& visitor) = 0;
-        virtual Value accept(ExprVisitor<Value>& visitor) = 0;
+        virtual std::shared_ptr<Value> accept(ExprVisitor<std::shared_ptr<Value>>& visitor) = 0;
         virtual void accept(ExprVisitor<void>& visitor) = 0;
 
         const Token& diagnostics_token;
