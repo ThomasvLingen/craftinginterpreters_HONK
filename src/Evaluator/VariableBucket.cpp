@@ -13,7 +13,7 @@ namespace Honk
 
     void VariableBucket::new_var(const std::string& identifier, Value initial_value)
     {
-        this->_values[identifier] = initial_value;
+        this->_values[identifier] = std::make_shared<Value>(initial_value);
     }
 
     void VariableBucket::new_var(NativeCallable native_fn)
@@ -21,9 +21,9 @@ namespace Honk
         this->new_var(native_fn.identifier, Value {native_fn});
     }
 
-    Value* VariableBucket::get_var(const std::string& identifier)
+    Value::s_ptr VariableBucket::get_var(const std::string& identifier)
     {
-        Value* local_var = Util::map_get_ptr(this->_values, identifier);
+        Value::s_ptr local_var = Util::map_get_s_ptr(this->_values, identifier);
         if (local_var) {
             return local_var;
         }
@@ -36,7 +36,7 @@ namespace Honk
         return Util::map_get_ptr(this->_values, identifier) != nullptr;
     }
 
-    Value* VariableBucket::_try_get_from_enclosing(const std::string& identifier)
+    Value::s_ptr VariableBucket::_try_get_from_enclosing(const std::string& identifier)
     {
         if (!this->_enclosing) {
             return nullptr;

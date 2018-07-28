@@ -9,6 +9,11 @@
 
 namespace Honk
 {
+    Value::Value(Honk::TokenLiteral val)
+        : value(val)
+    {
+    }
+
     std::string Value::to_str() const
     {
         if (this->is_a<std::string>()) {

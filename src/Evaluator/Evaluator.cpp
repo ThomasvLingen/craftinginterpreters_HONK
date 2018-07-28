@@ -46,23 +46,23 @@ namespace Honk
     Value Evaluator::evaluate(Expr& expression)
     {
         try {
-            return this->_evaluate(expression);
+            return *this->_evaluate(expression);
         } catch (EvaluateError& e) {
             this->_parent.report_error(e.error_token->line, e.what());
         }
     }
 
-    Value Evaluator::visit_Literal(Expr::Literal& expr)
+    Value::s_ptr Evaluator::visit_Literal(Expr::Literal& expr)
     {
-        return expr.value;
+        return std::make_shared<Value>(expr.value);
     }
 
-    Value Evaluator::visit_Grouped(Expr::Grouped& expr)
+    Value::s_ptr Evaluator::visit_Grouped(Expr::Grouped& expr)
     {
         return this->_evaluate(*expr.expression);
     }
 
-    Value Evaluator::_evaluate(Expr& expr)
+    Value::s_ptr Evaluator::_evaluate(Expr& expr)
     {
         this->_callstack.add_call(&expr.diagnostics_token);
 
@@ -78,20 +78,20 @@ namespace Honk
         statement.accept(*this);
     }
 
-    Value Evaluator::visit_Unary(Expr::Unary& expr)
+    Value::s_ptr Evaluator::visit_Unary(Expr::Unary& expr)
     {
-        Value right = this->_evaluate(*expr.right);
+        Value right = *this->_evaluate(*expr.right);
 
         if (expr.op_type() == TokenType::MINUS) {
             if (honk_int_t* val = right.get<honk_int_t>()) {
-                return Value {-*val};
+                return std::make_shared<Value>(-*val);
             }
 
             throw this->_error("Unary expression cannot be evaluated: minus used on something other than an integer");
         }
 
         if (expr.op_type() == TokenType::NOT) {
-            return Value {!this->_is_truthy(right)};
+            return std::make_shared<Value>(!this->_is_truthy(right));
         }
 
         throw this->_error("Unary expression cannot be evaluated: invalid operator");
@@ -120,15 +120,17 @@ namespace Honk
         return a == b;
     }
 
-    Value Evaluator::visit_Binary(Expr::Binary& expr)
+    Value::s_ptr Evaluator::visit_Binary(Expr::Binary& expr)
     {
         // Binary expressions are evaluated left to right
-        Value left = this->_evaluate(*expr.left);
-        Value right = this->_evaluate(*expr.right);
+        Value left = *this->_evaluate(*expr.left);
+        Value right = *this->_evaluate(*expr.right);
 
         // I felt that BinaryExpressions were too complex to just stuff it all in one giant function
         // Therefore I made a BinaryExpressionVisitor, which selects the right sub-member from the this class
-        return expr.accept(*this, left, right);
+        return std::make_shared<Value> (
+            expr.accept(*this, left, right)
+        );
     }
 
     Value Evaluator::visit_minus(const Value& left, const Value& right)
@@ -210,75 +212,77 @@ namespace Honk
         return Value {!this->_is_equal(left, right)};
     }
 
-    Value Evaluator::visit_VarAccess(Expr::VarAccess& expr)
+    Value::s_ptr Evaluator::visit_VarAccess(Expr::VarAccess& expr)
     {
-        Value* accessed_value = this->_resolved_lookup(expr, expr.get_identifier());
+        Value::s_ptr accessed_value = this->_resolved_lookup(expr, expr.get_identifier());
 
         if (!accessed_value) {
             throw this->_error("Accessing an undefined variable: " + expr.get_identifier());
         }
 
-        return *accessed_value;
+        return accessed_value;
     }
 
-    Value Evaluator::visit_VarAssign(Expr::VarAssign& expr)
+    Value::s_ptr Evaluator::visit_VarAssign(Expr::VarAssign& expr)
     {
-        Value* assigned_value = this->_resolved_lookup(expr, expr.get_identifier());
+        Value::s_ptr assigned_value = this->_resolved_lookup(expr, expr.get_identifier());
 
         if (!assigned_value) {
             throw this->_error("Trying to assign to an undefined variable: " + expr.get_identifier());
         }
 
-        return *assigned_value = this->_evaluate(*expr.new_value);
+        return std::make_shared<Value>(
+            *assigned_value = *this->_evaluate(*expr.new_value)
+        );
     }
 
-    Value Evaluator::visit_LogicalOr(Expr::LogicalOr& expr)
+    Value::s_ptr Evaluator::visit_LogicalOr(Expr::LogicalOr& expr)
     {
-        Value left = this->_evaluate(*expr.left);
+        Value::s_ptr left = this->_evaluate(*expr.left);
 
-        if (this->_is_truthy(left)) {
+        if (this->_is_truthy(*left)) {
             return left;
         }
 
         return this->_evaluate(*expr.right);
     }
 
-    Value Evaluator::visit_LogicalAnd(Expr::LogicalAnd& expr)
+    Value::s_ptr Evaluator::visit_LogicalAnd(Expr::LogicalAnd& expr)
     {
-        Value left = this->_evaluate(*expr.left);
+        Value::s_ptr left = this->_evaluate(*expr.left);
 
-        if (!this->_is_truthy(left)) {
+        if (!this->_is_truthy(*left)) {
             return left;
         }
 
         return this->_evaluate(*expr.right);
     }
 
-    Value Evaluator::visit_Call(Expr::Call& expr)
+    Value::s_ptr Evaluator::visit_Call(Expr::Call& expr)
     {
-        Value callee = this->_evaluate(*expr.callee);
+        Value::s_ptr callee = this->_evaluate(*expr.callee);
 
         Arguments args = Util::map<Arguments>(expr.args,
             [this] (Expr::u_ptr& arg_expr) {
-                return this->_evaluate(*arg_expr);
+                return *this->_evaluate(*arg_expr);
             });
 
-        if (Callable* function = callee.get_as_callable()) {
+        if (Callable* function = callee->get_as_callable()) {
             if (args.size() != function->n_args()) {
                 throw this->_invalid_call_error(function->n_args(), args.size());
             }
 
-            return function->call(*this, args);
+            return std::make_shared<Value>(function->call(*this, args));
         } else {
             throw this->_error("Attempting to call a non-callable value");
         }
     }
 
-    Value Evaluator::visit_Fun(Expr::Fun& expr)
+    Value::s_ptr Evaluator::visit_Fun(Expr::Fun& expr)
     {
-        return Value {
+        return std::make_shared<Value> (
             Function { std::nullopt, &expr, this->claim_env()}
-        };
+        );
     }
 
     template<typename T>
@@ -339,7 +343,7 @@ namespace Honk
             throw this->_error("Redeclaring variable in same scope: " + identifier);
         }
 
-        Value initial_value = this->_evaluate_optional(stmt.initializer);
+        Value initial_value = *this->_evaluate_optional(stmt.initializer);
         this->env().new_var(identifier, initial_value);
     }
 
@@ -377,7 +381,7 @@ namespace Honk
 
     void Evaluator::visit_Return(Stmt::Return& stmt)
     {
-        throw Return(this->_evaluate_optional(stmt.return_value));
+        throw Return(*this->_evaluate_optional(stmt.return_value));
     }
 
     void Evaluator::visit_Class(Stmt::Class& stmt)
@@ -398,13 +402,13 @@ namespace Honk
 
     bool Evaluator::_is_truthy(Expr& expr)
     {
-        return this->_is_truthy(this->_evaluate(expr));
+        return this->_is_truthy(*this->_evaluate(expr));
     }
 
-    Value Evaluator::_evaluate_optional(std::optional<Expr::u_ptr>& expr)
+    Value::s_ptr Evaluator::_evaluate_optional(std::optional<Expr::u_ptr>& expr)
     {
         if (!expr) {
-            return Value { null };
+            return std::make_shared<Value>(null);
         }
 
         return this->_evaluate(**expr);
@@ -429,7 +433,7 @@ namespace Honk
         this->_resolved_lookups.insert(to_add.cbegin(), to_add.cend());
     }
 
-    Value* Evaluator::_resolved_lookup(const Expr& access_expr, std::string identifier)
+    Value::s_ptr Evaluator::_resolved_lookup(const Expr& access_expr, std::string identifier)
     {
         VariableBucket& target_env = this->get_target_env(access_expr);
 

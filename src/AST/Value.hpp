@@ -6,6 +6,7 @@
 #define HONK_VALUE_HPP
 
 #include <vector>
+#include <memory>
 
 #include "Lexer/TokenLiteral.hpp"
 
@@ -17,7 +18,10 @@ namespace Honk
     // Also, the implementation could be swapped for a union + tagging as well.
     struct Value
     {
+        using s_ptr = std::shared_ptr<Value>;
         TokenLiteral value;
+
+        Value(TokenLiteral val);
 
         template <typename T>
         T* get()
