@@ -52,6 +52,10 @@ namespace Honk
             return this->get<Function>();
         }
 
+        if (this->is_a<Class>()) {
+            return this->get<Class>();
+        }
+
         return nullptr;
     }
 }
