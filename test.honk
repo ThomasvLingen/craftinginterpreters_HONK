@@ -225,6 +225,12 @@ class Honker
 print("Class in string form: ");
 println(Honker);
 
+// Class instance
+var my_honker = Honker();
+print("Instance of class in string form: ");
+println(my_honker);
+
+
 // Grammar edge-case. fun expr where a statement _could_ be
 fun () { return "do not crash please"; };
 

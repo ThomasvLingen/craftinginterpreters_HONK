@@ -15,8 +15,7 @@ namespace Honk
 
     std::ostream& operator<<(std::ostream& os, const ClassInstance& obj)
     {
-        // BUG: fixme, currently hella broken because of the way Values are instantiated / passed around.
-        os << "instanceof:" << obj._class->name;
+        os << "instance_of:" << *obj._class;
 
         return os;
     }
