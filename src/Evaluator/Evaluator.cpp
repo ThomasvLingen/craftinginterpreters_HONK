@@ -49,6 +49,8 @@ namespace Honk
             return *this->_evaluate(expression);
         } catch (EvaluateError& e) {
             this->_parent.report_error(e.error_token->line, e.what());
+
+            return { null };
         }
     }
 
