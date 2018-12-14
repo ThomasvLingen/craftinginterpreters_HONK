@@ -1,4 +1,7 @@
 // Variable shadowing in scopes bug
+// RESOLVED
+// * A resolved lookup was generated twice for one lookup, once for every time it was encountered in the current stack
+//   of scopes. This was wrong and lead to wrong variable accesses.
 
 fun shadowing_works()
 {
