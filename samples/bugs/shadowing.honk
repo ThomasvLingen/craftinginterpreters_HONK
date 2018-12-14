@@ -1,0 +1,23 @@
+// Variable shadowing in scopes bug
+
+fun shadowing_works()
+{
+    var top = false;
+
+    {
+        var top = true;  // For some reason this doesn't shadow the top declaration
+        return top;
+    }
+}
+
+fun bool_ok_str(val)
+{
+    if (val) {
+        return "[ OK ]";
+    } else {
+        return "[FAIL]";
+    }
+}
+
+print("[SHADOWING] ");
+println(bool_ok_str(shadowing_works()));
