@@ -52,7 +52,7 @@ namespace Honk
         return { null };
     }
 
-    Value StandardLibrary::Native::println(Evaluator& runtime, Arguments args)
+    Value StandardLibrary::Native::println(Evaluator&, Arguments args)
     {
         std::cout << _get_printable(args[0]) << std::endl;
 
