@@ -1,0 +1,16 @@
+var start_timestamp = honk_get_time_ms(); // This is used for timing the test script
+
+class Foo
+{
+    boop()
+    {
+        println("boop");
+    }
+}
+
+var thing = Foo();
+println(thing);
+
+var end_timestamp = honk_get_time_ms(); // End timestamp
+print("Time taken in ms: ");
+println(end_timestamp - start_timestamp);
