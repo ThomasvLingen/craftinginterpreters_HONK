@@ -119,6 +119,7 @@ namespace Honk
                     identifier,
                     expr.diagnostics_token.line
                 });
+                return;  // Be sure to return so we don't add multiple resolved lookups for one access.
             }
         }
 
