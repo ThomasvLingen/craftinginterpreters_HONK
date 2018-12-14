@@ -41,6 +41,7 @@ namespace Honk
         struct VarAssign;
         struct Call;
         struct Fun;
+        struct Get;
 
     protected:
         Expr();

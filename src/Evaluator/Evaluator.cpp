@@ -287,6 +287,11 @@ namespace Honk
         );
     }
 
+    Value::s_ptr Evaluator::visit_Get(Expr::Get& expr)
+    {
+        throw this->_error("Get expressions are unimplemented. Sorry!");
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {

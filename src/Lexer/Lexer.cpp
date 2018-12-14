@@ -16,7 +16,7 @@ namespace Honk
     SingleCharTokenMap Lexer::single_char_tokens = {
         {'(', TokenType::PAREN_OPEN}, {')', TokenType::PAREN_CLOSE},
         {'{', TokenType::CURLY_OPEN}, {'}', TokenType::CURLY_CLOSE},
-        {',', TokenType::COMMA},      {';', TokenType::SEMICOLON},
+        {',', TokenType::COMMA},      {';', TokenType::SEMICOLON},   {'.', TokenType::DOT},
         {'+', TokenType::PLUS},       {'-', TokenType::MINUS},
         {'*', TokenType::STAR},       {'/', TokenType::SLASH},
     };

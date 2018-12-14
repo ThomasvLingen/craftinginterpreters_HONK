@@ -2,14 +2,14 @@ var start_timestamp = honk_get_time_ms(); // This is used for timing the test sc
 
 class Foo
 {
-    boop()
-    {
-        println("boop");
-    }
+
 }
 
 var thing = Foo();
 println(thing);
+
+// Get expression
+egg.scramble(3).with(cheddar);
 
 var end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");

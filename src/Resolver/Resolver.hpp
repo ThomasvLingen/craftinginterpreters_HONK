@@ -92,6 +92,7 @@ namespace Honk
         void visit_VarAssign(Expr::VarAssign& expr) override;
         void visit_Call(Expr::Call& stmt) override;
         void visit_Fun(Expr::Fun& expr) override;
+        void visit_Get(Expr::Get& expr) override;
 
     private:
         const Interpreter& _parent;

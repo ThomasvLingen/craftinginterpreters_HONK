@@ -142,4 +142,11 @@ namespace Honk
     {
         return *(Stmt::Block*)this->body.get();
     }
+
+    Expr::Get::Get(Expr::u_ptr get_target, Token identifier_tok)
+        : Expr(this->identifier_tok)
+        , get_target(std::move(get_target))
+        , identifier_tok(identifier_tok)
+    {
+    }
 }

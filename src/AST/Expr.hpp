@@ -45,6 +45,7 @@ namespace Honk
         virtual T visit_VarAssign(Expr::VarAssign& expr) = 0;
         virtual T visit_Call(Expr::Call& stmt) = 0;
         virtual T visit_Fun(Expr::Fun& expr) = 0;
+        virtual T visit_Get(Expr::Get& expr) = 0;
     };
 
     struct BinaryExprVisitor
@@ -176,6 +177,16 @@ namespace Honk
         Stmt::u_ptr body;
 
         EXPRVISITORS_ACCEPT(Fun);
+    };
+
+    struct Expr::Get : Expr
+    {
+        Get(Expr::u_ptr get_target, Token identifier_tok);
+
+        Expr::u_ptr get_target;
+        Token identifier_tok;
+
+        EXPRVISITORS_ACCEPT(Get);
     };
 }
 

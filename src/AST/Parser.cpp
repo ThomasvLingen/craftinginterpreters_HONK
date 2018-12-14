@@ -79,6 +79,10 @@ namespace Honk
             constexpr char NO_OPEN[] = "Expected a '{' after the class identifier";
             constexpr char NO_CLOSE[] = "Expected a '}' at the end of a class";
         }
+        namespace GET
+        {
+            constexpr char NO_IDEN[] = "Expected an identifier after the '.'";
+        }
     }
 
     Parser::Parser(const Interpreter& parent, const TokenStream& input)
@@ -450,19 +454,42 @@ namespace Honk
         return params;
     }
 
+    bool _match_call_tree(const Token& token)
+    {
+        static auto match_tokentypes = {TokenType::PAREN_OPEN, TokenType::DOT};
+        return Util::contains(match_tokentypes, token.type);
+    }
+
     Expr::u_ptr Parser::_parse_call_tree()
     {
         Expr::u_ptr left = this->_parse_primary();
 
-        while (this->_match(TokenType::PAREN_OPEN)) {
-            std::vector<Expr::u_ptr> args = this->_parse_arguments();
-            if (args.size() > this->_MAX_CALL_ARGS) {
-                this->_panic(ERROR::ARGS::TOO_MANY);
+        while (Token::opt matched = this->_match(_match_call_tree)) {
+            if (matched->type == TokenType::PAREN_OPEN) {
+                left = this->_parse_call(std::move(left));
             }
-            left = std::make_unique<Expr::Call>(std::move(left), std::move(args));
+
+            if (matched->type == TokenType::DOT) {
+                left = this->_parse_get(std::move(left));
+            }
         }
 
         return left;
+    }
+
+    Expr::u_ptr Parser::_parse_call(Expr::u_ptr call_tree)
+    {
+        std::vector<Expr::u_ptr> args = this->_parse_arguments();
+        if (args.size() > this->_MAX_CALL_ARGS) {
+            this->_panic(ERROR::ARGS::TOO_MANY);
+        }
+        return std::make_unique<Expr::Call>(std::move(call_tree), std::move(args));
+    }
+
+    Expr::u_ptr Parser::_parse_get(Expr::u_ptr call_tree)
+    {
+        Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::GET::NO_IDEN);
+        return std::make_unique<Expr::Get>(std::move(call_tree), identifier);
     }
 
     bool _match_literal(const Token& token)

@@ -37,6 +37,7 @@ namespace Honk
         std::string visit_VarAccess(Expr::VarAccess& expr) override;
         std::string visit_VarAssign(Expr::VarAssign& expr) override;
         std::string visit_Fun(Expr::Fun& expr) override;
+        std::string visit_Get(Expr::Get& expr) override;
 
         std::string parenthesize(const std::string& name, std::vector<Expr*> expressions);
         std::string parenthesize(const std::string& name, std::vector<Expr::u_ptr>& exprs);
