@@ -268,4 +268,16 @@ namespace Honk
     {
         return expr.accept(*this);
     }
+
+    std::string PrettyASTPrinter::visit_Set(Expr::Set& expr)
+    {
+        std::string output;
+        output += "(set ";
+        output += _to_str(*expr.set_target);
+        output += "<" + Token::get_text(expr.identifier_tok) + ">";
+        output += " = " + _to_str(*expr.new_value);
+        output += ")";
+
+        return output;
+    }
 }

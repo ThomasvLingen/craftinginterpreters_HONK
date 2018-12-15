@@ -277,6 +277,12 @@ namespace Honk
         this->_resolve(*expr.get_target);
     }
 
+    void Resolver::visit_Set(Expr::Set& expr)
+    {
+        this->_resolve(*expr.set_target);
+        this->_resolve(*expr.new_value);
+    }
+
     void Resolver::CurrentFnContext::scope_enter(Resolver::FunctionType context_type)
     {
         this->old_value = target;

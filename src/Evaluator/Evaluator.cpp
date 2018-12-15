@@ -298,6 +298,11 @@ namespace Honk
         return gotten_value;
     }
 
+    Value::s_ptr Evaluator::visit_Set(Expr::Set& expr)
+    {
+        throw this->_error("Sorry, not implemented");
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {

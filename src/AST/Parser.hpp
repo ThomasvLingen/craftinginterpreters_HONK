@@ -94,7 +94,8 @@ namespace Honk
 
         // Expression grammar:
         //     expression     → assignment ;
-        //     assignment     → IDENTIFIER "=" logic_or
+        //     assignment     → IDENTIFIER    "=" logic_or
+        //                    | call_tree get "=" logic_or
         //                    | logic_or ;
         //
         //     logic_or       → logic_and ( "or" logic_and )* ;

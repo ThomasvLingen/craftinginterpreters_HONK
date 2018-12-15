@@ -42,6 +42,7 @@ namespace Honk
         struct Call;
         struct Fun;
         struct Get;
+        struct Set;
 
     protected:
         Expr();

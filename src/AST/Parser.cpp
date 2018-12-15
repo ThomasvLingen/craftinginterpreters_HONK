@@ -298,17 +298,25 @@ namespace Honk
 
     Expr::u_ptr Parser::_parse_assignment()
     {
-        if (!this->_peek(TokenType::ASSIGNMENT)) {
+        Expr::u_ptr left = this->_parse_logic_or();
+
+        if (!_match(TokenType::ASSIGNMENT)) {
             // This means we fall through to logic_or
-            return this->_parse_logic_or();
+            return left;
         }
 
-        Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::ASSIGNMENT::INVALID_TARGET);
+        Expr::u_ptr right = this->_parse_logic_or();
 
-        this->_advance();
+        // Eww, RTTI.
+        if (auto* access_expr = dynamic_cast<Expr::VarAccess*>(left.get())) {
+            return std::make_unique<Expr::VarAssign>(access_expr->identifier_tok, std::move(right));
+        }
 
-        Expr::u_ptr new_value = this->_parse_logic_or();
-        return std::make_unique<Expr::VarAssign>(identifier, std::move(new_value));
+        if (auto* get_expr = dynamic_cast<Expr::Get*>(left.get())) {
+            return std::make_unique<Expr::Set>(std::move(get_expr->get_target), get_expr->identifier_tok, std::move(right));
+        }
+
+        this->_panic("Trying to assign to non-assignable target");
     }
 
     Expr::u_ptr Parser::_parse_logic_or()
