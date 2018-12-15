@@ -6,10 +6,9 @@ class Foo
 }
 
 var thing = Foo();
-println(thing);
+println(thing);  // Instance printing
 
-// Get expression
-egg.scramble(3).with(cheddar);
+println(thing.bar);
 
 var end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");
