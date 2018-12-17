@@ -19,6 +19,7 @@ namespace Honk
         ClassInstance(const Class& cls);
 
         std::shared_ptr<Value> get_field(std::string identifier);
+        void set_field(std::string identifier, std::shared_ptr<Value> value);
 
         friend std::ostream& operator<<(std::ostream& os, const ClassInstance& obj);
         friend bool operator==(const ClassInstance& a, const ClassInstance& b);

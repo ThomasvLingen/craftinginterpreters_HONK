@@ -300,7 +300,14 @@ namespace Honk
 
     Value::s_ptr Evaluator::visit_Set(Expr::Set& expr)
     {
-        throw this->_error("Sorry, not implemented");
+        Value::s_ptr set_target = this->_evaluate(*expr.set_target);
+        if (ClassInstance* set_target_instance = set_target->get<ClassInstance>()) {
+            Value::s_ptr set_value = this->_evaluate(*expr.new_value);
+            set_target_instance->set_field(expr.identifier_tok.text, set_value);
+            return set_value;
+        } else {
+            throw this->_error("Attempting to set a field from something other than a class instance");
+        }
     }
 
     template<typename T>

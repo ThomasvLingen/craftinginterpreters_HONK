@@ -2,15 +2,18 @@ var start_timestamp = honk_get_time_ms(); // This is used for timing the test sc
 
 class Foo
 {
-
 }
 
-var thing = Foo();
-println(thing);  // Instance printing
+fun modify_foo(this)
+{
+    this.foo = "yes!";
 
-println(thing.bar);
+    print("inside = "); println(this.foo);
+}
 
-breakfast.omelette.filling.meat = ham;
+var my_foo = Foo();
+modify_foo(my_foo);
+print("outside = "); println(my_foo.foo);  // This throws an error, because instances are passed by value, which is BAD
 
 var end_timestamp = honk_get_time_ms(); // End timestamp
 print("Time taken in ms: ");

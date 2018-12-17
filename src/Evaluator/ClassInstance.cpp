@@ -36,4 +36,10 @@ namespace Honk
 
         return Util::map_get_s_ptr(this->_fields, identifier);
     }
+
+    void ClassInstance::set_field(std::string identifier, std::shared_ptr<Value> value)
+    {
+        // TODO: Make it so this checks if the field was declared in the classdecl.
+        this->_fields[identifier] = value;
+    }
 }
