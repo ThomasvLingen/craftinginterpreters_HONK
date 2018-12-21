@@ -32,7 +32,9 @@ namespace Honk
     Value Class::call(Evaluator& runtime, Arguments args)
     {
         // TODO finish this
-        return Value { ClassInstance(*this) };
+        return Value {
+            std::make_shared<ClassInstance>(*this)
+        };
     }
 
     size_t Class::n_args() const

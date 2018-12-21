@@ -16,6 +16,8 @@ namespace Honk
 
     struct ClassInstance
     {
+        using s_ptr = std::shared_ptr<ClassInstance>;
+
         ClassInstance(const Class& cls);
 
         std::shared_ptr<Value> get_field(std::string identifier);

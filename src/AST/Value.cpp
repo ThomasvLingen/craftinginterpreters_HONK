@@ -24,6 +24,10 @@ namespace Honk
             return Util::bool_str(this->get_as<bool>());
         }
 
+        if (this->is_a<ClassInstance::s_ptr>()) {
+            return _to_string(this->get_as<ClassInstance::s_ptr>());  // To trigger the right overload
+        }
+
         return _to_string(this->value);
     }
 

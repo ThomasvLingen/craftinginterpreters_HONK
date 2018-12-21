@@ -27,7 +27,7 @@ namespace Honk
     using honk_int_t = int64_t;
 
     // TODO: think about passing by reference
-    //       Implement using std::shared_ptr<ClassInstance> etc?
+    //       * ClassInstance is passed by reference
     using TokenLiteral = std::variant<
         std::string,
         honk_int_t,
@@ -36,9 +36,10 @@ namespace Honk
         NativeCallable,
         Function,
         Class,
-        ClassInstance
+        ClassInstance::s_ptr  // It being a ref-counted object is what makes it passed-by-reference
     >;
 
+    std::string _to_string(ClassInstance::s_ptr inst_ref);
     std::string _to_string(TokenLiteral literal);
 }
 

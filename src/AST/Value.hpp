@@ -35,6 +35,12 @@ namespace Honk
             return std::get<T>(this->value);
         }
 
+        template <typename T>
+        T& get()
+        {
+            return std::get<T>(this->value);
+        }
+
         Callable* get_as_callable();
 
         template<typename T>

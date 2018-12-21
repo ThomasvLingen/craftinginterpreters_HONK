@@ -285,13 +285,14 @@ namespace Honk
     Value::s_ptr Evaluator::visit_Get(Expr::Get& expr)
     {
         Value::s_ptr target = this->_evaluate(*expr.get_target);
-        if (!target->is_a<ClassInstance>()) {
+        if (!target->is_a<ClassInstance::s_ptr>()) {
             throw this->_error("Attempting to get a field from something other than a class instance");
         }
 
         std::string identifier = Token::get_text(expr.identifier_tok);
 
-        Value::s_ptr gotten_value = target->get_if<ClassInstance>()->get_field(identifier);
+        // NOTE: The second arrow really makes a big difference here   v
+        Value::s_ptr gotten_value = target->get<ClassInstance::s_ptr>()->get_field(identifier);
         if (!gotten_value) {
             throw this->_error("Attempting to access an undefined field");
         }
@@ -300,14 +301,14 @@ namespace Honk
 
     Value::s_ptr Evaluator::visit_Set(Expr::Set& expr)
     {
-        Value::s_ptr set_target = this->_evaluate(*expr.set_target);
-        if (ClassInstance* set_target_instance = set_target->get_if<ClassInstance>()) {
-            Value::s_ptr set_value = this->_evaluate(*expr.new_value);
-            set_target_instance->set_field(expr.identifier_tok.text, set_value);
-            return set_value;
-        } else {
+        Value::s_ptr target = this->_evaluate(*expr.set_target);
+        if (!target->is_a<ClassInstance::s_ptr>()) {
             throw this->_error("Attempting to set a field from something other than a class instance");
         }
+
+        Value::s_ptr set_value = this->_evaluate(*expr.new_value);
+        target->get<ClassInstance::s_ptr>()->set_field(expr.identifier_tok.text, set_value);
+        return set_value;
     }
 
     template<typename T>
