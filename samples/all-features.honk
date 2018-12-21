@@ -213,23 +213,28 @@ countdown(3, fun(x) {
     }
 });
 
-// Classes!
-class Honker
-{
-    honk()
+{ // Classes
+    class Honker
     {
-        println("Honk!");
+        honk()
+        {
+            println("Honk!");
+        }
     }
+
+    print("Class          in string form: ");
+    println(Honker);
+
+    // Class instance
+    var my_honker = Honker();
+    print("Class-instance in string form: ");
+    println(my_honker);
+
+    // Class instance fields
+    my_honker.honk_sound = "HONK";
+    print("Class-instance fields: `my_honker.honk_sound` = ");
+    println(my_honker.honk_sound);
 }
-
-print("Class in string form: ");
-println(Honker);
-
-// Class instance
-var my_honker = Honker();
-print("Instance of class in string form: ");
-println(my_honker);
-
 
 // Grammar edge-case. fun expr where a statement _could_ be
 fun () { return "do not crash please"; };
