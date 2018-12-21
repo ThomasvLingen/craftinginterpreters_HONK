@@ -50,15 +50,15 @@ namespace Honk
     Callable* Value::get_as_callable()
     {
         if (this->is_a<NativeCallable>()) {
-            return this->get<NativeCallable>();
+            return this->get_if<NativeCallable>();
         }
 
         if (this->is_a<Function>()) {
-            return this->get<Function>();
+            return this->get_if<Function>();
         }
 
         if (this->is_a<Class>()) {
-            return this->get<Class>();
+            return this->get_if<Class>();
         }
 
         return nullptr;

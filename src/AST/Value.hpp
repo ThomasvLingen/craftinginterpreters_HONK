@@ -24,7 +24,7 @@ namespace Honk
         Value(TokenLiteral val);
 
         template <typename T>
-        T* get()
+        T* get_if()
         {
             return std::get_if<T>(&this->value);
         }

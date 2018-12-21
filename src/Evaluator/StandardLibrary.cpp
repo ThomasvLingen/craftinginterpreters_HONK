@@ -38,7 +38,7 @@ namespace Honk
 
     std::string _get_printable(Value& val)
     {
-        if (bool* val_bool = val.get<bool>()) {
+        if (bool* val_bool = val.get_if<bool>()) {
             return Util::bool_str(*val_bool);
         }
 

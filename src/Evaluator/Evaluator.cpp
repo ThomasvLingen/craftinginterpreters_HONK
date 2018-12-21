@@ -80,7 +80,7 @@ namespace Honk
         Value right = *this->_evaluate(*expr.right);
 
         if (expr.op_type() == TokenType::MINUS) {
-            if (honk_int_t* val = right.get<honk_int_t>()) {
+            if (honk_int_t* val = right.get_if<honk_int_t>()) {
                 return std::make_shared<Value>(-*val);
             }
 
@@ -291,7 +291,7 @@ namespace Honk
 
         std::string identifier = Token::get_text(expr.identifier_tok);
 
-        Value::s_ptr gotten_value = target->get<ClassInstance>()->get_field(identifier);
+        Value::s_ptr gotten_value = target->get_if<ClassInstance>()->get_field(identifier);
         if (!gotten_value) {
             throw this->_error("Attempting to access an undefined field");
         }
@@ -301,7 +301,7 @@ namespace Honk
     Value::s_ptr Evaluator::visit_Set(Expr::Set& expr)
     {
         Value::s_ptr set_target = this->_evaluate(*expr.set_target);
-        if (ClassInstance* set_target_instance = set_target->get<ClassInstance>()) {
+        if (ClassInstance* set_target_instance = set_target->get_if<ClassInstance>()) {
             Value::s_ptr set_value = this->_evaluate(*expr.new_value);
             set_target_instance->set_field(expr.identifier_tok.text, set_value);
             return set_value;
