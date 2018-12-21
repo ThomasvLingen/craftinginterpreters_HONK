@@ -1,0 +1,63 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+file_extensions:
+  - honk
+scope: source.honk
+
+variables:
+  ident: '[A-Za-z_][A-Z-a-z_0-9]*'
+
+contexts:
+  main:
+    # Strings begin and end with quotes, and use backslashes as an escape
+    # character
+    - match: '"'
+      scope: punctuation.definition.string.begin.honk
+      push: double_quoted_string
+
+    # Comments begin with a '//' and finish at the end of the line
+    - match: '//'
+      scope: punctuation.definition.comment.honk
+      push: line_comment
+
+    - match: '\b(if|else|for|while|class|return)\b'
+      scope: keyword.control.honk
+
+    - match: '\bvar\b'
+      scope: keyword.control.honk
+      push: var_decl
+
+    - match: 'fun'
+      scope: keyword.control.honk
+      push: function_decl
+
+    # Numbers
+    - match: '\b(-)?[0-9.]+\b'
+      scope: constant.numeric.honk
+
+    - match: '\b(null|true|false)\b'
+      scope: constant.language
+
+  double_quoted_string:
+    - meta_scope: string.quoted.double.honk
+    - match: '"'
+      scope: punctuation.definition.string.end.honk
+      pop: true
+
+  line_comment:
+    - meta_scope: comment.line.honk
+    - match: $
+      pop: true
+
+  var_decl:
+    - meta_scope: variable.honk
+    - match: '\b{{ident}}\b'
+      pop: true
+
+  function_decl:
+    - match: '({{ident}})?\(.*\)'
+      captures:
+        1: entity.name.honk
+        2: source.honk
+      pop: true

@@ -26,6 +26,8 @@ namespace Honk
 
     using honk_int_t = int64_t;
 
+    // TODO: think about passing by reference
+    //       Implement using std::shared_ptr<ClassInstance> etc?
     using TokenLiteral = std::variant<
         std::string,
         honk_int_t,

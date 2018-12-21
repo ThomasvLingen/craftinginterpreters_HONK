@@ -5,6 +5,7 @@
 #ifndef HONK_EVALUATOR_HPP
 #define HONK_EVALUATOR_HPP
 
+#include "Errors.hpp"
 #include "AST/Expr.hpp"
 #include "AST/Stmt.hpp"
 #include "Resolver/Resolver.hpp"
@@ -15,13 +16,6 @@ namespace Honk
 {
     struct Interpreter;
     struct StandardLibrary;
-
-    struct EvaluateError : std::runtime_error
-    {
-        EvaluateError(const char* msg, const Token* error_token);
-
-        const Token* error_token = nullptr;
-    };
 
     struct Return : std::exception
     {
@@ -71,6 +65,8 @@ namespace Honk
         Value::s_ptr visit_VarAssign(Expr::VarAssign& expr) override;
         Value::s_ptr visit_Call(Expr::Call& expr) override;
         Value::s_ptr visit_Fun(Expr::Fun& expr) override;
+        Value::s_ptr visit_Get(Expr::Get& expr) override;
+        Value::s_ptr visit_Set(Expr::Set& expr) override;
 
         // Binary expression visitor methods
         virtual Value visit_minus(const Value& left, const Value& right) override;

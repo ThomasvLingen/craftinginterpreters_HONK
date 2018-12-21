@@ -248,6 +248,17 @@ namespace Honk
         return output;
     }
 
+    std::string PrettyASTPrinter::visit_Get(Expr::Get& expr)
+    {
+        std::string output;
+        output += "(get ";
+        output += _to_str(*expr.get_target);
+        output += "." + Token::get_text(expr.identifier_tok);
+        output += ")";
+
+        return output;
+    }
+
     std::string PrettyASTPrinter::_to_str(Stmt& stmt)
     {
         return stmt.accept(*this);
@@ -256,5 +267,17 @@ namespace Honk
     std::string PrettyASTPrinter::_to_str(Expr& expr)
     {
         return expr.accept(*this);
+    }
+
+    std::string PrettyASTPrinter::visit_Set(Expr::Set& expr)
+    {
+        std::string output;
+        output += "(set ";
+        output += _to_str(*expr.set_target);
+        output += "<" + Token::get_text(expr.identifier_tok) + ">";
+        output += " = " + _to_str(*expr.new_value);
+        output += ")";
+
+        return output;
     }
 }

@@ -94,7 +94,8 @@ namespace Honk
 
         // Expression grammar:
         //     expression     → assignment ;
-        //     assignment     → IDENTIFIER "=" logic_or
+        //     assignment     → IDENTIFIER    "=" logic_or
+        //                    | call_tree get "=" logic_or
         //                    | logic_or ;
         //
         //     logic_or       → logic_and ( "or" logic_and )* ;
@@ -106,13 +107,15 @@ namespace Honk
         //     multiplication → unary ( ( "/" | "*" ) unary )* ;
         //     unary          → ( "!" | "-" ) unary
         //                    | call_tree ;
-        //     call_tree      → primary ( "(" arguments? ")" )* ;
+        //     call_tree      → primary ( call | get )* ;
+        //     call           → "(" arguments? ")" ;
+        //     get            → "." IDENTIFIER ;
         //     arguments      → expression ( "," expression )* ;
         //     primary        → INT | STRING | BOOL | "null"
         //                    | IDENTIFIER
         //                    | anon_function
         //                    | "(" expression ")" ;
-        //     anon_function  → fun function_body ;
+        //     anon_function  → "fun" function_body ;
         Expr::u_ptr _parse_expression();
         Expr::u_ptr _parse_assignment();
         Expr::u_ptr _parse_logic_or();
@@ -123,6 +126,8 @@ namespace Honk
         Expr::u_ptr _parse_multiplication();
         Expr::u_ptr _parse_unary();
         Expr::u_ptr _parse_call_tree();
+        Expr::u_ptr _parse_call(Expr::u_ptr call_tree);
+        Expr::u_ptr _parse_get(Expr::u_ptr call_tree);
         Expr::u_ptr _parse_primary();
         Expr::u_ptr _parse_function_body();
 

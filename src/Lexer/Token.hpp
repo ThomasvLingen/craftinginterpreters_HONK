@@ -21,7 +21,7 @@ namespace Honk
         IDENTIFIER, INT, BOOL, STRING,
 
         PAREN_OPEN, PAREN_CLOSE, CURLY_OPEN, CURLY_CLOSE,
-        COMMA, SEMICOLON,
+        COMMA, SEMICOLON, DOT,
         PLUS, MINUS, STAR, SLASH,
 
         NOT,

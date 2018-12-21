@@ -12,6 +12,7 @@
 #include "StandardLibrary.hpp"
 #include "Function.hpp"
 #include "Class.hpp"
+#include "ClassInstance.hpp"
 
 namespace Honk
 {
@@ -19,12 +20,6 @@ namespace Honk
         : _parent(parent)
     {
         StandardLibrary::register_in(this->scopes);
-    }
-
-    EvaluateError::EvaluateError(const char* msg, const Token* error_token)
-        : std::runtime_error(msg)
-        , error_token(error_token)
-    {
     }
 
     Return::Return(Value returned_value)
@@ -285,6 +280,34 @@ namespace Honk
         return std::make_shared<Value> (
             Function { std::nullopt, &expr, this->claim_env()}
         );
+    }
+
+    Value::s_ptr Evaluator::visit_Get(Expr::Get& expr)
+    {
+        Value::s_ptr target = this->_evaluate(*expr.get_target);
+        if (!target->is_a<ClassInstance>()) {
+            throw this->_error("Attempting to get a field from something other than a class instance");
+        }
+
+        std::string identifier = Token::get_text(expr.identifier_tok);
+
+        Value::s_ptr gotten_value = target->get<ClassInstance>()->get_field(identifier);
+        if (!gotten_value) {
+            throw this->_error("Attempting to access an undefined field");
+        }
+        return gotten_value;
+    }
+
+    Value::s_ptr Evaluator::visit_Set(Expr::Set& expr)
+    {
+        Value::s_ptr set_target = this->_evaluate(*expr.set_target);
+        if (ClassInstance* set_target_instance = set_target->get<ClassInstance>()) {
+            Value::s_ptr set_value = this->_evaluate(*expr.new_value);
+            set_target_instance->set_field(expr.identifier_tok.text, set_value);
+            return set_value;
+        } else {
+            throw this->_error("Attempting to set a field from something other than a class instance");
+        }
     }
 
     template<typename T>
