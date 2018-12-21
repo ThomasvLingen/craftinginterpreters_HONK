@@ -1,0 +1,29 @@
+class Foo
+{
+}
+
+fun bool_ok_str(val)
+{
+    if (val) {
+        return "[ OK ]";
+    } else {
+        return "[FAIL]";
+    }
+}
+
+fun set_flag(obj)
+{
+    obj.flag = true;
+}
+
+fun objs_passed_by_reference()
+{
+    var my_foo = Foo();
+    my_foo.flag = false;
+    set_flag(my_foo);
+
+    return my_foo.flag;
+}
+
+print("[objs_passed_by_reference] ");
+println(bool_ok_str(objs_passed_by_reference()));

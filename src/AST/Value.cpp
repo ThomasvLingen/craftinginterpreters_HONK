@@ -24,6 +24,10 @@ namespace Honk
             return Util::bool_str(this->get_as<bool>());
         }
 
+        if (this->is_a<ClassInstance::s_ptr>()) {
+            return _to_string(this->get_as<ClassInstance::s_ptr>());  // To trigger the right overload
+        }
+
         return _to_string(this->value);
     }
 
@@ -50,15 +54,15 @@ namespace Honk
     Callable* Value::get_as_callable()
     {
         if (this->is_a<NativeCallable>()) {
-            return this->get<NativeCallable>();
+            return this->get_if<NativeCallable>();
         }
 
         if (this->is_a<Function>()) {
-            return this->get<Function>();
+            return this->get_if<Function>();
         }
 
         if (this->is_a<Class>()) {
-            return this->get<Class>();
+            return this->get_if<Class>();
         }
 
         return nullptr;

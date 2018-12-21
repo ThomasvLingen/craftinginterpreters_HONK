@@ -20,6 +20,13 @@ namespace Honk
         return true;
     }
 
+    std::string _to_string(ClassInstance::s_ptr inst_ref)
+    {
+        std::stringstream str;
+        str << *inst_ref;
+        return str.str();
+    }
+
     std::string _to_string(TokenLiteral literal)
     {
         std::stringstream str;
