@@ -54,11 +54,15 @@ namespace Honk
         //                     | class_declaration
         //                     | statement ;
         //
-        //     class_declaration  → "class" IDENTIFIER "{" method_declaration* "}" ;
+        //     class_declaration  → "class" IDENTIFIER "{" class_member_decl* "}" ;
+        //     class_member_decl  → class_field_declaration
+        //                        | class_method_declaration;
+        //     class_method_declaration → IDENTIFIER function_body ;
+        //     class_field_declaration  → "var" IDENTIFIER ;
+        //
         //     var_declaration    → "var" IDENTIFIER ( "=" expression )? ";" ;
         //     fun_declaration    → "fun" IDENTIFIER function_body ;
         //
-        //     method_declaration → IDENTIFIER function_body ;
         //     function_body      → "(" parameters? ")" stmt_block ;
         //     parameters         → IDENTIFIER ( "," IDENTIFIER )* ;
         //     statement          → stmt_expr
@@ -82,7 +86,9 @@ namespace Honk
         Stmt::u_ptr _parse_protected_decl();
         Stmt::u_ptr _parse_declaration();
         Stmt::Class::u_ptr _parse_declaration_class();
-        Stmt::u_ptr _parse_declaration_vardeclaration();
+        Stmt::VarDeclaration::u_ptr _parse_declaration_class_field();
+        Stmt::FunDeclaration::u_ptr _parse_declaration_class_method();
+        Stmt::VarDeclaration::u_ptr _parse_declaration_vardeclaration();
         Stmt::FunDeclaration::u_ptr _parse_declaration_fun();
         Stmt::u_ptr _parse_statement();
         Stmt::u_ptr _parse_statement_expression();

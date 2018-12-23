@@ -159,17 +159,41 @@ namespace Honk
 
         this->_assert_match(TokenType::CURLY_OPEN, ERROR::CLASS::NO_OPEN);
 
-        std::vector<Stmt::FunDeclaration::u_ptr> class_methods;
+        std::vector<Stmt::FunDeclaration::u_ptr> methods;
+        std::vector<Stmt::VarDeclaration::u_ptr> fields;
+
         while (!this->_check(TokenType::CURLY_CLOSE)) {
-            class_methods.push_back(this->_parse_declaration_fun());
+            if (this->_match(TokenType::VAR)) {
+                fields.push_back(this->_parse_declaration_class_field());
+            } else {
+                methods.push_back(this->_parse_declaration_class_method());
+            }
         }
 
         this->_assert_match(TokenType::CURLY_CLOSE, ERROR::CLASS::NO_CLOSE);
 
-        return std::make_unique<Stmt::Class>(class_name, std::move(class_methods));
+        return std::make_unique<Stmt::Class>(class_name, std::move(fields), std::move(methods));
     }
 
-    Stmt::u_ptr Parser::_parse_declaration_vardeclaration()
+    Stmt::VarDeclaration::u_ptr Parser::_parse_declaration_class_field()
+        // var keyword is already parsed
+    {
+        Stmt::VarDeclaration::u_ptr field = this->_parse_declaration_vardeclaration();
+
+        if (field->initializer) {
+            this->_panic("Attempting to initialize class field in declaration. Not allowed, use the constructor instead.");
+        }
+
+        return field;
+    }
+
+    Stmt::FunDeclaration::u_ptr Parser::_parse_declaration_class_method()
+    {
+        // I never implied this would be spectacular
+        return this->_parse_declaration_fun();
+    }
+
+    Stmt::VarDeclaration::u_ptr Parser::_parse_declaration_vardeclaration()
     {
         Token identifier = this->_assert_match(TokenType::IDENTIFIER, ERROR::VAR::NO_IDENTIFIER);
 

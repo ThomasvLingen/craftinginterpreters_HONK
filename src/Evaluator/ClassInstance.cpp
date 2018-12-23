@@ -14,6 +14,7 @@ namespace Honk
     ClassInstance::ClassInstance(const Class& cls)
         : _class(&cls)
     {
+        this->_declare_instance_fields();
     }
 
     std::ostream& operator<<(std::ostream& os, const ClassInstance& obj)
@@ -37,9 +38,25 @@ namespace Honk
         return Util::map_get_s_ptr(this->_fields, identifier);
     }
 
-    void ClassInstance::set_field(std::string identifier, std::shared_ptr<Value> value)
+    bool ClassInstance::set_field(std::string identifier, std::shared_ptr<Value> value)
     {
-        // TODO: Make it so this checks if the field was declared in the classdecl.
+        if (!Util::contains(this->_fields, identifier)) {
+            return false;
+        }
+
         this->_fields[identifier] = value;
+        return true;
+    }
+
+    void ClassInstance::_declare_instance_fields()
+    {
+        for (const std::string& field : this->_class->declared_fields) {
+            this->_declare_field(field);
+        }
+    }
+
+    void ClassInstance::_declare_field(std::string identifier)
+    {
+        this->_fields[identifier] = std::make_shared<Value>(null);
     }
 }

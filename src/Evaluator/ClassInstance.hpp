@@ -21,7 +21,7 @@ namespace Honk
         ClassInstance(const Class& cls);
 
         std::shared_ptr<Value> get_field(std::string identifier);
-        void set_field(std::string identifier, std::shared_ptr<Value> value);
+        bool set_field(std::string identifier, std::shared_ptr<Value> value);
 
         friend std::ostream& operator<<(std::ostream& os, const ClassInstance& obj);
         friend bool operator==(const ClassInstance& a, const ClassInstance& b);
@@ -33,6 +33,10 @@ namespace Honk
         // A class instance is a heap-allocated object, which contains an unordered_map which allocates objects on the
         //     heap, which contains handles (shared pointers) to reference-counted, heap-allocated, objects.
         std::unordered_map<std::string, std::shared_ptr<Value>> _fields;
+
+        void _declare_instance_fields();
+        void _declare_field(std::string identifier);
+
     };
 }
 

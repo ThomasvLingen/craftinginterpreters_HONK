@@ -13,13 +13,14 @@ namespace Honk
 {
     struct Class : Callable
     {
-        Class(std::string name);
+        Class(std::string name, std::vector<std::string> fields);
 
         // Serves as a constructor
         Value call(Evaluator& runtime, Arguments args);
         size_t n_args() const;
 
         std::string name;
+        std::vector<std::string> declared_fields;
 
         friend std::ostream& operator<<(std::ostream& os, const Class& obj);
         friend bool operator==(const Class& a, const Class& b);

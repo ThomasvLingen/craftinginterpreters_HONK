@@ -83,8 +83,10 @@ namespace Honk
     {
     }
 
-    Stmt::Class::Class(Token name, std::vector<Stmt::FunDeclaration::u_ptr> methods)
+    Stmt::Class::Class(Token name, std::vector<Stmt::VarDeclaration::u_ptr> fields,
+                       std::vector<Stmt::FunDeclaration::u_ptr> methods)
         : name(name)
+        , fields(std::move(fields))
         , methods(std::move(methods))
     {
     }

@@ -129,9 +129,10 @@ namespace Honk
 
     struct Stmt::Class : Stmt
     {
-        Class(Token name, std::vector<Stmt::FunDeclaration::u_ptr> methods);
+        Class(Token name, std::vector<Stmt::VarDeclaration::u_ptr> fields, std::vector<Stmt::FunDeclaration::u_ptr> methods);
 
         Token name;
+        std::vector<Stmt::VarDeclaration::u_ptr> fields;
         std::vector<Stmt::FunDeclaration::u_ptr> methods;
 
         STMTVISITORS_ACCEPT(Class);

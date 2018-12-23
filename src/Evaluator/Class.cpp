@@ -11,9 +11,11 @@
 
 namespace Honk
 {
-    Class::Class(std::string name)
+    Class::Class(std::string name, std::vector<std::string> fields)
         : name(name)
+        , declared_fields(fields)
     {
+
     }
 
     std::ostream& operator<<(std::ostream& os, const Class& obj)

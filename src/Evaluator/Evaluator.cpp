@@ -307,7 +307,10 @@ namespace Honk
         }
 
         Value::s_ptr set_value = this->_evaluate(*expr.new_value);
-        target->get<ClassInstance::s_ptr>()->set_field(expr.identifier_tok.text, set_value);
+        bool ok = target->get<ClassInstance::s_ptr>()->set_field(expr.identifier_tok.text, set_value);
+        if (!ok) {
+            throw this->_error("Attempting to set a non-declared field");
+        }
         return set_value;
     }
 
@@ -412,7 +415,12 @@ namespace Honk
 
     void Evaluator::visit_Class(Stmt::Class& stmt)
     {
-        Class cls(stmt.name.text);
+        std::vector<std::string> fields = Util::map<std::vector<std::string>> (stmt.fields,
+            [] (Stmt::VarDeclaration::u_ptr& field_decl) {
+                return field_decl->get_identifier();
+            });
+
+        Class cls(stmt.name.text, fields);
         this->env().new_var(stmt.name.text, Value {cls});
     }
 
