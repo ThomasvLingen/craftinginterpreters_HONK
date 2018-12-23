@@ -151,7 +151,7 @@ namespace Honk
     }
 
     Expr::Set::Set(Expr::u_ptr set_target, Token identifier_tok, Expr::u_ptr new_value)
-        : Expr(identifier_tok)
+        : Expr(this->identifier_tok)
         , set_target(std::move(set_target))
         , identifier_tok(identifier_tok)
         , new_value(std::move(new_value))

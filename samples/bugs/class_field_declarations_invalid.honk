@@ -1,0 +1,9 @@
+class Foo
+{
+
+}
+
+var my_foo = Foo();
+my_foo.undeclared = "this should throw an error";
+
+println(my_foo.undeclared);

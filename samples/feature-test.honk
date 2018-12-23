@@ -1,20 +1,9 @@
-var start_timestamp = honk_get_time_ms(); // This is used for timing the test script
-
 class Foo
 {
-}
-
-fun modify_foo(this)
-{
-    this.foo = "yes!";
-
-    print("inside = "); println(this.foo);
+    honk() {
+        println("Honk!");
+    }
 }
 
 var my_foo = Foo();
-modify_foo(my_foo);
-print("outside = "); println(my_foo.foo);  // This throws an error, because instances are passed by value, which is BAD
-
-var end_timestamp = honk_get_time_ms(); // End timestamp
-print("Time taken in ms: ");
-println(end_timestamp - start_timestamp);
+my_foo.honk();

@@ -1,0 +1,9 @@
+class Foo
+{
+    var message;
+}
+
+var my_foo = Foo();
+my_foo.message = "yay!";
+
+println(my_foo.message);

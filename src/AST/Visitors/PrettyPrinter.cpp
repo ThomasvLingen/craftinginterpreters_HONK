@@ -196,6 +196,10 @@ namespace Honk
         output +=  stmt.name.text;
         output += "\n";
 
+        for (Stmt::VarDeclaration::u_ptr& field : stmt.fields) {
+            output += "field: " + field->diagnostics_token.text + "\n";
+        }
+
         for (Stmt::FunDeclaration::u_ptr& method : stmt.methods) {
             output += this->_to_str(*method);
         }
