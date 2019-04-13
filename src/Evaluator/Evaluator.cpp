@@ -420,7 +420,16 @@ namespace Honk
                 return field_decl->get_identifier();
             });
 
-        Class cls(stmt.name.text, fields);
+        Class::MethodMap methods = Util::map_to_stlmap<Class::MethodMap> (stmt.methods,
+            [this] (const Stmt::FunDeclaration::u_ptr& method_decl) {
+                std::string name = method_decl->get_identifier();
+
+                return std::make_pair(
+                    name, Function(name, &method_decl->get_fun(), this->claim_env())
+                );
+            });
+
+        Class cls(stmt.name.text, fields, methods);
         this->env().new_var(stmt.name.text, Value {cls});
     }
 

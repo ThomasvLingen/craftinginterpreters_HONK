@@ -74,6 +74,20 @@ namespace Honk
 
             return mapped_values;
         }
+
+        template <typename TargetMap, typename Container, typename Callable>
+        TargetMap map_to_stlmap(const Container& original, const Callable& map_fn)
+            // Signature of map_fn = std::pair<std::string, TargetMap::mapped_type> map_fn(const Container::value_type& value)
+        {
+            using mapped_type = typename Container::value_type;
+            TargetMap mapped_values;
+
+            for (const mapped_type& value : original) {
+                mapped_values.insert(map_fn(value));
+            }
+
+            return mapped_values;
+        }
     }
 }
 

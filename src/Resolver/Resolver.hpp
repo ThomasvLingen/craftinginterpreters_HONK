@@ -49,7 +49,8 @@ namespace Honk
         enum struct FunctionType
         {
             NONE,
-            FUNCTION
+            FUNCTION,
+            METHOD
         };
 
         struct CurrentFnContext : Util::I_Scopable<FunctionType>

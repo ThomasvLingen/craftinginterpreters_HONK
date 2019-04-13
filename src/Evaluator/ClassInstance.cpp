@@ -31,11 +31,13 @@ namespace Honk
 
     Value::s_ptr ClassInstance::get_field(std::string identifier)
     {
-        if (!Util::contains(this->_fields, identifier)) {
-            return nullptr;
+        // Do we have a field that matches it?
+        if (Util::contains(this->_fields, identifier)) {
+            return Util::map_get_s_ptr(this->_fields, identifier);
         }
 
-        return Util::map_get_s_ptr(this->_fields, identifier);
+        // If not, check if Class has a method that matches it
+        return this->_class->get_method(identifier);
     }
 
     bool ClassInstance::set_field(std::string identifier, std::shared_ptr<Value> value)

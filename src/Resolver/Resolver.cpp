@@ -196,7 +196,12 @@ namespace Honk
         this->_declare(stmt.name.text, stmt.name);
         this->_define(stmt.name.text);
 
-        // TODO: add method resolving
+        for (Stmt::FunDeclaration::u_ptr& method : stmt.methods) {
+            CurrentFnContext context(this->_current_fn);
+            Util::ScopeGuard<FunctionType> ctx_guard(context, FunctionType::METHOD);
+
+            this->_resolve_function(method->get_fun());
+        }
     }
 
     void Resolver::visit_Binary(Expr::Binary& expr)

@@ -6,16 +6,18 @@
 
 #include <ostream>
 
+#include "Util/Util.hpp"
+
 #include "AST/Value.hpp"
 #include "ClassInstance.hpp"
 
 namespace Honk
 {
-    Class::Class(std::string name, std::vector<std::string> fields)
+    Class::Class(std::string name, std::vector<std::string> fields, MethodMap methods)
         : name(name)
         , declared_fields(fields)
+        , declared_methods(methods)
     {
-
     }
 
     std::ostream& operator<<(std::ostream& os, const Class& obj)
@@ -43,6 +45,16 @@ namespace Honk
     {
         // TODO finish this
         return 0;
+    }
+
+    std::shared_ptr<Value> Class::get_method(std::string identifier) const
+    {
+        if (Util::contains(this->declared_methods, identifier)) {
+            // NOTE: This means we make a copy here and detach it.
+            return std::make_shared<Value>(this->declared_methods.at(identifier));
+        } else {
+            return nullptr;
+        }
     }
 }
 

@@ -7,3 +7,5 @@ class Foo
 
 var my_foo = Foo();
 my_foo.honk();
+
+Foo().honk();

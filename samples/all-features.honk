@@ -236,6 +236,10 @@ countdown(3, fun(x) {
     my_honker.honk_sound = "HONK";
     print("Class-instance fields: `my_honker.honk_sound` = ");
     println(my_honker.honk_sound);
+
+    // Class methods
+    println("Method invocation: `my_honker.honk()`");
+    my_honker.honk();
 }
 
 // Grammar edge-case. fun expr where a statement _could_ be
