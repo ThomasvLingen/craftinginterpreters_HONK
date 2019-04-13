@@ -216,6 +216,8 @@ countdown(3, fun(x) {
 { // Classes
     class Honker
     {
+        var honk_sound;
+
         honk()
         {
             println("Honk!");
