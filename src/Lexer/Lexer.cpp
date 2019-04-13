@@ -249,7 +249,7 @@ namespace Honk
             // Just keep eating the number
         }
 
-        this->_add_token(TokenType::INT, std::stoll(this->_get_token_text()));
+        this->_add_token(TokenType::INT, Util::stoint64_t(this->_get_token_text()));
         return true;
     }
 
