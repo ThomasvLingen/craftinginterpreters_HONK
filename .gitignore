@@ -2,6 +2,9 @@
 .idea/
 cmake-build-debug/
 
+# Visual studio code editor files
+.vscode/
+
 # Gdb history
 .gdb_history
 
@@ -10,7 +13,6 @@ docs/html
 
 # build folder
 build/
-.idea/
 
 # Compiled Object files
 *.slo
