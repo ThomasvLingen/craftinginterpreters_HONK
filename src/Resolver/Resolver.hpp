@@ -95,6 +95,7 @@ namespace Honk
         void visit_Fun(Expr::Fun& expr) override;
         void visit_Get(Expr::Get& expr) override;
         void visit_Set(Expr::Set& expr) override;
+        void visit_This(Expr::This& expr) override;
 
     private:
         const Interpreter& _parent;

@@ -536,6 +536,10 @@ namespace Honk
             return std::make_unique<Expr::Literal>(literal->value);
         }
 
+        if (Token::opt this_ = this->_match(TokenType::THIS)) {
+            return std::make_unique<Expr::This>(*this_);
+        }
+
         if (Token::opt identifier = this->_match(TokenType::IDENTIFIER)) {
             return std::make_unique<Expr::VarAccess>(*identifier);
         }

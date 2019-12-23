@@ -288,6 +288,12 @@ namespace Honk
         this->_resolve(*expr.new_value);
     }
 
+    void Resolver::visit_This(Expr::This& expr)
+    {
+        // TODO implement
+        throw ResolveError("Not implemented", &expr.this_tok);
+    }
+
     void Resolver::CurrentFnContext::scope_enter(Resolver::FunctionType context_type)
     {
         this->old_value = target;

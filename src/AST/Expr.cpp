@@ -157,4 +157,10 @@ namespace Honk
         , new_value(std::move(new_value))
     {
     }
+
+    Expr::This::This(Token this_tok)
+        : Expr(this->this_tok)
+        , this_tok(this_tok)
+    {
+    }
 }

@@ -284,4 +284,9 @@ namespace Honk
 
         return output;
     }
+
+    std::string PrettyASTPrinter::visit_This(Expr::This& expr)
+    {
+        return "(this)";
+    }
 }

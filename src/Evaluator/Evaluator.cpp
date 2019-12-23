@@ -314,6 +314,12 @@ namespace Honk
         return set_value;
     }
 
+    Value::s_ptr Evaluator::visit_This(Expr::This& expr)
+    {
+        // TODO: implement
+        throw this->_error("Not yet implemented");
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {
