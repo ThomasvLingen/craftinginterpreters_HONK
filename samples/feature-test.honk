@@ -1,11 +1,13 @@
-class Foo
+class ButtonWithSound
 {
-    honk() {
-        println("Honk!");
+    var sound;
+
+    press()
+    {
+        println(this.sound);
     }
 }
 
-var my_foo = Foo();
-my_foo.honk();
-
-Foo().honk();
+var the_button = ButtonWithSound();
+the_button.sound = "That was easy";
+the_button.press();
