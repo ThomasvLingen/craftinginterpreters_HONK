@@ -30,7 +30,7 @@ namespace Honk
         GREATER, GREATER_EQ,
         LESS_THAN, LESS_THAN_EQ,
 
-        CLASS,
+        CLASS, THIS,
         FUN, RETURN,
         CONST, VAR, ASSIGNMENT, VAL_NULL,
         IF, ELSE, WHILE, FOR,
