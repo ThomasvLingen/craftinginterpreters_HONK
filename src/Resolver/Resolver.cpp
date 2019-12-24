@@ -295,20 +295,4 @@ namespace Honk
     {
         this->_resolve_local(expr, expr.this_tok.text);
     }
-
-    void Resolver::CurrentFnContext::scope_enter(Resolver::FunctionType context_type)
-    {
-        this->old_value = target;
-        this->target = context_type;
-    }
-
-    void Resolver::CurrentFnContext::scope_exit()
-    {
-        this->target = old_value;
-    }
-
-    Resolver::CurrentFnContext::CurrentFnContext(Resolver::FunctionType& target)
-        : target(target)
-    {
-    }
 }

@@ -14,6 +14,8 @@
 
 #include "Util/ScopeGuard.hpp"
 
+#include "ContextTrackers.hpp"
+
 namespace Honk
 {
     // Forward declarations
@@ -39,31 +41,10 @@ namespace Honk
         const Token* error_token = nullptr;
     };
 
-
-
-
     struct Resolver
         : StmtVisitor<void>, ExprVisitor<void>
         , Util::I_Scopable<>
     {
-        enum struct FunctionType
-        {
-            NONE,
-            FUNCTION,
-            METHOD
-        };
-
-        struct CurrentFnContext : Util::I_Scopable<FunctionType>
-        {
-            CurrentFnContext(FunctionType& target);
-
-            FunctionType& target;
-            FunctionType old_value = FunctionType::NONE;
-
-            void scope_enter(Resolver::FunctionType context_type) override;
-            void scope_exit();
-        };
-
         Resolver(const Interpreter& parent);
 
         std::optional<VariableResolveMapping> resolve(Stmt::stream& code);
