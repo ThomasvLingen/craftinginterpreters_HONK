@@ -196,6 +196,9 @@ namespace Honk
         this->_declare(stmt.name.text, stmt.name);
         this->_define(stmt.name.text);
 
+        Util::ScopeGuard<> scope_guard(*this); // Scope to contain "this" for this class
+        this->_declare("this", stmt.diagnostics_token);
+
         for (Stmt::FunDeclaration::u_ptr& method : stmt.methods) {
             CurrentFnContext context(this->_current_fn);
             Util::ScopeGuard<FunctionType> ctx_guard(context, FunctionType::METHOD);
@@ -290,8 +293,7 @@ namespace Honk
 
     void Resolver::visit_This(Expr::This& expr)
     {
-        // TODO implement
-        throw ResolveError("Not implemented", &expr.this_tok);
+        this->_resolve_local(expr, expr.this_tok.text);
     }
 
     void Resolver::CurrentFnContext::scope_enter(Resolver::FunctionType context_type)

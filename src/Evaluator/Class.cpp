@@ -47,6 +47,16 @@ namespace Honk
         return 0;
     }
 
+    std::shared_ptr<Value> Class::get_bound_method(ClassInstance::s_ptr instance, std::string identifier) const
+    {
+        if (!Util::contains(this->declared_methods, identifier)) {
+            return nullptr;
+        }
+
+        Function unbound_method = this->declared_methods.at(identifier);
+        return std::make_shared<Value>(unbound_method.bind(instance));
+    }
+
     std::shared_ptr<Value> Class::get_method(std::string identifier) const
     {
         if (Util::contains(this->declared_methods, identifier)) {

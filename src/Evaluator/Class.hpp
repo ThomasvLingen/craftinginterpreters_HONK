@@ -14,6 +14,8 @@
 
 namespace Honk
 {
+    struct ClassInstance;
+
     // NOTE: This is a class _declaration_. Not an instance. For that, see `ClassInstance.hpp`
     struct Class : Callable
     {
@@ -27,6 +29,7 @@ namespace Honk
         Value call(Evaluator& runtime, Arguments args);
         size_t n_args() const;
 
+        std::shared_ptr<Value> get_bound_method(std::shared_ptr<ClassInstance> instance, std::string identifier) const;
         std::shared_ptr<Value> get_method(std::string identifier) const;
 
         std::string name;

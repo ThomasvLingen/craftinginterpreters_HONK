@@ -8,6 +8,24 @@ class ButtonWithSound
     }
 }
 
+class Counter
+{
+    var count;
+
+    tick()
+    {
+        this.count = this.count + 1;
+    }
+}
+
 var the_button = ButtonWithSound();
 the_button.sound = "That was easy";
 the_button.press();
+
+var my_counter = Counter();
+my_counter.count = 0;
+my_counter.tick();
+my_counter.tick();
+my_counter.tick();
+
+println(my_counter.count);

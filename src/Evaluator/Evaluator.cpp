@@ -316,8 +316,7 @@ namespace Honk
 
     Value::s_ptr Evaluator::visit_This(Expr::This& expr)
     {
-        // TODO: implement
-        throw this->_error("Not yet implemented");
+        return this->_resolved_lookup(expr, expr.this_tok.text);
     }
 
     template<typename T>
