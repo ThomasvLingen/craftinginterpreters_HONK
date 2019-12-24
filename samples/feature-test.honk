@@ -2,17 +2,16 @@ class ButtonWithSound
 {
     var sound;
 
+    init(sound)
+    {
+        this.sound = sound;
+    }
+
     press()
     {
         println(this.sound);
     }
 }
 
-var the_button = ButtonWithSound();
-the_button.sound = "That was easy";
+var the_button = ButtonWithSound("That was easy");
 the_button.press();
-
-fun not_a_method()
-{
-    print(this);
-}
