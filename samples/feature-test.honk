@@ -1,18 +1,64 @@
-class ButtonWithSound
+class ArrayItem
 {
-    var sound;
+    var item;
+    var next;
 
-    press()
+    init(item, next)
     {
-        println(this.sound);
+        this.item = item;
+        this.next = next;
     }
 }
 
-var the_button = ButtonWithSound();
-the_button.sound = "That was easy";
-the_button.press();
-
-fun not_a_method()
+// This is pretty awful, but kind of funny.
+class Array
 {
-    print(this);
+    var head;
+
+    init(n_items)
+    {
+        while (n_items > 0) {
+            this.head = ArrayItem(null, this.head);
+            n_items = n_items - 1;
+        }
+    }
+
+    get(index)
+    {
+        var item = this.head;
+
+        while (index > 0 and item) {
+            item = item.next;
+            index = index - 1;
+        }
+
+        return item;
+    }
+
+    set(index, value)
+    {
+        var target = this.get(index);
+        target.item = value;
+    }
+
+    print()
+    {
+        var current = this.head;
+        var count = 0;
+
+        while (current) {
+            print(count);
+            print(" = ");
+            println(current.item);
+
+            current = current.next;
+            count = count + 1;
+        }
+    }
 }
+
+var thingy = Array(5);
+thingy.print();
+
+thingy.set(2, "lolwut");
+thingy.print();

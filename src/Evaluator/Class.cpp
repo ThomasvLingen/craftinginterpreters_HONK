@@ -35,16 +35,25 @@ namespace Honk
 
     Value Class::call(Evaluator& runtime, Arguments args)
     {
-        // TODO finish this
-        return Value {
-            std::make_shared<ClassInstance>(*this)
-        };
+        ClassInstance::s_ptr instance = std::make_shared<ClassInstance>(*this);
+
+        // NOTE: we use a std::string literal here since for some arcane reason using a normal string literal makes template argument deduction shit itself
+        using namespace std::string_literals;
+        if (Util::contains(this->declared_methods, "init"s)) {
+            this->declared_methods.at("init").bind(instance).call(runtime, args);  // TODO refactor this into an optional
+        }
+
+        return Value {instance};
     }
 
     size_t Class::n_args() const
     {
-        // TODO finish this
-        return 0;
+        using namespace std::string_literals;
+        if (Util::contains(this->declared_methods, "init"s)) {
+            return this->declared_methods.at("init").n_args();
+        } else {
+            return 0;
+        }
     }
 
     std::shared_ptr<Value> Class::get_bound_method(ClassInstance::s_ptr instance, std::string identifier) const
