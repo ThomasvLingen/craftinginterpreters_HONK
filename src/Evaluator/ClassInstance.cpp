@@ -37,7 +37,8 @@ namespace Honk
         }
 
         // If not, check if Class has a method that matches it
-        return this->_class->get_method(identifier);
+        // BIND IT
+        return this->_class->get_bound_method(shared_from_this(), identifier);
     }
 
     bool ClassInstance::set_field(std::string identifier, std::shared_ptr<Value> value)

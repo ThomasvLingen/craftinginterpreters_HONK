@@ -43,6 +43,7 @@ namespace Honk
         struct Fun;
         struct Get;
         struct Set;
+        struct This;
 
     protected:
         Expr();

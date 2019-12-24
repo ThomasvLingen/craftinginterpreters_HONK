@@ -14,6 +14,7 @@
 
 namespace Honk
 {
+    struct ClassInstance;
     struct VariableBucket;
 
     struct Function : Callable
@@ -23,6 +24,8 @@ namespace Honk
 
         size_t n_args() const override;
         Value call(Evaluator& runtime, Arguments args) override;
+
+        Function bind(std::shared_ptr<ClassInstance> instance);
 
         friend std::ostream& operator<<(std::ostream& os, const Function& obj);
         friend bool operator==(const Function& a, const Function& b);

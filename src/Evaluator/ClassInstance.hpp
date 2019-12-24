@@ -14,7 +14,7 @@ namespace Honk
     struct Class;
     struct Value;
 
-    struct ClassInstance
+    struct ClassInstance : std::enable_shared_from_this<ClassInstance>
     {
         using s_ptr = std::shared_ptr<ClassInstance>;
 

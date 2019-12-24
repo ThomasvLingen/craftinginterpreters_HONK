@@ -48,6 +48,14 @@ namespace Honk
         }
     }
 
+    Function Function::bind(ClassInstance::s_ptr instance)
+    {
+        auto bound_closure = std::make_shared<VariableBucket>(this->_closure.get());
+        bound_closure->new_var("this", Value {instance});
+
+        return Function(this->_identifier, this->_declaration, bound_closure);
+    }
+
     std::ostream& operator<<(std::ostream& os, const Function& obj)
     {
         if (obj._identifier) {

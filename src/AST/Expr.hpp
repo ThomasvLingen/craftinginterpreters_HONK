@@ -17,6 +17,7 @@
 
 // I am sure that somewhere, someone is cursing intently at me as I write this.
 // But I can't be fucked to write a unique accept method every time.
+// TODO: Maybe I can write a DSL for this?
 #define EXPRVISITOR_ACCEPT(returntype, classname)                \
     returntype accept(ExprVisitor<returntype>& visitor) override \
     {                                                            \
@@ -47,6 +48,7 @@ namespace Honk
         virtual T visit_Fun(Expr::Fun& expr) = 0;
         virtual T visit_Get(Expr::Get& expr) = 0;
         virtual T visit_Set(Expr::Set& expr) = 0;
+        virtual T visit_This(Expr::This& expr) = 0;
     };
 
     struct BinaryExprVisitor
@@ -199,6 +201,15 @@ namespace Honk
         Expr::u_ptr new_value;
 
         EXPRVISITORS_ACCEPT(Set);
+    };
+
+    struct Expr::This : Expr
+    {
+        This(Token this_tok);
+
+        Token this_tok;
+
+        EXPRVISITORS_ACCEPT(This);
     };
 }
 

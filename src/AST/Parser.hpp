@@ -118,6 +118,7 @@ namespace Honk
         //     get            → "." IDENTIFIER ;
         //     arguments      → expression ( "," expression )* ;
         //     primary        → INT | STRING | BOOL | "null"
+        //                    | "this"
         //                    | IDENTIFIER
         //                    | anon_function
         //                    | "(" expression ")" ;

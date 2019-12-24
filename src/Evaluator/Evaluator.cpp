@@ -314,6 +314,17 @@ namespace Honk
         return set_value;
     }
 
+    Value::s_ptr Evaluator::visit_This(Expr::This& expr)
+    {
+        Value::s_ptr resolved_this = this->_resolved_lookup(expr, expr.this_tok.text);
+
+        if (!resolved_this) {
+            throw this->_error("Invalid lookup of this");
+        }
+
+        return resolved_this;
+    }
+
     template<typename T>
     std::pair<T, T> Evaluator::_get_as(const Value& left, const Value& right)
     {

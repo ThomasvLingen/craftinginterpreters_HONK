@@ -193,8 +193,14 @@ namespace Honk
 
     void Resolver::visit_Class(Stmt::Class& stmt)
     {
+        CurrentClassContext class_context(this->_current_classtype); // Save the classtype for this scope
+        Util::ScopeGuard<ClassType> class_ctx_guard(class_context, ClassType::CLASS);
+
         this->_declare(stmt.name.text, stmt.name);
         this->_define(stmt.name.text);
+
+        Util::ScopeGuard<> scope_guard(*this); // Scope to contain "this" for this class
+        this->_declare("this", stmt.diagnostics_token);
 
         for (Stmt::FunDeclaration::u_ptr& method : stmt.methods) {
             CurrentFnContext context(this->_current_fn);
@@ -288,19 +294,12 @@ namespace Honk
         this->_resolve(*expr.new_value);
     }
 
-    void Resolver::CurrentFnContext::scope_enter(Resolver::FunctionType context_type)
+    void Resolver::visit_This(Expr::This& expr)
     {
-        this->old_value = target;
-        this->target = context_type;
-    }
+        if (this->_current_classtype == ClassType::NONE) {
+            throw ResolveError("Using 'this' outside of a class method", &expr.diagnostics_token);
+        }
 
-    void Resolver::CurrentFnContext::scope_exit()
-    {
-        this->target = old_value;
-    }
-
-    Resolver::CurrentFnContext::CurrentFnContext(Resolver::FunctionType& target)
-        : target(target)
-    {
+        this->_resolve_local(expr, expr.this_tok.text);
     }
 }

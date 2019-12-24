@@ -22,7 +22,7 @@ namespace Honk
     };
 
     KeywordTokenMap Lexer::keyword_tokens = {
-        {"class", TokenType::CLASS},
+        {"class", TokenType::CLASS}, {"this", TokenType::THIS},
         {"fun",   TokenType::FUN},   {"return", TokenType::RETURN},
         {"const", TokenType::CONST}, {"var",    TokenType::VAR},
         {"if",    TokenType::IF},    {"else",   TokenType::ELSE},   {"while", TokenType::WHILE},    {"for", TokenType::FOR},
