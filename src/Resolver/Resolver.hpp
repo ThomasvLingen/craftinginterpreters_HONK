@@ -85,6 +85,7 @@ namespace Honk
         std::vector<LocalScope> _scopes;
 
         FunctionType _current_fn = FunctionType::NONE;
+        ClassType _current_classtype = ClassType::NONE;
 
         LocalScope& _get_current_scope();
 

@@ -16,5 +16,3 @@ fun not_a_method()
 {
     print(this);
 }
-
-not_a_method();

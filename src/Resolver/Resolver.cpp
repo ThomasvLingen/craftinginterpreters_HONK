@@ -193,6 +193,9 @@ namespace Honk
 
     void Resolver::visit_Class(Stmt::Class& stmt)
     {
+        CurrentClassContext class_context(this->_current_classtype); // Save the classtype for this scope
+        Util::ScopeGuard<ClassType> class_ctx_guard(class_context, ClassType::CLASS);
+
         this->_declare(stmt.name.text, stmt.name);
         this->_define(stmt.name.text);
 
@@ -293,6 +296,10 @@ namespace Honk
 
     void Resolver::visit_This(Expr::This& expr)
     {
+        if (this->_current_classtype == ClassType::NONE) {
+            throw ResolveError("Using 'this' outside of a class method", &expr.diagnostics_token);
+        }
+
         this->_resolve_local(expr, expr.this_tok.text);
     }
 }
