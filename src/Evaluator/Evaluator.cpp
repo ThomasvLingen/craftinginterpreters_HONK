@@ -108,7 +108,15 @@ namespace Honk
             return val.get_as<honk_int_t>() != 0;
         }
 
-        return val.get_as<bool>();
+        if (val.is_a<bool>()) {
+            return val.get_as<bool>();
+        }
+
+        if (val.is_a<ClassInstance::s_ptr>()) {
+            return true;
+        }
+
+        throw this->_error("Attempting to test truthyness of invalid value. Can only check truthyness of: null, bool, string, integers, and instances");
     }
 
     bool Evaluator::_is_equal(const Value& a, const Value& b)
